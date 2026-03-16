@@ -20,18 +20,6 @@ const RADIUS_OPTIONS = [
 const SPACING_KEYS = ["1", "2", "3", "4", "5", "6", "8", "10", "12", "16"] as const;
 
 export function LayoutTab({ tokens, onTokenChange }: LayoutTabProps) {
-  function handleRadiusPreset(key: string, value: string) {
-    onTokenChange(`--radius-${key === "none" ? "none" : key === "full" ? "full" : `${key}-prim`}`, value);
-    // Also update the main --radius token to use a sensible default
-    if (key === "md") {
-      onTokenChange("--radius", value);
-    }
-  }
-
-  function getActiveRadius(): string {
-    return tokens.primitives.radius.md;
-  }
-
   return (
     <div className="space-y-6 p-4">
       {/* Border Radius */}
