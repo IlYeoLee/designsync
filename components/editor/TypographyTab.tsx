@@ -8,6 +8,7 @@ interface TypographyTabProps {
   tokens: TokenState;
   onTokenChange: (variable: string, value: string) => void;
   onFontFamilyChange: (font: string) => void;
+  onFontUpload?: (fontName: string) => void;
 }
 
 /** Input that displays px value but stores/emits rem values */
@@ -63,11 +64,12 @@ function RemPxInput({
   );
 }
 
-export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange }: TypographyTabProps) {
+export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFontUpload }: TypographyTabProps) {
   const [fontSearch, setFontSearch] = React.useState("");
   const [localFonts, setLocalFonts] = React.useState<string[]>([]);
   const [localFontsLoading, setLocalFontsLoading] = React.useState(false);
   const [fontSection, setFontSection] = React.useState<"google" | "local">("google");
+  const [fontUploadStatus, setFontUploadStatus] = React.useState<{ loading: boolean; font: string; result: Record<string, unknown> | null } | null>(null);
 
   const filteredGoogleFonts = GOOGLE_FONTS.filter((f) =>
     f.toLowerCase().includes(fontSearch.toLowerCase())
@@ -94,6 +96,21 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange }: Typ
   function handleSelectFont(font: string, isGoogle: boolean) {
     if (isGoogle) injectGoogleFont(font);
     onFontFamilyChange(font);
+    if (isGoogle) {
+      setFontUploadStatus({ loading: true, font, result: null });
+      fetch('/api/font', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fontName: font }),
+      })
+        .then(r => r.json())
+        .then(data => {
+          setFontUploadStatus({ loading: false, font, result: data });
+          if (onFontUpload) onFontUpload(font);
+          setTimeout(() => setFontUploadStatus(null), 5000);
+        })
+        .catch(() => setFontUploadStatus({ loading: false, font, result: { error: 'Network error' } }));
+    }
   }
 
   const fontSizeKeys = ["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl", "5xl"] as const;
@@ -112,6 +129,22 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange }: Typ
           <p className="text-base font-normal">The quick brown fox</p>
           <p className="text-sm text-muted-foreground">{tokens.primitives.fontFamily}</p>
         </div>
+
+        {fontUploadStatus && (
+          <div className={`mb-3 px-3 py-2 rounded-md text-xs border ${
+            fontUploadStatus.loading
+              ? "bg-muted/50 border-border text-muted-foreground"
+              : fontUploadStatus.result?.error
+              ? "bg-destructive/10 border-destructive/30 text-destructive"
+              : "bg-success-50 border-success-200 text-success-700"
+          }`}>
+            {fontUploadStatus.loading
+              ? `Uploading ${fontUploadStatus.font} to registry...`
+              : fontUploadStatus.result?.error
+              ? `✗ Upload failed: ${fontUploadStatus.result.error as string}`
+              : `✓ Uploaded! shadcn add ${fontUploadStatus.result?.registryUrl as string}`}
+          </div>
+        )}
 
         <div className="flex border border-border rounded-md overflow-hidden mb-2">
           {(["google", "local"] as const).map((sec) => (
