@@ -1,6 +1,10 @@
 "use client";
 
 import * as React from "react";
+import { toast } from "sonner";
+import { Bar, BarChart, Line, LineChart, XAxis, YAxis } from "recharts";
+
+// Existing components
 import { Button } from "@/registry/new-york/ui/button";
 import { Badge } from "@/registry/new-york/ui/badge";
 import { Input } from "@/registry/new-york/ui/input";
@@ -19,7 +23,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/registry/new-york/ui
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/registry/new-york/ui/accordion";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/registry/new-york/ui/table";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/registry/new-york/ui/breadcrumb";
-import { AlertCircle, CheckCircle2, Info, Home } from "lucide-react";
+
+// New components
+import { Calendar } from "@/registry/new-york/ui/calendar";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/registry/new-york/ui/carousel";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/registry/new-york/ui/chart";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator, CommandShortcut } from "@/registry/new-york/ui/command";
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuLabel, ContextMenuSeparator, ContextMenuShortcut, ContextMenuTrigger } from "@/registry/new-york/ui/context-menu";
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/registry/new-york/ui/drawer";
+import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/registry/new-york/ui/input-otp";
+import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarTrigger } from "@/registry/new-york/ui/menubar";
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/registry/new-york/ui/navigation-menu";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/registry/new-york/ui/resizable";
+import { Toaster } from "@/registry/new-york/ui/sonner";
+import { TypographyH1, TypographyH2, TypographyH3, TypographyH4, TypographyP, TypographyBlockquote, TypographyCode, TypographyLead, TypographyMuted } from "@/registry/new-york/ui/typography";
+
+import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as CalendarIcon, Smile, Music, Search, Settings, User, LayoutDashboard, FileText } from "lucide-react";
 
 type PreviewCategory = "form" | "overlay" | "navigation" | "display" | "feedback";
 
@@ -31,10 +50,14 @@ const PREVIEW_CATEGORIES: { id: PreviewCategory; label: string }[] = [
   { id: "feedback", label: "Feedback" },
 ];
 
+// ─── Form ──────────────────────────────────────────────────────────────────────
+
 function FormPreview() {
   const [sliderVal, setSliderVal] = React.useState([50]);
   const [checked, setChecked] = React.useState(false);
   const [switched, setSwitched] = React.useState(false);
+  const [otpValue, setOtpValue] = React.useState("");
+  const [date, setDate] = React.useState<Date | undefined>(new Date());
 
   return (
     <div className="space-y-6">
@@ -71,6 +94,32 @@ function FormPreview() {
             <Label htmlFor="textarea-preview">Message</Label>
             <Textarea id="textarea-preview" placeholder="Type your message here..." rows={3} />
           </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* OTP Input */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Input OTP</h3>
+        <div className="space-y-2">
+          <Label>Verification code</Label>
+          <InputOTP maxLength={6} value={otpValue} onChange={setOtpValue}>
+            <InputOTPGroup>
+              <InputOTPSlot index={0} />
+              <InputOTPSlot index={1} />
+              <InputOTPSlot index={2} />
+            </InputOTPGroup>
+            <InputOTPSeparator />
+            <InputOTPGroup>
+              <InputOTPSlot index={3} />
+              <InputOTPSlot index={4} />
+              <InputOTPSlot index={5} />
+            </InputOTPGroup>
+          </InputOTP>
+          {otpValue && (
+            <p className="text-xs text-muted-foreground">Entered: {otpValue}</p>
+          )}
         </div>
       </div>
 
@@ -116,25 +165,147 @@ function FormPreview() {
           <p className="text-xs text-muted-foreground">Value: {sliderVal[0]}</p>
         </div>
       </div>
+
+      <Separator />
+
+      {/* Calendar */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Calendar</h3>
+        <Calendar
+          mode="single"
+          selected={date}
+          onSelect={setDate}
+          className="rounded-md border border-border w-fit"
+        />
+      </div>
     </div>
   );
 }
 
+// ─── Overlay ───────────────────────────────────────────────────────────────────
+
 function OverlayPreview() {
   return (
     <div className="space-y-6">
+      {/* Drawer */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-3">Tooltip Hint</h3>
-        <p className="text-xs text-muted-foreground mb-4">
-          Interactive overlays (Dialog, Dropdown, Popover, Sheet, Tooltip) require user interaction.
-          Below is a static representation.
-        </p>
+        <h3 className="text-sm font-medium text-foreground mb-3">Drawer</h3>
+        <Drawer>
+          <DrawerTrigger asChild>
+            <Button variant="outline">Open Drawer</Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <div className="mx-auto w-full max-w-sm">
+              <DrawerHeader>
+                <DrawerTitle>Edit Profile</DrawerTitle>
+                <DrawerDescription>
+                  Make changes to your profile here. Click save when done.
+                </DrawerDescription>
+              </DrawerHeader>
+              <div className="p-4 space-y-3">
+                <div className="space-y-1.5">
+                  <Label>Name</Label>
+                  <Input placeholder="Your name" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Username</Label>
+                  <Input placeholder="@username" />
+                </div>
+              </div>
+              <DrawerFooter>
+                <Button>Save changes</Button>
+                <DrawerClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DrawerClose>
+              </DrawerFooter>
+            </div>
+          </DrawerContent>
+        </Drawer>
+      </div>
+
+      <Separator />
+
+      {/* Command */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Command</h3>
+        <Command className="rounded-lg border border-border shadow-md max-w-sm">
+          <CommandInput placeholder="Type a command or search..." />
+          <CommandList>
+            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandGroup heading="Suggestions">
+              <CommandItem>
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                <span>Calendar</span>
+              </CommandItem>
+              <CommandItem>
+                <Smile className="mr-2 h-4 w-4" />
+                <span>Search Emoji</span>
+              </CommandItem>
+              <CommandItem>
+                <Calculator className="mr-2 h-4 w-4" />
+                <span>Calculator</span>
+              </CommandItem>
+            </CommandGroup>
+            <CommandSeparator />
+            <CommandGroup heading="Settings">
+              <CommandItem>
+                <User className="mr-2 h-4 w-4" />
+                <span>Profile</span>
+                <CommandShortcut>⌘P</CommandShortcut>
+              </CommandItem>
+              <CommandItem>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
+                <CommandShortcut>⌘S</CommandShortcut>
+              </CommandItem>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </div>
+
+      <Separator />
+
+      {/* Context Menu */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Context Menu</h3>
+        <ContextMenu>
+          <ContextMenuTrigger>
+            <div className="flex h-20 w-full max-w-sm items-center justify-center rounded-md border border-dashed border-border text-sm text-muted-foreground cursor-default select-none">
+              Right-click here
+            </div>
+          </ContextMenuTrigger>
+          <ContextMenuContent className="w-48">
+            <ContextMenuLabel>Actions</ContextMenuLabel>
+            <ContextMenuSeparator />
+            <ContextMenuItem>
+              <FileText className="mr-2 h-4 w-4" />
+              Open
+              <ContextMenuShortcut>⌘O</ContextMenuShortcut>
+            </ContextMenuItem>
+            <ContextMenuItem>
+              Rename
+              <ContextMenuShortcut>F2</ContextMenuShortcut>
+            </ContextMenuItem>
+            <ContextMenuSeparator />
+            <ContextMenuItem className="text-destructive focus:text-destructive">
+              Delete
+              <ContextMenuShortcut>⌫</ContextMenuShortcut>
+            </ContextMenuItem>
+          </ContextMenuContent>
+        </ContextMenu>
+      </div>
+
+      <Separator />
+
+      {/* Static: Dialog / Dropdown / Popover / Tooltip */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Dialog / Dropdown / Popover / Tooltip</h3>
         <div className="grid grid-cols-2 gap-3">
           <Card className="p-3">
             <p className="text-xs font-medium mb-2">Dialog</p>
             <div className="bg-muted rounded-md p-3 text-xs text-muted-foreground border border-border">
               <p className="font-medium text-foreground mb-1">Modal Title</p>
-              <p>Modal content area with actions below.</p>
+              <p>Modal content area.</p>
               <div className="flex gap-2 mt-2">
                 <Button size="sm" variant="outline">Cancel</Button>
                 <Button size="sm">Confirm</Button>
@@ -145,29 +316,10 @@ function OverlayPreview() {
             <p className="text-xs font-medium mb-2">Dropdown</p>
             <div className="bg-popover rounded-md p-1 border border-border shadow-md text-xs w-full">
               {["Profile", "Settings", "Help", "Sign out"].map((item, i) => (
-                <div
-                  key={item}
-                  className={`px-2 py-1.5 rounded hover:bg-accent cursor-default ${i === 3 ? "text-destructive" : ""}`}
-                >
+                <div key={item} className={`px-2 py-1.5 rounded hover:bg-accent cursor-default ${i === 3 ? "text-destructive" : ""}`}>
                   {item}
                 </div>
               ))}
-            </div>
-          </Card>
-          <Card className="p-3">
-            <p className="text-xs font-medium mb-2">Popover</p>
-            <div className="bg-popover rounded-md p-3 border border-border shadow-md text-xs">
-              <p className="font-medium text-foreground mb-1">Popover</p>
-              <p className="text-muted-foreground">Quick info panel content.</p>
-            </div>
-          </Card>
-          <Card className="p-3">
-            <p className="text-xs font-medium mb-2">Tooltip</p>
-            <div className="flex items-center gap-2">
-              <Button size="sm" variant="outline">Hover me</Button>
-              <div className="bg-foreground text-background text-xs px-2 py-1 rounded">
-                Tooltip text
-              </div>
             </div>
           </Card>
         </div>
@@ -176,18 +328,107 @@ function OverlayPreview() {
   );
 }
 
+// ─── Navigation ────────────────────────────────────────────────────────────────
+
 function NavigationPreview() {
   return (
     <div className="space-y-6">
+      {/* Menubar */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Menubar</h3>
+        <Menubar>
+          <MenubarMenu>
+            <MenubarTrigger>File</MenubarTrigger>
+            <MenubarContent>
+              <MenubarItem>New Tab <MenubarShortcut>⌘T</MenubarShortcut></MenubarItem>
+              <MenubarItem>New Window <MenubarShortcut>⌘N</MenubarShortcut></MenubarItem>
+              <MenubarSeparator />
+              <MenubarItem>Save <MenubarShortcut>⌘S</MenubarShortcut></MenubarItem>
+            </MenubarContent>
+          </MenubarMenu>
+          <MenubarMenu>
+            <MenubarTrigger>Edit</MenubarTrigger>
+            <MenubarContent>
+              <MenubarItem>Undo <MenubarShortcut>⌘Z</MenubarShortcut></MenubarItem>
+              <MenubarItem>Redo <MenubarShortcut>⇧⌘Z</MenubarShortcut></MenubarItem>
+              <MenubarSeparator />
+              <MenubarItem>Cut</MenubarItem>
+              <MenubarItem>Copy</MenubarItem>
+              <MenubarItem>Paste</MenubarItem>
+            </MenubarContent>
+          </MenubarMenu>
+          <MenubarMenu>
+            <MenubarTrigger>View</MenubarTrigger>
+            <MenubarContent>
+              <MenubarItem>Zoom In</MenubarItem>
+              <MenubarItem>Zoom Out</MenubarItem>
+            </MenubarContent>
+          </MenubarMenu>
+        </Menubar>
+      </div>
+
+      <Separator />
+
+      {/* Navigation Menu */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Navigation Menu</h3>
+        <NavigationMenu>
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid gap-3 p-4 w-[300px]">
+                  <li>
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()} href="#">
+                      <div>
+                        <div className="text-sm font-medium mb-1">Introduction</div>
+                        <p className="text-xs text-muted-foreground">Re-usable components built with Radix UI.</p>
+                      </div>
+                    </NavigationMenuLink>
+                  </li>
+                  <li>
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()} href="#">
+                      <div>
+                        <div className="text-sm font-medium mb-1">Installation</div>
+                        <p className="text-xs text-muted-foreground">How to install dependencies.</p>
+                      </div>
+                    </NavigationMenuLink>
+                  </li>
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuTrigger>Components</NavigationMenuTrigger>
+              <NavigationMenuContent>
+                <ul className="grid grid-cols-2 gap-2 p-4 w-[350px]">
+                  {["Alert", "Button", "Card", "Dialog", "Input", "Select"].map((name) => (
+                    <li key={name}>
+                      <NavigationMenuLink className={navigationMenuTriggerStyle()} href="#">
+                        {name}
+                      </NavigationMenuLink>
+                    </li>
+                  ))}
+                </ul>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()} href="#">
+                Docs
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
+      </div>
+
+      <Separator />
+
       {/* Breadcrumb */}
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">Breadcrumb</h3>
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="#">
-                <Home className="w-3.5 h-3.5" />
-              </BreadcrumbLink>
+              <BreadcrumbLink href="#"><Home className="w-3.5 h-3.5" /></BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -213,30 +454,51 @@ function NavigationPreview() {
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="account" className="mt-3">
-            <Card>
-              <CardHeader>
-                <CardTitle>Account</CardTitle>
-                <CardDescription>Manage your account settings.</CardDescription>
-              </CardHeader>
-            </Card>
+            <Card><CardHeader><CardTitle>Account</CardTitle><CardDescription>Manage your account settings.</CardDescription></CardHeader></Card>
           </TabsContent>
           <TabsContent value="password" className="mt-3">
-            <Card>
-              <CardHeader>
-                <CardTitle>Password</CardTitle>
-                <CardDescription>Change your password here.</CardDescription>
-              </CardHeader>
-            </Card>
+            <Card><CardHeader><CardTitle>Password</CardTitle><CardDescription>Change your password here.</CardDescription></CardHeader></Card>
           </TabsContent>
           <TabsContent value="settings" className="mt-3">
-            <Card>
-              <CardHeader>
-                <CardTitle>Settings</CardTitle>
-                <CardDescription>Manage your preferences.</CardDescription>
-              </CardHeader>
-            </Card>
+            <Card><CardHeader><CardTitle>Settings</CardTitle><CardDescription>Manage your preferences.</CardDescription></CardHeader></Card>
           </TabsContent>
         </Tabs>
+      </div>
+
+      <Separator />
+
+      {/* Sidebar Preview (static mockup) */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Sidebar</h3>
+        <div className="flex rounded-lg border border-border overflow-hidden h-48">
+          <div className="w-44 bg-sidebar border-r border-sidebar-border flex flex-col p-2 gap-0.5">
+            <div className="px-2 py-1.5 mb-1">
+              <span className="text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider">App</span>
+            </div>
+            {[
+              { icon: LayoutDashboard, label: "Dashboard", active: true },
+              { icon: FileText, label: "Documents", active: false },
+              { icon: CalendarIcon, label: "Calendar", active: false },
+              { icon: Settings, label: "Settings", active: false },
+            ].map(({ icon: Icon, label, active }) => (
+              <div
+                key={label}
+                className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-xs cursor-default transition-colors ${
+                  active
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50"
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {label}
+              </div>
+            ))}
+          </div>
+          <div className="flex-1 bg-background p-4">
+            <p className="text-xs font-medium text-foreground mb-1">Main Content</p>
+            <p className="text-xs text-muted-foreground">Sidebar layout preview</p>
+          </div>
+        </div>
       </div>
 
       <Separator />
@@ -258,9 +520,154 @@ function NavigationPreview() {
   );
 }
 
+// ─── Display ───────────────────────────────────────────────────────────────────
+
+const chartData = [
+  { month: "Jan", revenue: 4200, users: 240 },
+  { month: "Feb", revenue: 5800, users: 310 },
+  { month: "Mar", revenue: 4900, users: 280 },
+  { month: "Apr", revenue: 7200, users: 420 },
+  { month: "May", revenue: 6100, users: 380 },
+  { month: "Jun", revenue: 8400, users: 510 },
+];
+
+const barChartConfig = {
+  revenue: { label: "Revenue", color: "var(--brand-500)" },
+  users: { label: "Users", color: "var(--brand-300)" },
+} satisfies ChartConfig;
+
+const lineChartConfig = {
+  users: { label: "Users", color: "var(--brand-500)" },
+} satisfies ChartConfig;
+
 function DisplayPreview() {
   return (
     <div className="space-y-6">
+      {/* Typography */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Typography</h3>
+        <div className="space-y-2 max-w-lg">
+          <TypographyH1>Heading 1</TypographyH1>
+          <TypographyH2>Heading 2</TypographyH2>
+          <TypographyH3>Heading 3</TypographyH3>
+          <TypographyH4>Heading 4</TypographyH4>
+          <TypographyLead>A lead paragraph introduces the section with slightly larger text.</TypographyLead>
+          <TypographyP>Regular paragraph text. The quick brown fox jumps over the lazy dog.</TypographyP>
+          <TypographyBlockquote>
+            "Design is not just what it looks like. Design is how it works." — Steve Jobs
+          </TypographyBlockquote>
+          <TypographyCode>npm install @designsync/ui</TypographyCode>
+          <TypographyMuted>This is muted / helper text for secondary information.</TypographyMuted>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Chart — Bar */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Chart — Bar</h3>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Monthly Revenue</CardTitle>
+            <CardDescription>January – June 2024</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={barChartConfig} className="h-48 w-full">
+              <BarChart data={chartData}>
+                <XAxis dataKey="month" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+                <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="revenue" fill="var(--color-revenue)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Separator />
+
+      {/* Chart — Line */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Chart — Line</h3>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">User Growth</CardTitle>
+            <CardDescription>Active users over time</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={lineChartConfig} className="h-48 w-full">
+              <LineChart data={chartData}>
+                <XAxis dataKey="month" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+                <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Line type="monotone" dataKey="users" stroke="var(--color-users)" strokeWidth={2} dot={{ r: 3 }} />
+              </LineChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Separator />
+
+      {/* Carousel */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Carousel</h3>
+        <Carousel className="w-full max-w-sm mx-auto">
+          <CarouselContent>
+            {[
+              { title: "Component Library", desc: "47 production-ready components", color: "bg-brand-100" },
+              { title: "Design Tokens", desc: "2-layer token system with primitives", color: "bg-brand-200" },
+              { title: "Dark Mode", desc: "Full dark mode support out of the box", color: "bg-brand-300" },
+              { title: "Customizable", desc: "Edit tokens and preview in real time", color: "bg-brand-400" },
+            ].map((item, i) => (
+              <CarouselItem key={i}>
+                <Card>
+                  <CardContent className="flex flex-col items-center justify-center p-8 text-center gap-2 h-36">
+                    <Badge variant="secondary">{i + 1} / 4</Badge>
+                    <p className="font-semibold text-sm">{item.title}</p>
+                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                  </CardContent>
+                </Card>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious />
+          <CarouselNext />
+        </Carousel>
+      </div>
+
+      <Separator />
+
+      {/* Resizable */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Resizable</h3>
+        <ResizablePanelGroup direction="horizontal" className="rounded-lg border border-border h-32 max-w-lg">
+          <ResizablePanel defaultSize={50} minSize={20}>
+            <div className="flex h-full items-center justify-center p-4">
+              <p className="text-xs text-muted-foreground font-medium">Left Panel</p>
+            </div>
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel defaultSize={50} minSize={20}>
+            <ResizablePanelGroup direction="vertical">
+              <ResizablePanel defaultSize={50}>
+                <div className="flex h-full items-center justify-center p-2">
+                  <p className="text-xs text-muted-foreground">Top Right</p>
+                </div>
+              </ResizablePanel>
+              <ResizableHandle withHandle />
+              <ResizablePanel defaultSize={50}>
+                <div className="flex h-full items-center justify-center p-2">
+                  <p className="text-xs text-muted-foreground">Bottom Right</p>
+                </div>
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
+
+      <Separator />
+
       {/* Cards & Badges */}
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">Card & Badges</h3>
@@ -317,9 +724,7 @@ function DisplayPreview() {
                 <TableCell className="font-medium">{row.name}</TableCell>
                 <TableCell>{row.role}</TableCell>
                 <TableCell>
-                  <Badge variant={row.status === "Active" ? "default" : "secondary"}>
-                    {row.status}
-                  </Badge>
+                  <Badge variant={row.status === "Active" ? "default" : "secondary"}>{row.status}</Badge>
                 </TableCell>
               </TableRow>
             ))}
@@ -356,8 +761,7 @@ function DisplayPreview() {
         <div className="space-y-3 max-w-sm">
           <div className="space-y-1">
             <div className="flex justify-between text-xs text-muted-foreground mb-1">
-              <span>Upload progress</span>
-              <span>68%</span>
+              <span>Upload progress</span><span>68%</span>
             </div>
             <Progress value={68} />
           </div>
@@ -372,66 +776,78 @@ function DisplayPreview() {
   );
 }
 
+// ─── Feedback ──────────────────────────────────────────────────────────────────
+
 function FeedbackPreview() {
   return (
-    <div className="space-y-4">
-      <h3 className="text-sm font-medium text-foreground mb-3">Alerts</h3>
-
-      <Alert>
-        <Info className="h-4 w-4" />
-        <AlertTitle>Information</AlertTitle>
-        <AlertDescription>
-          Your account has been successfully updated with the new settings.
-        </AlertDescription>
-      </Alert>
-
-      <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
-        <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-        <AlertTitle className="text-green-800 dark:text-green-200">Success</AlertTitle>
-        <AlertDescription className="text-green-700 dark:text-green-300">
-          Your changes have been saved and deployed successfully.
-        </AlertDescription>
-      </Alert>
-
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Error</AlertTitle>
-        <AlertDescription>
-          Failed to connect to the server. Please check your network connection.
-        </AlertDescription>
-      </Alert>
+    <div className="space-y-6">
+      {/* Sonner */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Sonner Toast</h3>
+        <Toaster />
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" size="sm" onClick={() => toast("Event has been created")}>
+            Default
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => toast.success("Saved successfully!", { description: "Your design tokens have been updated." })}>
+            Success
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => toast.error("Deploy failed", { description: "Check your API credentials and try again." })}>
+            Error
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => toast.warning("Unsaved changes", { description: "You have unsaved changes that will be lost." })}>
+            Warning
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => toast.info("Update available", { description: "A new version is available for download." })}>
+            Info
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => toast.loading("Deploying...", { description: "Pushing changes to Vercel." })}>
+            Loading
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => toast("File saved", {
+            action: { label: "Undo", onClick: () => console.log("Undo") },
+          })}>
+            With Action
+          </Button>
+        </div>
+      </div>
 
       <Separator />
 
-      <h3 className="text-sm font-medium text-foreground mb-3">Toast Simulation</h3>
-      <div className="space-y-2">
-        <div className="flex items-center gap-3 bg-foreground text-background px-4 py-3 rounded-md shadow-lg max-w-sm">
-          <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0" />
-          <div className="flex-1">
-            <p className="text-sm font-medium">Saved successfully</p>
-            <p className="text-xs opacity-70">Your design tokens have been updated.</p>
-          </div>
-          <button className="text-xs opacity-50 hover:opacity-100">×</button>
-        </div>
-        <div className="flex items-center gap-3 bg-destructive text-white px-4 py-3 rounded-md shadow-lg max-w-sm">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
-          <div className="flex-1">
-            <p className="text-sm font-medium">Deploy failed</p>
-            <p className="text-xs opacity-70">Check your API credentials and try again.</p>
-          </div>
-          <button className="text-xs opacity-50 hover:opacity-100">×</button>
+      {/* Alerts */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Alert</h3>
+        <div className="space-y-3">
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertTitle>Information</AlertTitle>
+            <AlertDescription>Your account has been successfully updated.</AlertDescription>
+          </Alert>
+          <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
+            <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+            <AlertTitle className="text-green-800 dark:text-green-200">Success</AlertTitle>
+            <AlertDescription className="text-green-700 dark:text-green-300">
+              Your changes have been saved and deployed successfully.
+            </AlertDescription>
+          </Alert>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>Failed to connect to the server. Please check your network connection.</AlertDescription>
+          </Alert>
         </div>
       </div>
     </div>
   );
 }
 
+// ─── Root ──────────────────────────────────────────────────────────────────────
+
 export function PreviewPanel() {
   const [category, setCategory] = React.useState<PreviewCategory>("form");
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-background">
-      {/* Category tabs */}
       <div className="border-b border-border bg-card flex items-center px-4 gap-1 flex-shrink-0 overflow-x-auto">
         {PREVIEW_CATEGORIES.map((cat) => (
           <button
@@ -448,7 +864,6 @@ export function PreviewPanel() {
         ))}
       </div>
 
-      {/* Preview content */}
       <div className="flex-1 overflow-y-auto p-6">
         <div className="max-w-2xl mx-auto">
           {category === "form" && <FormPreview />}
