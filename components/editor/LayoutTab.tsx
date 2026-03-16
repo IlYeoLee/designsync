@@ -18,8 +18,22 @@ const RADIUS_OPTIONS = [
 ] as const;
 
 const SPACING_KEYS = ["1", "2", "3", "4", "5", "6", "8", "10", "12", "16"] as const;
+const SHADOW_LEVELS = [
+  { key: "sm", label: "SM", yOffset: 1, defaultBlur: 2, defaultSpread: 0, defaultOpacity: 0.05 },
+  { key: "md", label: "MD", yOffset: 4, defaultBlur: 6, defaultSpread: -1, defaultOpacity: 0.10 },
+  { key: "lg", label: "LG", yOffset: 10, defaultBlur: 15, defaultSpread: -3, defaultOpacity: 0.10 },
+] as const;
 
-/** Input showing px, but stores/emits rem. For 9999px edge case, bypasses conversion. */
+function parseShadow(shadowStr: string, yOffset: number): { blur: number; spread: number; opacity: number } {
+  const m = shadowStr.match(/0\s+\d+px\s+(\d+)px\s+(-?\d+)px\s+oklch\([^/]+\/\s*([\d.]+)\)/);
+  if (m) return { blur: parseInt(m[1]), spread: parseInt(m[2]), opacity: parseFloat(m[3]) };
+  return { blur: yOffset * 2, spread: 0, opacity: 0.05 };
+}
+
+function buildShadow(yOffset: number, blur: number, spread: number, opacity: number): string {
+  return `0 ${yOffset}px ${blur}px ${spread}px oklch(0 0 0 / ${opacity.toFixed(2)})`;
+}
+
 function RemPxInput({
   value,
   onChange,
@@ -34,7 +48,6 @@ function RemPxInput({
   const isSpecial = value === "0px" || value === "9999px";
   const remVal = isSpecial ? (value === "9999px" ? 9999 : 0) : parseFloat(value) || 0;
   const pxVal = isSpecial ? (value === "9999px" ? 9999 : 0) : Math.round(remVal * 16);
-  const displayUnit = isSpecial ? "px" : "px";
 
   const [inputPx, setInputPx] = React.useState(String(pxVal));
   const [focused, setFocused] = React.useState(false);
@@ -69,7 +82,7 @@ function RemPxInput({
         className="w-12 h-full text-xs px-1.5 bg-transparent font-mono text-right focus:outline-none"
       />
       <span className="text-[10px] text-muted-foreground px-1.5 bg-muted/30 h-full flex items-center border-l border-input select-none">
-        {displayUnit}
+        px
       </span>
     </div>
   );
@@ -153,10 +166,69 @@ export function LayoutTab({ tokens, onTokenChange }: LayoutTabProps) {
         </div>
       </div>
 
+      {/* Shadows */}
+      <div>
+        <p className="text-xs font-medium text-foreground mb-3">Shadows</p>
+        <div className="space-y-5">
+          {SHADOW_LEVELS.map(({ key, label, yOffset }) => {
+            const currentShadow = tokens.primitives.shadows?.[key] ??
+              `0 ${yOffset}px ${yOffset * 2}px 0px oklch(0 0 0 / 0.05)`;
+            const { blur, spread, opacity } = parseShadow(currentShadow, yOffset);
+
+            function update(newBlur: number, newSpread: number, newOpacity: number) {
+              onTokenChange(`--ds-shadow-${key}`, buildShadow(yOffset, newBlur, newSpread, newOpacity));
+            }
+
+            return (
+              <div key={key}>
+                {/* Preview */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs text-muted-foreground w-6 font-mono">{label}</span>
+                  <div
+                    className="flex-1 h-8 rounded-md bg-background border border-border/50"
+                    style={{ boxShadow: currentShadow }}
+                  />
+                </div>
+                {/* Blur */}
+                <div className="flex items-center gap-2 mb-1 pl-8">
+                  <span className="text-[10px] text-muted-foreground w-10">Blur</span>
+                  <input
+                    type="range" min={0} max={30} step={1} value={blur}
+                    onChange={(e) => update(+e.target.value, spread, opacity)}
+                    className="flex-1 h-1.5 accent-primary"
+                  />
+                  <span className="text-[10px] font-mono text-muted-foreground w-8 text-right">{blur}px</span>
+                </div>
+                {/* Spread */}
+                <div className="flex items-center gap-2 mb-1 pl-8">
+                  <span className="text-[10px] text-muted-foreground w-10">Spread</span>
+                  <input
+                    type="range" min={-10} max={10} step={1} value={spread}
+                    onChange={(e) => update(blur, +e.target.value, opacity)}
+                    className="flex-1 h-1.5 accent-primary"
+                  />
+                  <span className="text-[10px] font-mono text-muted-foreground w-8 text-right">{spread}px</span>
+                </div>
+                {/* Opacity */}
+                <div className="flex items-center gap-2 pl-8">
+                  <span className="text-[10px] text-muted-foreground w-10">Opacity</span>
+                  <input
+                    type="range" min={0} max={0.5} step={0.01} value={opacity}
+                    onChange={(e) => update(blur, spread, +e.target.value)}
+                    className="flex-1 h-1.5 accent-primary"
+                  />
+                  <span className="text-[10px] font-mono text-muted-foreground w-8 text-right">{Math.round(opacity * 100)}%</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="rounded-md bg-muted/50 p-3 border border-border">
         <p className="text-xs text-muted-foreground">
-          All values are stored as rem internally. The <code className="font-mono text-xs">--radius</code> semantic
-          token follows the MD radius value by default.
+          Shadows use <code className="font-mono text-xs">shadow-sm/md/lg</code> Tailwind utilities via CSS var wiring.
+          Spacing changes affect all <code className="font-mono text-xs">p-*</code>, <code className="font-mono text-xs">gap-*</code> utilities.
         </p>
       </div>
     </div>
