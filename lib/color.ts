@@ -58,36 +58,42 @@ export const PALETTE_LIGHTNESS: Record<string, number> = {
   "800": 0.30, "900": 0.22,
 };
 
-/** Chroma factor relative to max (at step 600) */
+/**
+ * Chroma factor for each step, normalized so peak (500–600) = 1.0.
+ * Matches Tailwind's natural saturation curve: vivid at mid-tones, soft at extremes.
+ */
 export const PALETTE_CHROMA_FACTOR: Record<string, number> = {
-  "50": 0.09, "100": 0.23, "200": 0.41, "300": 0.59,
-  "400": 0.77, "500": 0.91, "600": 1.0, "700": 0.91,
-  "800": 0.73, "900": 0.55,
+  "50":  0.08, "100": 0.21, "200": 0.42, "300": 0.63,
+  "400": 0.83, "500": 1.00, "600": 1.00, "700": 0.88,
+  "800": 0.71, "900": 0.54,
 };
-
-const BASE_L_AT_600 = 0.48; // default lightness for step 600
 
 /**
  * Generate a full 50-900 color scale from a hex color.
- * The picked color's tone is preserved: its hue/chroma/lightness are used as
- * the reference for step 600, and other steps are shifted proportionally.
+ *
+ * Algorithm:
+ * - Hue & chroma are extracted from the input hex.
+ * - Each step uses the ABSOLUTE lightness from PALETTE_LIGHTNESS (no shifting).
+ *   This prevents all light steps from clamping to L≈0.98 when the input is
+ *   lighter than the canonical step-600 lightness (0.48).
+ * - Step 600 stores the original hex for exact round-trip fidelity.
+ * - All other steps use `oklch(L C H)` with L from the canonical curve
+ *   and C = inputC × PALETTE_CHROMA_FACTOR[step].
  */
 export function generatePaletteFromHex(hex: string): Record<string, string> | null {
   const oklch = hexToOklch(hex);
   if (!oklch) return null;
-  const { l: baseL, c, h } = oklch;
+  const { c, h } = oklch;
   const steps = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900"];
   const result: Record<string, string> = {};
   for (const step of steps) {
     if (step === "600") {
-      // Preserve the exact input hex at step 600 for perfect round-trip fidelity
       result[step] = hex;
       continue;
     }
     const targetL = PALETTE_LIGHTNESS[step];
-    const shiftedL = Math.max(0.05, Math.min(0.98, baseL + (targetL - BASE_L_AT_600)));
     const stepC = Math.max(0, c * PALETTE_CHROMA_FACTOR[step]);
-    result[step] = `oklch(${shiftedL.toFixed(3)} ${stepC.toFixed(3)} ${Math.round(h)})`;
+    result[step] = `oklch(${targetL.toFixed(3)} ${stepC.toFixed(3)} ${Math.round(h)})`;
   }
   return result;
 }
