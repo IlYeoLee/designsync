@@ -12,11 +12,20 @@ type Tab = "colors" | "typography" | "layout";
 interface EditorPanelProps {
   tokens: TokenState;
   onTokenChange: (variable: string, value: string) => void;
+  onBatchChange: (changes: { variable: string; value: string }[]) => void;
+  onSemanticChange: (mode: "light" | "dark", key: string, value: string) => void;
   onFontFamilyChange: (font: string) => void;
   history: HistoryEntry[];
 }
 
-export function EditorPanel({ tokens, onTokenChange, onFontFamilyChange, history }: EditorPanelProps) {
+export function EditorPanel({
+  tokens,
+  onTokenChange,
+  onBatchChange,
+  onSemanticChange,
+  onFontFamilyChange,
+  history,
+}: EditorPanelProps) {
   const [activeTab, setActiveTab] = React.useState<Tab>("colors");
   const [historyOpen, setHistoryOpen] = React.useState(true);
 
@@ -54,10 +63,15 @@ export function EditorPanel({ tokens, onTokenChange, onFontFamilyChange, history
         ))}
       </div>
 
-      {/* Tab content - scrollable */}
+      {/* Tab content */}
       <div className="flex-1 overflow-y-auto min-h-0">
         {activeTab === "colors" && (
-          <ColorTab tokens={tokens} onTokenChange={onTokenChange} />
+          <ColorTab
+            tokens={tokens}
+            onTokenChange={onTokenChange}
+            onBatchChange={onBatchChange}
+            onSemanticChange={onSemanticChange}
+          />
         )}
         {activeTab === "typography" && (
           <TypographyTab
@@ -79,11 +93,7 @@ export function EditorPanel({ tokens, onTokenChange, onFontFamilyChange, history
             onClick={() => setHistoryOpen(!historyOpen)}
           >
             <span className="font-medium">Recent Changes ({history.length})</span>
-            {historyOpen ? (
-              <ChevronDown className="w-3.5 h-3.5" />
-            ) : (
-              <ChevronUp className="w-3.5 h-3.5" />
-            )}
+            {historyOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
           </button>
           {historyOpen && (
             <div className="px-4 pb-3 space-y-1.5 max-h-32 overflow-y-auto">
@@ -93,17 +103,13 @@ export function EditorPanel({ tokens, onTokenChange, onFontFamilyChange, history
                   <div className="flex-1 min-w-0">
                     <code className="text-[10px] text-foreground block truncate">{entry.variable}</code>
                     <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                      <span
-                        className="w-3 h-3 rounded-sm border border-border inline-block flex-shrink-0"
-                        style={{ backgroundColor: entry.from }}
-                      />
-                      <span className="truncate">{entry.from}</span>
+                      <span className="w-3 h-3 rounded-sm border border-border inline-block flex-shrink-0"
+                        style={{ backgroundColor: entry.from }} />
+                      <span className="truncate max-w-[50px]">{entry.from}</span>
                       <span>→</span>
-                      <span
-                        className="w-3 h-3 rounded-sm border border-border inline-block flex-shrink-0"
-                        style={{ backgroundColor: entry.to }}
-                      />
-                      <span className="truncate">{entry.to}</span>
+                      <span className="w-3 h-3 rounded-sm border border-border inline-block flex-shrink-0"
+                        style={{ backgroundColor: entry.to }} />
+                      <span className="truncate max-w-[50px]">{entry.to}</span>
                     </div>
                   </div>
                   <span className="text-[9px] text-muted-foreground flex-shrink-0">

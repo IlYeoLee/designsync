@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Moon, Sun, Save, Copy, Check, Loader2 } from "lucide-react";
+import { Moon, Sun, Save, Copy, Check, Loader2, Undo2 } from "lucide-react";
 
 interface HeaderProps {
   isDark: boolean;
@@ -9,9 +9,11 @@ interface HeaderProps {
   onSave: () => void;
   isSaving: boolean;
   saveSuccess: boolean;
+  onUndo: () => void;
+  canUndo: boolean;
 }
 
-export function Header({ isDark, onToggleDark, onSave, isSaving, saveSuccess }: HeaderProps) {
+export function Header({ isDark, onToggleDark, onSave, isSaving, saveSuccess, onUndo, canUndo }: HeaderProps) {
   const [copied, setCopied] = React.useState(false);
 
   const handleCopyUrl = async () => {
@@ -19,9 +21,7 @@ export function Header({ isDark, onToggleDark, onSave, isSaving, saveSuccess }: 
       await navigator.clipboard.writeText("https://designsync-omega.vercel.app/r/designsync-all.json");
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // fallback
-    }
+    } catch { /* fallback */ }
   };
 
   return (
@@ -32,31 +32,32 @@ export function Header({ isDark, onToggleDark, onSave, isSaving, saveSuccess }: 
           <span className="text-primary-foreground text-xs font-bold">DS</span>
         </div>
         <span className="font-semibold text-sm text-foreground">DesignSync</span>
-        <span className="text-xs px-1.5 py-0.5 rounded-full bg-accent text-accent-foreground font-medium">
-          v1.0
-        </span>
+        <span className="text-xs px-1.5 py-0.5 rounded-full bg-accent text-accent-foreground font-medium">v1.0</span>
       </div>
 
-      {/* Spacer */}
       <div className="flex-1" />
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
         {/* Copy URL */}
-        <div className="relative group">
-          <button
-            onClick={handleCopyUrl}
-            className="h-8 px-3 rounded-md border border-border bg-background hover:bg-accent text-xs flex items-center gap-1.5 transition-colors"
-            title="Copy registry URL"
-          >
-            {copied ? (
-              <Check className="w-3.5 h-3.5 text-green-500" />
-            ) : (
-              <Copy className="w-3.5 h-3.5" />
-            )}
-            <span className="hidden sm:inline">{copied ? "Copied!" : "Copy URL"}</span>
-          </button>
-        </div>
+        <button
+          onClick={handleCopyUrl}
+          className="h-8 px-3 rounded-md border border-border bg-background hover:bg-accent text-xs flex items-center gap-1.5 transition-colors"
+          title="Copy registry URL"
+        >
+          {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+          <span className="hidden sm:inline">{copied ? "Copied!" : "Copy URL"}</span>
+        </button>
+
+        {/* Undo */}
+        <button
+          onClick={onUndo}
+          disabled={!canUndo}
+          className="h-8 w-8 rounded-md border border-border bg-background hover:bg-accent flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          title="Undo last change (Ctrl+Z)"
+        >
+          <Undo2 className="w-4 h-4" />
+        </button>
 
         {/* Dark mode toggle */}
         <button
@@ -64,14 +65,10 @@ export function Header({ isDark, onToggleDark, onSave, isSaving, saveSuccess }: 
           className="h-8 w-8 rounded-md border border-border bg-background hover:bg-accent flex items-center justify-center transition-colors"
           title={isDark ? "Switch to light mode" : "Switch to dark mode"}
         >
-          {isDark ? (
-            <Sun className="w-4 h-4" />
-          ) : (
-            <Moon className="w-4 h-4" />
-          )}
+          {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
         </button>
 
-        {/* Save button */}
+        {/* Save */}
         <button
           onClick={onSave}
           disabled={isSaving}
