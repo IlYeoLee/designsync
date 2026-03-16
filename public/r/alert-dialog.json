@@ -7,7 +7,7 @@
     "@radix-ui/react-alert-dialog"
   ],
   "registryDependencies": [
-    "http://localhost:3000/r/button.json"
+    "https://designsync-omega.vercel.app/r/button.json"
   ],
   "files": [
     {

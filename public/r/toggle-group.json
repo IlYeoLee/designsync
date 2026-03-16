@@ -7,7 +7,7 @@
     "@radix-ui/react-toggle-group"
   ],
   "registryDependencies": [
-    "http://localhost:3000/r/toggle.json"
+    "https://designsync-omega.vercel.app/r/toggle.json"
   ],
   "files": [
     {

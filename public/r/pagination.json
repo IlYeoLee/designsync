@@ -4,7 +4,7 @@
   "title": "Pagination",
   "description": "Pagination with page navigation, next and previous links.",
   "registryDependencies": [
-    "http://localhost:3000/r/button.json"
+    "https://designsync-omega.vercel.app/r/button.json"
   ],
   "files": [
     {
