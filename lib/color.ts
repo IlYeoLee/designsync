@@ -79,7 +79,11 @@ export function generatePaletteFromHex(hex: string): Record<string, string> | nu
   const steps = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900"];
   const result: Record<string, string> = {};
   for (const step of steps) {
-    // Shift lightness proportionally from the user's chosen base lightness
+    if (step === "600") {
+      // Preserve the exact input hex at step 600 for perfect round-trip fidelity
+      result[step] = hex;
+      continue;
+    }
     const targetL = PALETTE_LIGHTNESS[step];
     const shiftedL = Math.max(0.05, Math.min(0.98, baseL + (targetL - BASE_L_AT_600)));
     const stepC = Math.max(0, c * PALETTE_CHROMA_FACTOR[step]);
