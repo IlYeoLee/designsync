@@ -17,6 +17,7 @@ export type TokenState = {
     lineHeight: Record<'tight' | 'normal' | 'loose', string>;
     spacing: Record<'1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16', string>;
     radius: Record<'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full', string>;
+    shadows: Record<'sm' | 'md' | 'lg', string>;
   };
   semantic: {
     light: Record<string, string>;
@@ -135,6 +136,11 @@ export const DEFAULT_TOKENS: TokenState = {
       'xl': '0.75rem',
       'full': '9999px',
     },
+    shadows: {
+      sm: '0 1px 2px 0px oklch(0 0 0 / 0.05)',
+      md: '0 4px 6px -1px oklch(0 0 0 / 0.10)',
+      lg: '0 10px 15px -3px oklch(0 0 0 / 0.10)',
+    },
   },
   semantic: {
     light: {
@@ -230,6 +236,11 @@ export function applyTokensToDocument(tokens: TokenState): void {
   for (const [key, varName] of Object.entries(radiusMap)) {
     root.style.setProperty(varName, tokens.primitives.radius[key as keyof typeof tokens.primitives.radius]);
   }
+
+  // Apply shadows
+  root.style.setProperty('--ds-shadow-sm', tokens.primitives.shadows.sm);
+  root.style.setProperty('--ds-shadow-md', tokens.primitives.shadows.md);
+  root.style.setProperty('--ds-shadow-lg', tokens.primitives.shadows.lg);
 
   // Apply font family via --custom-font-family (used in @theme inline fallback chain)
   root.style.setProperty('--custom-font-family', tokens.primitives.fontFamily);
