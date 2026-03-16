@@ -51,10 +51,8 @@ export function hexToOklch(hex: string): { l: number; c: number; h: number } | n
   }
 }
 
-/**
- * Returns true if oklch(L, C, H) is representable in sRGB.
- * Uses the exact inverse OKLab → linear sRGB matrix.
- */
+// ─── Gamut helpers ────────────────────────────────────────────────────────────
+
 function isInSRGBGamut(l: number, c: number, h: number): boolean {
   const hRad = h * Math.PI / 180;
   const a = c * Math.cos(hRad);
@@ -81,15 +79,12 @@ function isInSRGBGamut(l: number, c: number, h: number): boolean {
 }
 
 /**
- * Binary-search the maximum sRGB-safe chroma for a given (L, H).
- * Searches in [0, maxC] with 24 iterations (~0.000024 precision).
- * H and L are never modified — zero hue shift guaranteed.
+ * Clamp chroma to the sRGB gamut boundary at fixed (L, H).
+ * Uses binary search — H is never modified, preventing hue drift.
  */
-function maxGamutChroma(l: number, h: number, maxC = 0.4): number {
-  // Quick check: if even the max is in gamut, return it directly
-  if (isInSRGBGamut(l, maxC, h)) return maxC;
-
-  let lo = 0, hi = maxC;
+function clampChromaToGamut(l: number, c: number, h: number): number {
+  if (isInSRGBGamut(l, c, h)) return c;
+  let lo = 0, hi = c;
   for (let i = 0; i < 24; i++) {
     const mid = (lo + hi) / 2;
     if (isInSRGBGamut(l, mid, h)) lo = mid;
@@ -98,39 +93,117 @@ function maxGamutChroma(l: number, h: number, maxC = 0.4): number {
   return lo;
 }
 
-/**
- * Target lightness for each palette step.
- * Step 600 is always overridden with the input color's actual L.
- * Evenly spaced, covering the full perceptual brightness range.
- */
-export const PALETTE_LIGHTNESS: Record<string, number> = {
-  "50": 0.97, "100": 0.90, "200": 0.80, "300": 0.70,
-  "400": 0.60, "500": 0.50, "600": 0.44, // 600 is overridden at runtime
-  "700": 0.35, "800": 0.25, "900": 0.15,
+// ─── Tone curve ───────────────────────────────────────────────────────────────
+
+type ToneEntry = {
+  /** Target lightness. null = use input color's actual L (600 anchor). */
+  l: number | null;
+  /** Chroma multiplier relative to the input color's C at 600. */
+  cMul: number;
+  /** Degrees to shift hue. Positive = toward higher H (greener for lime). */
+  hShift: number;
 };
 
 /**
- * Generate a full 50–900 oklch palette from a hex color.
+ * Base tone curve — same shape as Tailwind v3/shadcn oklch palettes.
+ * 600 uses l:null so the seed color's actual lightness is preserved exactly.
+ */
+const BASE_TONE_CURVE: Record<string, ToneEntry> = {
+  "50":  { l: 0.97, cMul: 0.12, hShift: 0 },
+  "100": { l: 0.93, cMul: 0.22, hShift: 0 },
+  "200": { l: 0.87, cMul: 0.38, hShift: 0 },
+  "300": { l: 0.79, cMul: 0.58, hShift: 0 },
+  "400": { l: 0.71, cMul: 0.78, hShift: 0 },
+  "500": { l: 0.64, cMul: 0.92, hShift: 0 },
+  "600": { l: null, cMul: 1.00, hShift: 0 },
+  "700": { l: 0.54, cMul: 0.86, hShift: 0 },
+  "800": { l: 0.46, cMul: 0.68, hShift: 0 },
+  "900": { l: 0.38, cMul: 0.50, hShift: 0 },
+};
+
+/** Keep PALETTE_LIGHTNESS exported — used in other editor tabs. */
+export const PALETTE_LIGHTNESS: Record<string, number> = Object.fromEntries(
+  Object.entries(BASE_TONE_CURVE).map(([k, v]) => [k, v.l ?? 0.44])
+);
+
+// ─── Hue-family detection & corrections ───────────────────────────────────────
+
+type HueFamily = 'lime' | 'mint' | 'default';
+
+function detectHueFamily(h: number, c: number): HueFamily {
+  if (c < 0.05) return 'default'; // near-achromatic
+  // Lime / yellow-green: 80°–145°
+  if (h >= 80 && h < 145) return 'lime';
+  // Mint / teal-green: 145°–190°
+  if (h >= 145 && h < 190) return 'mint';
+  return 'default';
+}
+
+/**
+ * Layer family-specific corrections on top of the base tone entry.
+ *
+ * Lime (80°–145°):
+ *   Light tones — reduce cMul to prevent neon-yellow cast.
+ *   Dark tones  — shift H toward pure green (+) to prevent brown/olive cast.
+ *
+ * Mint (145°–190°):
+ *   Light tones — reduce cMul strongly to prevent highlighter/neon look.
+ *   Dark tones  — shift H away from cyan/teal (−) to prevent teal drift.
+ */
+function applyFamilyCorrections(step: string, entry: ToneEntry, family: HueFamily): ToneEntry {
+  const t = { ...entry };
+  const n = parseInt(step, 10);
+
+  if (family === 'lime') {
+    if (n <= 100) t.cMul *= 0.75;
+    else if (n <= 200) t.cMul *= 0.82;
+    else if (n <= 300) t.cMul *= 0.90;
+    if (n === 700) t.hShift = +4;
+    else if (n === 800) t.hShift = +7;
+    else if (n === 900) t.hShift = +10;
+  } else if (family === 'mint') {
+    if (n <= 100) t.cMul *= 0.50;
+    else if (n <= 200) t.cMul *= 0.62;
+    else if (n <= 300) t.cMul *= 0.75;
+    else if (n <= 400) t.cMul *= 0.87;
+    if (n === 700) t.hShift = -4;
+    else if (n === 800) t.hShift = -7;
+    else if (n === 900) t.hShift = -10;
+  }
+
+  return t;
+}
+
+// ─── Main palette generator ───────────────────────────────────────────────────
+
+/**
+ * Generate a full 50–900 oklch palette from a seed hex color.
  *
  * Algorithm:
- * 1. Extract oklch { l, c, h } from the input hex.
- * 2. Step 600 = original hex (pixel-perfect anchor — no L forcing).
- * 3. All other steps use the fixed L values from PALETTE_LIGHTNESS.
- * 4. For each step, binary-search the MAXIMUM chroma in [0, 0.4]
- *    that keeps oklch(L, C, H) within the sRGB gamut.
- *    → This ensures every step is as vivid as physically possible,
- *      not artificially desaturated by a chroma factor table.
- * 5. H is always inputH — zero hue shift across the entire scale.
+ * 1. Convert hex → oklch(inputL, inputC, inputH).
+ * 2. Detect hue family (lime / mint / default) for family corrections.
+ * 3. Step 600 = original hex (pixel-perfect anchor).
+ * 4. For every other step:
+ *    a. Target L  = BASE_TONE_CURVE[step].l
+ *    b. Target H  = inputH + hShift  (family correction, ±0–10°)
+ *    c. Target C  = inputC × cMul   (base × family correction)
+ *    d. Gamut map : if (L, C, H) is outside sRGB, binary-search the
+ *       maximum in-gamut chroma while keeping L and H fixed.
+ * 5. Console-log each step's final L/C/H plus any gamut-clip notes.
  */
 export function generatePaletteFromHex(hex: string): Record<string, string> | null {
   const oklch = hexToOklch(hex);
   if (!oklch) return null;
   const { l: inputL, c: inputC, h: inputH } = oklch;
 
+  const family = detectHueFamily(inputH, inputC);
   const steps = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900"] as const;
   const result: Record<string, string> = {};
 
-  console.group(`[palette] ${hex}  L=${inputL.toFixed(3)} C=${inputC.toFixed(3)} H=${inputH.toFixed(1)}°`);
+  console.group(
+    `[palette] ${hex}  L=${inputL.toFixed(3)} C=${inputC.toFixed(3)} H=${inputH.toFixed(1)}°` +
+    (family !== 'default' ? `  family=${family}` : '')
+  );
 
   for (const step of steps) {
     if (step === "600") {
@@ -139,15 +212,23 @@ export function generatePaletteFromHex(hex: string): Record<string, string> | nu
       continue;
     }
 
-    const targetL = PALETTE_LIGHTNESS[step];
-    const bestC = maxGamutChroma(targetL, inputH);
-    const wasClipped = bestC < 0.4 - 0.001; // nearly always true for saturated hues
+    const base = BASE_TONE_CURVE[step];
+    const entry = applyFamilyCorrections(step, base, family);
 
-    result[step] = `oklch(${targetL.toFixed(3)} ${bestC.toFixed(4)} ${inputH.toFixed(2)})`;
+    const targetL = entry.l!;
+    const targetH = ((inputH + entry.hShift) % 360 + 360) % 360;
+    const nominalC = inputC * entry.cMul;
+    const finalC = clampChromaToGamut(targetL, nominalC, targetH);
+    const clipped = finalC < nominalC - 0.0005;
 
+    result[step] = `oklch(${targetL.toFixed(3)} ${finalC.toFixed(4)} ${targetH.toFixed(2)})`;
+
+    const hTag = entry.hShift !== 0 ? ` hShift=${entry.hShift > 0 ? '+' : ''}${entry.hShift}°` : '';
+    const cTag = clipped
+      ? `  ⚠ gamut C ${nominalC.toFixed(3)}→${finalC.toFixed(3)}`
+      : '';
     console.log(
-      `  ${step.padStart(3)}  L=${targetL.toFixed(3)} C=${bestC.toFixed(4)} H=${inputH.toFixed(1)}°` +
-      (wasClipped ? `  (gamut-mapped from 0.4)` : `  (full chroma)`)
+      `  ${step.padStart(3)}  L=${targetL.toFixed(3)} C=${finalC.toFixed(4)} H=${targetH.toFixed(1)}°${hTag}${cTag}`
     );
   }
 
