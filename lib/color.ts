@@ -52,8 +52,8 @@ export function hexToOklch(hex: string): { l: number; c: number; h: number } | n
 }
 
 /**
- * Check if an oklch(L, C, H) color is within the sRGB gamut.
- * Uses the inverse OKLab → linear sRGB matrix.
+ * Returns true if oklch(L, C, H) is representable in sRGB.
+ * Uses the exact inverse OKLab → linear sRGB matrix.
  */
 function isInSRGBGamut(l: number, c: number, h: number): boolean {
   const hRad = h * Math.PI / 180;
@@ -81,111 +81,74 @@ function isInSRGBGamut(l: number, c: number, h: number): boolean {
 }
 
 /**
- * Binary-search for the maximum chroma that keeps oklch(L, C, H) in sRGB.
- * H and L are held fixed — no hue shift.
- * Returns the mapped chroma and whether clipping occurred.
+ * Binary-search the maximum sRGB-safe chroma for a given (L, H).
+ * Searches in [0, maxC] with 24 iterations (~0.000024 precision).
+ * H and L are never modified — zero hue shift guaranteed.
  */
-function mapToGamut(l: number, c: number, h: number): { c: number; clipped: boolean } {
-  if (isInSRGBGamut(l, c, h)) return { c, clipped: false };
+function maxGamutChroma(l: number, h: number, maxC = 0.4): number {
+  // Quick check: if even the max is in gamut, return it directly
+  if (isInSRGBGamut(l, maxC, h)) return maxC;
 
-  let lo = 0, hi = c;
-  for (let i = 0; i < 20; i++) {
+  let lo = 0, hi = maxC;
+  for (let i = 0; i < 24; i++) {
     const mid = (lo + hi) / 2;
     if (isInSRGBGamut(l, mid, h)) lo = mid;
     else hi = mid;
   }
-  return { c: lo, clipped: true };
+  return lo;
 }
 
 /**
- * Perceptual lightness for each palette step (oklch L, 0–1).
- * Canonical anchors: 50 = 0.97 (lightest), 600 = 0.44 (base), 900 = 0.15 (darkest).
+ * Target lightness for each palette step.
+ * Step 600 is always overridden with the input color's actual L.
+ * Evenly spaced, covering the full perceptual brightness range.
  */
 export const PALETTE_LIGHTNESS: Record<string, number> = {
-  "50": 0.97, "100": 0.93, "200": 0.86, "300": 0.76,
-  "400": 0.64, "500": 0.54, "600": 0.44, "700": 0.35,
-  "800": 0.25, "900": 0.15,
-};
-
-/** Canonical lightness anchors used for curve re-scaling */
-const CANON_L50  = 0.97;
-const CANON_L600 = 0.44;
-const CANON_L900 = 0.15;
-
-/**
- * Re-scale the lightness curve so that step 600 lands exactly on inputL.
- * Steps lighter than 600 are proportionally stretched between 0.97 and inputL.
- * Steps darker than 600 are proportionally stretched between inputL and 0.15.
- */
-function anchoredLightness(step: string, inputL: number): number {
-  if (step === "600") return inputL;
-  const canonL = PALETTE_LIGHTNESS[step];
-  const stepNum = parseInt(step);
-
-  if (stepNum < 600) {
-    // t = 0 at step 50, t = 1 at step 600 (canonical)
-    const t = (canonL - CANON_L50) / (CANON_L600 - CANON_L50);
-    return CANON_L50 + t * (inputL - CANON_L50);
-  } else {
-    // t = 0 at step 600, t = 1 at step 900 (canonical)
-    const t = (canonL - CANON_L600) / (CANON_L900 - CANON_L600);
-    return inputL + t * (CANON_L900 - inputL);
-  }
-}
-
-/**
- * Chroma factor for each step, normalized so peak (500–600) = 1.0.
- * Vivid at mid-tones, muted at extremes.
- */
-export const PALETTE_CHROMA_FACTOR: Record<string, number> = {
-  "50":  0.08, "100": 0.21, "200": 0.42, "300": 0.63,
-  "400": 0.83, "500": 1.00, "600": 1.00, "700": 0.88,
-  "800": 0.71, "900": 0.54,
+  "50": 0.97, "100": 0.90, "200": 0.80, "300": 0.70,
+  "400": 0.60, "500": 0.50, "600": 0.44, // 600 is overridden at runtime
+  "700": 0.35, "800": 0.25, "900": 0.15,
 };
 
 /**
- * Generate a full 50-900 color scale from a hex color.
+ * Generate a full 50–900 oklch palette from a hex color.
  *
  * Algorithm:
  * 1. Extract oklch { l, c, h } from the input hex.
- * 2. Step 600 anchors to the original hex (pixel-perfect match).
- * 3. All other steps use anchoredLightness() to re-scale the canonical
- *    L-curve so that 600 aligns with the input's actual lightness.
- * 4. Chroma = inputC × PALETTE_CHROMA_FACTOR[step].
- * 5. Binary-search gamut mapping: if oklch(L, C, H) is out of sRGB,
- *    reduce C until in-gamut while keeping L and H fixed.
- * 6. Console logs: hue per step (should be ±2° of input) + gamut-clip notices.
+ * 2. Step 600 = original hex (pixel-perfect anchor — no L forcing).
+ * 3. All other steps use the fixed L values from PALETTE_LIGHTNESS.
+ * 4. For each step, binary-search the MAXIMUM chroma in [0, 0.4]
+ *    that keeps oklch(L, C, H) within the sRGB gamut.
+ *    → This ensures every step is as vivid as physically possible,
+ *      not artificially desaturated by a chroma factor table.
+ * 5. H is always inputH — zero hue shift across the entire scale.
  */
 export function generatePaletteFromHex(hex: string): Record<string, string> | null {
   const oklch = hexToOklch(hex);
   if (!oklch) return null;
   const { l: inputL, c: inputC, h: inputH } = oklch;
 
-  const steps = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900"];
+  const steps = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900"] as const;
   const result: Record<string, string> = {};
 
-  console.group(`[palette] input: ${hex}  oklch(${inputL.toFixed(3)} ${inputC.toFixed(3)} ${inputH.toFixed(1)}°)`);
+  console.group(`[palette] ${hex}  L=${inputL.toFixed(3)} C=${inputC.toFixed(3)} H=${inputH.toFixed(1)}°`);
 
   for (const step of steps) {
     if (step === "600") {
       result[step] = hex;
-      console.log(`  600 → anchor  hue=${inputH.toFixed(1)}° (original hex)`);
+      console.log(`  600  anchor  L=${inputL.toFixed(3)} C=${inputC.toFixed(3)} H=${inputH.toFixed(1)}° (original hex)`);
       continue;
     }
 
-    const targetL = anchoredLightness(step, inputL);
-    const nominalC = inputC * PALETTE_CHROMA_FACTOR[step];
-    const { c: mappedC, clipped } = mapToGamut(targetL, nominalC, inputH);
+    const targetL = PALETTE_LIGHTNESS[step];
+    const bestC = maxGamutChroma(targetL, inputH);
+    const wasClipped = bestC < 0.4 - 0.001; // nearly always true for saturated hues
 
-    result[step] = `oklch(${targetL.toFixed(3)} ${mappedC.toFixed(3)} ${Math.round(inputH)})`;
+    result[step] = `oklch(${targetL.toFixed(3)} ${bestC.toFixed(4)} ${inputH.toFixed(2)})`;
 
-    const hueDiff = 0; // H is never changed — hue shift is always 0
-    const hueOk = Math.abs(hueDiff) <= 2;
-    if (clipped) {
-      console.log(`  ${step.padStart(3)} → GAMUT CLIP  L=${targetL.toFixed(3)}  C ${nominalC.toFixed(3)} → ${mappedC.toFixed(3)}  hue=${Math.round(inputH)}° ${hueOk ? "✓" : "⚠"}`);
-    } else {
-      console.log(`  ${step.padStart(3)} → ok         L=${targetL.toFixed(3)}  C=${mappedC.toFixed(3)}  hue=${Math.round(inputH)}° ✓`);
-    }
+    console.log(
+      `  ${step.padStart(3)}  L=${targetL.toFixed(3)} C=${bestC.toFixed(4)} H=${inputH.toFixed(1)}°` +
+      (wasClipped ? `  (gamut-mapped from 0.4)` : `  (full chroma)`)
+    );
   }
 
   console.groupEnd();
