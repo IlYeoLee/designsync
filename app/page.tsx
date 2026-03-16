@@ -197,6 +197,23 @@ export default function Home() {
     ].slice(0, 10));
   }
 
+  // ── Reset ───────────────────────────────────────────────────────
+  function handleReset() {
+    setSnapshots((prev) => [...prev.slice(-19), tokens]);
+    setTokens(DEFAULT_TOKENS);
+    applyTokensToDocument(DEFAULT_TOKENS);
+    document.documentElement.style.setProperty("--custom-font-family", DEFAULT_TOKENS.primitives.fontFamily);
+    document.body.style.fontFamily = DEFAULT_TOKENS.primitives.fontFamily;
+    const semanticTokens = isDark ? DEFAULT_TOKENS.semantic.dark : DEFAULT_TOKENS.semantic.light;
+    Object.entries(semanticTokens).forEach(([key, value]) => {
+      document.documentElement.style.setProperty(`--${key}`, value);
+    });
+    setHistory((prev) => [
+      { variable: "reset", from: "(custom)", to: "(defaults)", timestamp: new Date() },
+      ...prev,
+    ].slice(0, 10));
+  }
+
   // ── Save ────────────────────────────────────────────────────────
   async function handleSave() {
     setIsSaving(true);
@@ -230,6 +247,7 @@ export default function Home() {
         saveSuccess={saveSuccess}
         onUndo={handleUndo}
         canUndo={snapshots.length > 0}
+        onReset={handleReset}
       />
       <div className="flex-1 flex overflow-hidden">
         <EditorPanel
