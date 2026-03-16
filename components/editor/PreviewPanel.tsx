@@ -23,6 +23,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/registry/new-york/ui
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/registry/new-york/ui/accordion";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/registry/new-york/ui/table";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/registry/new-york/ui/breadcrumb";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/registry/new-york/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/registry/new-york/ui/popover";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/registry/new-york/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from "@/registry/new-york/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/registry/new-york/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/registry/new-york/ui/radio-group";
+import { Toggle } from "@/registry/new-york/ui/toggle";
+import { ToggleGroup, ToggleGroupItem } from "@/registry/new-york/ui/toggle-group";
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/registry/new-york/ui/sheet";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/registry/new-york/ui/collapsible";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/registry/new-york/ui/hover-card";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/registry/new-york/ui/alert-dialog";
+import { ScrollArea } from "@/registry/new-york/ui/scroll-area";
+import { AspectRatio } from "@/registry/new-york/ui/aspect-ratio";
 
 // New components
 import { Calendar } from "@/registry/new-york/ui/calendar";
@@ -38,7 +52,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/registry
 import { Toaster } from "@/registry/new-york/ui/sonner";
 import { TypographyH1, TypographyH2, TypographyH3, TypographyH4, TypographyP, TypographyBlockquote, TypographyCode, TypographyLead, TypographyMuted } from "@/registry/new-york/ui/typography";
 
-import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as CalendarIcon, Smile, Settings, User, LayoutDashboard, FileText } from "lucide-react";
+import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as CalendarIcon, Smile, Settings, User, LayoutDashboard, FileText, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, ChevronsUpDown, ChevronDown } from "lucide-react";
 
 type PreviewCategory = "form" | "overlay" | "navigation" | "display" | "feedback";
 
@@ -297,34 +311,319 @@ function OverlayPreview() {
 
       <Separator />
 
-      {/* Static: Dialog / Dropdown / Popover / Tooltip */}
+      {/* Dialog */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-3">Dialog / Dropdown / Popover / Tooltip</h3>
-        <div className="grid grid-cols-2 gap-3">
-          <Card className="p-3">
-            <p className="text-xs font-medium mb-2">Dialog</p>
-            <div className="bg-muted rounded-md p-3 text-xs text-muted-foreground border border-border">
-              <p className="font-medium text-foreground mb-1">Modal Title</p>
-              <p>Modal content area.</p>
-              <div className="flex gap-2 mt-2">
-                <Button size="sm" variant="outline">Cancel</Button>
-                <Button size="sm">Confirm</Button>
+        <h3 className="text-sm font-medium text-foreground mb-3">Dialog</h3>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">Open Dialog</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Edit Profile</DialogTitle>
+              <DialogDescription>Make changes to your profile here. Click save when done.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3 py-2">
+              <div className="space-y-1.5">
+                <Label>Name</Label>
+                <Input placeholder="Your name" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Username</Label>
+                <Input placeholder="@username" />
               </div>
             </div>
-          </Card>
-          <Card className="p-3">
-            <p className="text-xs font-medium mb-2">Dropdown</p>
-            <div className="bg-popover rounded-md p-1 border border-border shadow-md text-xs w-full">
-              {["Profile", "Settings", "Help", "Sign out"].map((item, i) => (
-                <div key={item} className={`px-2 py-1.5 rounded hover:bg-accent cursor-default ${i === 3 ? "text-destructive" : ""}`}>
-                  {item}
-                </div>
-              ))}
+            <DialogFooter>
+              <Button variant="outline">Cancel</Button>
+              <Button>Save changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <Separator />
+
+      {/* AlertDialog */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Alert Dialog</h3>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive">Delete Account</Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete your account and remove all data.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction>Continue</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+
+      <Separator />
+
+      {/* Sheet */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Sheet</h3>
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline">Open Sheet</Button>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Edit Profile</SheetTitle>
+              <SheetDescription>Make changes to your profile here. Click save when done.</SheetDescription>
+            </SheetHeader>
+            <div className="space-y-3 py-4">
+              <div className="space-y-1.5">
+                <Label>Name</Label>
+                <Input placeholder="Your name" />
+              </div>
             </div>
-          </Card>
+            <SheetFooter>
+              <Button>Save changes</Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+      </div>
+
+      <Separator />
+
+      {/* Dropdown Menu */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Dropdown Menu</h3>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">Open Menu <ChevronDown className="ml-2 h-4 w-4" /></Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-48">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <User className="mr-2 h-4 w-4" /> Profile <DropdownMenuShortcut>⌘P</DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Settings className="mr-2 h-4 w-4" /> Settings <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="text-destructive focus:text-destructive">Sign out</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+      <Separator />
+
+      {/* Popover */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Popover</h3>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline">Open Popover</Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-72">
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium">Dimensions</h4>
+              <p className="text-xs text-muted-foreground">Set the dimensions for the layer.</p>
+              <div className="grid grid-cols-3 items-center gap-3">
+                <Label className="text-right text-xs">Width</Label>
+                <Input defaultValue="100%" className="col-span-2 h-7 text-xs" />
+              </div>
+              <div className="grid grid-cols-3 items-center gap-3">
+                <Label className="text-right text-xs">Max. width</Label>
+                <Input defaultValue="300px" className="col-span-2 h-7 text-xs" />
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      <Separator />
+
+      {/* Tooltip */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Tooltip</h3>
+        <TooltipProvider>
+          <div className="flex gap-3">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="sm">Hover me</Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>This is a tooltip</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="icon" className="h-8 w-8">
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Open settings</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
+      </div>
+
+      <Separator />
+
+      {/* HoverCard */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Hover Card</h3>
+        <HoverCard>
+          <HoverCardTrigger asChild>
+            <Button variant="link" className="text-sm p-0 h-auto">@designsync</Button>
+          </HoverCardTrigger>
+          <HoverCardContent className="w-64">
+            <div className="flex gap-3">
+              <Avatar>
+                <AvatarFallback>DS</AvatarFallback>
+              </Avatar>
+              <div>
+                <h4 className="text-sm font-medium">DesignSync</h4>
+                <p className="text-xs text-muted-foreground mt-0.5">Design token editor for shadcn/ui.</p>
+                <p className="text-xs text-muted-foreground mt-1">Joined March 2024</p>
+              </div>
+            </div>
+          </HoverCardContent>
+        </HoverCard>
+      </div>
+
+      <Separator />
+
+      {/* Collapsible */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Collapsible</h3>
+        <CollapsibleDemo />
+      </div>
+
+      <Separator />
+
+      {/* Select */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Select</h3>
+        <div className="flex flex-wrap gap-3">
+          <Select>
+            <SelectTrigger className="w-44">
+              <SelectValue placeholder="Select a fruit" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="apple">Apple</SelectItem>
+              <SelectItem value="banana">Banana</SelectItem>
+              <SelectItem value="orange">Orange</SelectItem>
+              <SelectItem value="grape">Grape</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select defaultValue="react">
+            <SelectTrigger className="w-44">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="react">React</SelectItem>
+              <SelectItem value="vue">Vue</SelectItem>
+              <SelectItem value="svelte">Svelte</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* RadioGroup */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Radio Group</h3>
+        <RadioGroup defaultValue="comfortable">
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="default" id="r1" />
+            <Label htmlFor="r1">Default</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="comfortable" id="r2" />
+            <Label htmlFor="r2">Comfortable</Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="compact" id="r3" />
+            <Label htmlFor="r3">Compact</Label>
+          </div>
+        </RadioGroup>
+      </div>
+
+      <Separator />
+
+      {/* Toggle & ToggleGroup */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Toggle & Toggle Group</h3>
+        <div className="space-y-3">
+          <div className="flex gap-2">
+            <Toggle aria-label="Bold"><Bold className="h-4 w-4" /></Toggle>
+            <Toggle aria-label="Italic"><Italic className="h-4 w-4" /></Toggle>
+            <Toggle aria-label="Underline"><Underline className="h-4 w-4" /></Toggle>
+          </div>
+          <ToggleGroup type="single" defaultValue="center">
+            <ToggleGroupItem value="left" aria-label="Left"><AlignLeft className="h-4 w-4" /></ToggleGroupItem>
+            <ToggleGroupItem value="center" aria-label="Center"><AlignCenter className="h-4 w-4" /></ToggleGroupItem>
+            <ToggleGroupItem value="right" aria-label="Right"><AlignRight className="h-4 w-4" /></ToggleGroupItem>
+          </ToggleGroup>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* ScrollArea */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Scroll Area</h3>
+        <ScrollArea className="h-36 w-64 rounded-md border border-border p-3">
+          <div className="space-y-2">
+            {Array.from({ length: 12 }, (_, i) => (
+              <div key={i} className="text-xs text-muted-foreground">
+                Item {i + 1} — scroll to see more content below
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+
+      <Separator />
+
+      {/* AspectRatio */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Aspect Ratio</h3>
+        <div className="w-64">
+          <AspectRatio ratio={16 / 9} className="rounded-md overflow-hidden bg-muted border border-border">
+            <div className="flex items-center justify-center h-full text-xs text-muted-foreground">
+              16 / 9
+            </div>
+          </AspectRatio>
         </div>
       </div>
     </div>
+  );
+}
+
+function CollapsibleDemo() {
+  const [isOpen, setIsOpen] = React.useState(false);
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-72 space-y-2">
+      <div className="flex items-center justify-between">
+        <h4 className="text-sm font-medium">Starred repositories</h4>
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" size="sm" className="w-8 h-8 p-0">
+            <ChevronsUpDown className="h-4 w-4" />
+          </Button>
+        </CollapsibleTrigger>
+      </div>
+      <div className="rounded-md border border-border px-3 py-2 text-xs font-mono">@radix-ui/primitives</div>
+      <CollapsibleContent className="space-y-2">
+        <div className="rounded-md border border-border px-3 py-2 text-xs font-mono">@radix-ui/colors</div>
+        <div className="rounded-md border border-border px-3 py-2 text-xs font-mono">@stitches/react</div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
 
@@ -589,7 +888,7 @@ function DisplayPreview() {
       {/* Chart — Line */}
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">Chart — Line</h3>
-        <Card>
+        <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="text-sm">User Growth</CardTitle>
             <CardDescription>Active users over time</CardDescription>
@@ -671,7 +970,7 @@ function DisplayPreview() {
       {/* Cards & Badges */}
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">Card & Badges</h3>
-        <Card className="max-w-sm">
+        <Card className="max-w-sm shadow-md">
           <CardHeader>
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
@@ -823,10 +1122,15 @@ function FeedbackPreview() {
             <AlertTitle>Information</AlertTitle>
             <AlertDescription>Your account has been successfully updated.</AlertDescription>
           </Alert>
-          <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
-            <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-            <AlertTitle className="text-green-800 dark:text-green-200">Success</AlertTitle>
-            <AlertDescription className="text-green-700 dark:text-green-300">
+          <Alert
+            style={{
+              borderColor: "var(--success-300)",
+              backgroundColor: "var(--success-50)",
+            }}
+          >
+            <CheckCircle2 className="h-4 w-4" style={{ color: "var(--success-600)" }} />
+            <AlertTitle style={{ color: "var(--success-800)" }}>Success</AlertTitle>
+            <AlertDescription style={{ color: "var(--success-700)" }}>
               Your changes have been saved and deployed successfully.
             </AlertDescription>
           </Alert>
