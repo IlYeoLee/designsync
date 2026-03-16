@@ -24,9 +24,16 @@ interface ColorTabProps {
 export function ColorTab({ tokens, onTokenChange }: ColorTabProps) {
   const [activeColor, setActiveColor] = React.useState<{ scale: ColorScaleName; step: string } | null>(null);
 
-  function getSwatchHex(scale: ColorScaleName, step: string): string {
-    const value = tokens.primitives[scale][step as keyof ColorScale];
-    return oklchToHex(value);
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => { setMounted(true); }, []);
+
+  function getSwatchValue(scale: ColorScaleName, step: string): string {
+    return tokens.primitives[scale][step as keyof ColorScale];
+  }
+
+  function getPickerHex(scale: ColorScaleName, step: string): string {
+    if (!mounted) return '#000000';
+    return oklchToHex(tokens.primitives[scale][step as keyof ColorScale]);
   }
 
   function handleColorChange(scale: ColorScaleName, step: string, hex: string) {
@@ -44,29 +51,29 @@ export function ColorTab({ tokens, onTokenChange }: ColorTabProps) {
           </div>
           <div className="grid grid-cols-10 gap-1">
             {STEPS.map((step) => {
-              const hex = getSwatchHex(scale, step);
+              const value = getSwatchValue(scale, step);
               const isActive = activeColor?.scale === scale && activeColor?.step === step;
               return (
                 <div key={step} className="relative">
                   <button
-                    title={`${scale}-${step}: ${tokens.primitives[scale][step as keyof ColorScale]}`}
+                    title={`${scale}-${step}: ${value}`}
                     className={`
                       w-full aspect-square rounded-sm border-2 cursor-pointer transition-transform hover:scale-110
                       ${isActive ? "border-foreground scale-110 shadow-md" : "border-transparent"}
                     `}
-                    style={{ backgroundColor: hex }}
+                    style={{ backgroundColor: value }}
                     onClick={() => setActiveColor(isActive ? null : { scale, step })}
                   />
-                  {isActive && (
+                  {isActive && mounted && (
                     <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 z-20 bg-card border border-border rounded-md shadow-lg p-2 min-w-[120px]">
                       <p className="text-xs text-muted-foreground mb-1 font-mono">{scale}-{step}</p>
                       <input
                         type="color"
-                        value={hex}
+                        value={getPickerHex(scale, step)}
                         className="w-full h-8 rounded cursor-pointer border-0"
                         onChange={(e) => handleColorChange(scale, step, e.target.value)}
                       />
-                      <p className="text-xs font-mono text-center mt-1 text-muted-foreground">{hex}</p>
+                      <p className="text-xs font-mono text-center mt-1 text-muted-foreground">{value}</p>
                     </div>
                   )}
                 </div>
