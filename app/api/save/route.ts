@@ -1,26 +1,41 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN!;
-const GITHUB_REPO = process.env.GITHUB_REPO!; // "IlYeoLee/designsync"
+function getHeaders() {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) throw new Error("GITHUB_TOKEN env var is not set");
+  return {
+    Authorization: `Bearer ${token}`,
+    Accept: "application/vnd.github.v3+json",
+    "Content-Type": "application/json",
+  };
+}
 
-const GITHUB_HEADERS = {
-  Authorization: `Bearer ${GITHUB_TOKEN}`,
-  Accept: "application/vnd.github.v3+json",
-  "Content-Type": "application/json",
-};
+function getRepo() {
+  const repo = process.env.GITHUB_REPO;
+  if (!repo) throw new Error("GITHUB_REPO env var is not set");
+  return repo;
+}
+
+/** GET /api/save — env var health check (values hidden) */
+export async function GET() {
+  return NextResponse.json({
+    GITHUB_TOKEN: process.env.GITHUB_TOKEN ? "set" : "MISSING",
+    GITHUB_REPO: process.env.GITHUB_REPO ?? "MISSING",
+  });
+}
 
 /** Fetch a file from GitHub, returns { content, sha } or null if not found */
 async function getGitHubFile(
+  repo: string,
+  headers: Record<string, string>,
   path: string
 ): Promise<{ content: string; sha: string } | null> {
-  const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`;
-  const res = await fetch(url, { headers: GITHUB_HEADERS });
+  const url = `https://api.github.com/repos/${repo}/contents/${path}`;
+  const res = await fetch(url, { headers });
+  if (res.status === 404) return null;
   if (!res.ok) {
-    if (res.status === 404) return null;
     const err = await res.json().catch(() => ({}));
-    throw new Error(
-      `GitHub GET ${path} failed (${res.status}): ${JSON.stringify(err)}`
-    );
+    throw new Error(`GitHub GET ${path} failed (${res.status}): ${JSON.stringify(err)}`);
   }
   const data = await res.json();
   const content = Buffer.from(data.content, "base64").toString("utf-8");
@@ -29,12 +44,14 @@ async function getGitHubFile(
 
 /** Commit (create or update) a file on GitHub */
 async function commitGitHubFile(
+  repo: string,
+  headers: Record<string, string>,
   path: string,
   content: string,
   message: string,
   sha: string | null
 ): Promise<void> {
-  const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${path}`;
+  const url = `https://api.github.com/repos/${repo}/contents/${path}`;
   const body: Record<string, unknown> = {
     message,
     content: Buffer.from(content).toString("base64"),
@@ -43,14 +60,12 @@ async function commitGitHubFile(
 
   const res = await fetch(url, {
     method: "PUT",
-    headers: GITHUB_HEADERS,
+    headers,
     body: JSON.stringify(body),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(
-      `GitHub PUT ${path} failed (${res.status}): ${JSON.stringify(err)}`
-    );
+    throw new Error(`GitHub PUT ${path} failed (${res.status}): ${JSON.stringify(err)}`);
   }
 }
 
@@ -66,6 +81,10 @@ function resolveToken(
 
 export async function POST(req: NextRequest) {
   try {
+    // Resolve env vars inside handler — avoids module-init "Bearer undefined" bug
+    const repo = getRepo();
+    const headers = getHeaders();
+
     const body = await req.json();
     const { tokens, commitMessage = "chore: update design tokens" } = body;
 
@@ -78,29 +97,19 @@ export async function POST(req: NextRequest) {
     const { brand, neutral, error, success, warning, radius } =
       tokens.primitives;
 
-    for (const [step, val] of Object.entries(
-      brand as Record<string, string>
-    )) {
+    for (const [step, val] of Object.entries(brand as Record<string, string>)) {
       flatPrimitives[`--brand-${step}`] = val;
     }
-    for (const [step, val] of Object.entries(
-      neutral as Record<string, string>
-    )) {
+    for (const [step, val] of Object.entries(neutral as Record<string, string>)) {
       flatPrimitives[`--neutral-${step}`] = val;
     }
-    for (const [step, val] of Object.entries(
-      error as Record<string, string>
-    )) {
+    for (const [step, val] of Object.entries(error as Record<string, string>)) {
       flatPrimitives[`--error-${step}`] = val;
     }
-    for (const [step, val] of Object.entries(
-      success as Record<string, string>
-    )) {
+    for (const [step, val] of Object.entries(success as Record<string, string>)) {
       flatPrimitives[`--success-${step}`] = val;
     }
-    for (const [step, val] of Object.entries(
-      warning as Record<string, string>
-    )) {
+    for (const [step, val] of Object.entries(warning as Record<string, string>)) {
       flatPrimitives[`--warning-${step}`] = val;
     }
     flatPrimitives["--radius-none"] = radius.none;
@@ -149,7 +158,7 @@ export async function POST(req: NextRequest) {
 
     // 4. Fetch current tokens file from GitHub (gets content + sha)
     const TOKENS_PATH = "public/r/designsync-tokens.json";
-    const existing = await getGitHubFile(TOKENS_PATH);
+    const existing = await getGitHubFile(repo, headers, TOKENS_PATH);
 
     let tokensJson: Record<string, unknown> = {};
     if (existing) {
@@ -165,6 +174,8 @@ export async function POST(req: NextRequest) {
 
     // 5. Commit to GitHub (Vercel auto-deploys on push via GitHub integration)
     await commitGitHubFile(
+      repo,
+      headers,
       TOKENS_PATH,
       updatedContent,
       commitMessage,
