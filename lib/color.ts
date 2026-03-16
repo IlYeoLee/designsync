@@ -65,17 +65,25 @@ export const PALETTE_CHROMA_FACTOR: Record<string, number> = {
   "800": 0.73, "900": 0.55,
 };
 
-/** Generate a full 50-900 color scale from a hex color (treated as the 600 step) */
+const BASE_L_AT_600 = 0.48; // default lightness for step 600
+
+/**
+ * Generate a full 50-900 color scale from a hex color.
+ * The picked color's tone is preserved: its hue/chroma/lightness are used as
+ * the reference for step 600, and other steps are shifted proportionally.
+ */
 export function generatePaletteFromHex(hex: string): Record<string, string> | null {
   const oklch = hexToOklch(hex);
   if (!oklch) return null;
-  const { c, h } = oklch;
+  const { l: baseL, c, h } = oklch;
   const steps = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900"];
   const result: Record<string, string> = {};
   for (const step of steps) {
-    const l = PALETTE_LIGHTNESS[step];
+    // Shift lightness proportionally from the user's chosen base lightness
+    const targetL = PALETTE_LIGHTNESS[step];
+    const shiftedL = Math.max(0.05, Math.min(0.98, baseL + (targetL - BASE_L_AT_600)));
     const stepC = Math.max(0, c * PALETTE_CHROMA_FACTOR[step]);
-    result[step] = `oklch(${l} ${stepC.toFixed(3)} ${Math.round(h)})`;
+    result[step] = `oklch(${shiftedL.toFixed(3)} ${stepC.toFixed(3)} ${Math.round(h)})`;
   }
   return result;
 }

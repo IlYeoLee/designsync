@@ -227,4 +227,10 @@ export function applyTokensToDocument(tokens: TokenState): void {
   for (const [key, varName] of Object.entries(radiusMap)) {
     root.style.setProperty(varName, tokens.primitives.radius[key as keyof typeof tokens.primitives.radius]);
   }
+
+  // Apply font family via --custom-font-family (used in @theme inline fallback chain)
+  root.style.setProperty('--custom-font-family', tokens.primitives.fontFamily);
+  if (typeof document !== 'undefined') {
+    document.body.style.fontFamily = tokens.primitives.fontFamily;
+  }
 }
