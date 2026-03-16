@@ -82,22 +82,25 @@ export function LayoutTab({ tokens, onTokenChange }: LayoutTabProps) {
       <div>
         <p className="text-xs font-medium text-foreground mb-3">Border Radius</p>
         <div className="grid grid-cols-3 gap-2 mb-4">
-          {RADIUS_OPTIONS.map(({ key, label, value }) => (
-            <button
-              key={key}
-              onClick={() => {
-                onTokenChange(
-                  `--radius-${key === "none" ? "none" : key === "full" ? "full" : `${key}-prim`}`,
-                  value
-                );
-                onTokenChange("--radius", value === "9999px" ? "9999px" : value);
-              }}
-              className="flex flex-col items-center gap-2 p-2.5 rounded-md border border-border hover:border-primary/50 hover:bg-accent/30 transition-colors"
-            >
-              <div className="w-8 h-8 bg-primary" style={{ borderRadius: value }} />
-              <span className="text-[10px] text-muted-foreground">{label}</span>
-            </button>
-          ))}
+          {RADIUS_OPTIONS.map(({ key, label, value }) => {
+            const currentRadius = tokens.primitives.radius[key as keyof typeof tokens.primitives.radius];
+            return (
+              <button
+                key={key}
+                onClick={() => {
+                  onTokenChange(
+                    `--radius-${key === "none" ? "none" : key === "full" ? "full" : `${key}-prim`}`,
+                    value
+                  );
+                  onTokenChange("--radius", value === "9999px" ? "9999px" : value);
+                }}
+                className="flex flex-col items-center gap-2 p-2.5 rounded-md border border-border hover:border-primary/50 hover:bg-accent/30 transition-colors"
+              >
+                <div className="w-8 h-8 bg-primary" style={{ borderRadius: currentRadius }} />
+                <span className="text-[10px] text-muted-foreground">{label}</span>
+              </button>
+            );
+          })}
         </div>
 
         <p className="text-xs text-muted-foreground mb-2">Custom values</p>
