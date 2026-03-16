@@ -101,6 +101,12 @@ export default function Home() {
         next.primitives.radius[radiusMap[variable] as keyof typeof next.primitives.radius] = value;
         return next;
       }
+      const shadowMatch = variable.match(/^--ds-shadow-(sm|md|lg)$/);
+      if (shadowMatch) {
+        const level = shadowMatch[1] as keyof typeof next.primitives.shadows;
+        next.primitives.shadows[level] = value;
+        return next;
+      }
       return next;
     });
 
