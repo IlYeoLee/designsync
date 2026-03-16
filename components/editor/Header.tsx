@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Moon, Sun, Save, Copy, Check, Loader2, Undo2 } from "lucide-react";
+import { Moon, Sun, Save, Copy, Check, Loader2, Undo2, RotateCcw } from "lucide-react";
 
 interface HeaderProps {
   isDark: boolean;
@@ -11,10 +11,12 @@ interface HeaderProps {
   saveSuccess: boolean;
   onUndo: () => void;
   canUndo: boolean;
+  onReset: () => void;
 }
 
-export function Header({ isDark, onToggleDark, onSave, isSaving, saveSuccess, onUndo, canUndo }: HeaderProps) {
+export function Header({ isDark, onToggleDark, onSave, isSaving, saveSuccess, onUndo, canUndo, onReset }: HeaderProps) {
   const [copied, setCopied] = React.useState(false);
+  const [confirmReset, setConfirmReset] = React.useState(false);
 
   const handleCopyUrl = async () => {
     try {
@@ -23,6 +25,16 @@ export function Header({ isDark, onToggleDark, onSave, isSaving, saveSuccess, on
       setTimeout(() => setCopied(false), 2000);
     } catch { /* fallback */ }
   };
+
+  function handleResetClick() {
+    if (confirmReset) {
+      onReset();
+      setConfirmReset(false);
+    } else {
+      setConfirmReset(true);
+      setTimeout(() => setConfirmReset(false), 3000);
+    }
+  }
 
   return (
     <header className="h-12 border-b border-border bg-card flex items-center px-4 gap-4 flex-shrink-0 z-10">
@@ -47,6 +59,20 @@ export function Header({ isDark, onToggleDark, onSave, isSaving, saveSuccess, on
         >
           {copied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
           <span className="hidden sm:inline">{copied ? "Copied!" : "Copy URL"}</span>
+        </button>
+
+        {/* Reset */}
+        <button
+          onClick={handleResetClick}
+          className={`h-8 px-3 rounded-md border text-xs flex items-center gap-1.5 transition-colors ${
+            confirmReset
+              ? "border-destructive bg-destructive text-white hover:opacity-90"
+              : "border-border bg-background hover:bg-accent"
+          }`}
+          title="Reset all tokens to defaults"
+        >
+          <RotateCcw className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">{confirmReset ? "Confirm?" : "Reset"}</span>
         </button>
 
         {/* Undo */}
