@@ -519,6 +519,119 @@
       ]
     },
     {
+      "name": "calendar",
+      "type": "registry:ui",
+      "title": "Calendar",
+      "description": "A date field component that allows users to enter and edit date.",
+      "dependencies": ["react-day-picker", "date-fns"],
+      "registryDependencies": ["https://designsync-omega.vercel.app/r/button.json"],
+      "files": [{"path": "registry/new-york/ui/calendar.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "carousel",
+      "type": "registry:ui",
+      "title": "Carousel",
+      "description": "A carousel with motion and swipe built using Embla.",
+      "dependencies": ["embla-carousel-react"],
+      "files": [{"path": "registry/new-york/ui/carousel.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "chart",
+      "type": "registry:ui",
+      "title": "Chart",
+      "description": "Beautiful charts built using Recharts.",
+      "dependencies": ["recharts"],
+      "files": [{"path": "registry/new-york/ui/chart.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "command",
+      "type": "registry:ui",
+      "title": "Command",
+      "description": "Fast, composable, unstyled command menu for React.",
+      "dependencies": ["cmdk"],
+      "registryDependencies": ["https://designsync-omega.vercel.app/r/dialog.json"],
+      "files": [{"path": "registry/new-york/ui/command.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "context-menu",
+      "type": "registry:ui",
+      "title": "Context Menu",
+      "description": "Displays a menu to the user — such as a set of actions or functions — triggered by a right-click.",
+      "dependencies": ["@radix-ui/react-context-menu"],
+      "files": [{"path": "registry/new-york/ui/context-menu.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "drawer",
+      "type": "registry:ui",
+      "title": "Drawer",
+      "description": "A drawer component for React.",
+      "dependencies": ["vaul"],
+      "files": [{"path": "registry/new-york/ui/drawer.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "input-otp",
+      "type": "registry:ui",
+      "title": "Input OTP",
+      "description": "Accessible one-time password component with copy paste functionality.",
+      "dependencies": ["input-otp"],
+      "files": [{"path": "registry/new-york/ui/input-otp.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "menubar",
+      "type": "registry:ui",
+      "title": "Menubar",
+      "description": "A visually persistent menu common in desktop applications that provides quick access to a consistent set of commands.",
+      "dependencies": ["@radix-ui/react-menubar"],
+      "files": [{"path": "registry/new-york/ui/menubar.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "navigation-menu",
+      "type": "registry:ui",
+      "title": "Navigation Menu",
+      "description": "A collection of links for navigating websites.",
+      "dependencies": ["@radix-ui/react-navigation-menu"],
+      "files": [{"path": "registry/new-york/ui/navigation-menu.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "resizable",
+      "type": "registry:ui",
+      "title": "Resizable",
+      "description": "Accessible resizable panel groups and layouts with keyboard support.",
+      "dependencies": ["react-resizable-panels"],
+      "files": [{"path": "registry/new-york/ui/resizable.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "sidebar",
+      "type": "registry:ui",
+      "title": "Sidebar",
+      "description": "A composable, themeable and customizable sidebar component.",
+      "dependencies": ["@radix-ui/react-collapsible"],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/button.json",
+        "https://designsync-omega.vercel.app/r/input.json",
+        "https://designsync-omega.vercel.app/r/separator.json",
+        "https://designsync-omega.vercel.app/r/sheet.json",
+        "https://designsync-omega.vercel.app/r/skeleton.json",
+        "https://designsync-omega.vercel.app/r/tooltip.json"
+      ],
+      "files": [{"path": "registry/new-york/ui/sidebar.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "sonner",
+      "type": "registry:ui",
+      "title": "Sonner",
+      "description": "An opinionated toast component for React.",
+      "dependencies": ["sonner", "next-themes"],
+      "files": [{"path": "registry/new-york/ui/sonner.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "typography",
+      "type": "registry:ui",
+      "title": "Typography",
+      "description": "Styles for headings, paragraphs, lists and more.",
+      "files": [{"path": "registry/new-york/ui/typography.tsx", "type": "registry:ui"}]
+    },
+    {
       "name": "designsync-all",
       "type": "registry:ui",
       "title": "DesignSync All Components",
@@ -558,7 +671,20 @@
         "https://designsync-omega.vercel.app/r/tabs.json",
         "https://designsync-omega.vercel.app/r/toggle.json",
         "https://designsync-omega.vercel.app/r/toggle-group.json",
-        "https://designsync-omega.vercel.app/r/tooltip.json"
+        "https://designsync-omega.vercel.app/r/tooltip.json",
+        "https://designsync-omega.vercel.app/r/calendar.json",
+        "https://designsync-omega.vercel.app/r/carousel.json",
+        "https://designsync-omega.vercel.app/r/chart.json",
+        "https://designsync-omega.vercel.app/r/command.json",
+        "https://designsync-omega.vercel.app/r/context-menu.json",
+        "https://designsync-omega.vercel.app/r/drawer.json",
+        "https://designsync-omega.vercel.app/r/input-otp.json",
+        "https://designsync-omega.vercel.app/r/menubar.json",
+        "https://designsync-omega.vercel.app/r/navigation-menu.json",
+        "https://designsync-omega.vercel.app/r/resizable.json",
+        "https://designsync-omega.vercel.app/r/sidebar.json",
+        "https://designsync-omega.vercel.app/r/sonner.json",
+        "https://designsync-omega.vercel.app/r/typography.json"
       ],
       "files": []
     }
