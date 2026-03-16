@@ -16,13 +16,11 @@ function RemPxInput({
   onChange,
   min = 0.25,
   max = 6,
-  step = 0.0625,
 }: {
   value: string;
   onChange: (remValue: string) => void;
   min?: number;
   max?: number;
-  step?: number;
 }) {
   const remVal = parseFloat(value) || 0;
   const pxVal = Math.round(remVal * 16);
