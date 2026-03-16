@@ -12,7 +12,7 @@ export type TokenState = {
     success: ColorScale;
     warning: ColorScale;
     fontFamily: string;
-    fontSize: Record<'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl', string>;
+    fontSize: Record<'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl', string>;
     fontWeight: Record<'normal' | 'medium' | 'bold', string>;
     lineHeight: Record<'tight' | 'normal' | 'loose', string>;
     spacing: Record<'1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16', string>;
@@ -101,6 +101,9 @@ export const DEFAULT_TOKENS: TokenState = {
       'lg': '1.125rem',
       'xl': '1.25rem',
       '2xl': '1.5rem',
+      '3xl': '1.875rem',
+      '4xl': '2.25rem',
+      '5xl': '3rem',
     },
     fontWeight: {
       'normal': '400',
