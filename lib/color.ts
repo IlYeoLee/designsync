@@ -51,16 +51,20 @@ export function hexToOklch(hex: string): { l: number; c: number; h: number } | n
   }
 }
 
-/** Lightness for each palette step */
+/**
+ * Perceptual lightness for each palette step (oklch L, 0–1).
+ * Based on Tailwind/shadcn oklch scale — darker than HSL equivalents
+ * because oklch L is perceptually uniform (same L = same perceived brightness).
+ */
 export const PALETTE_LIGHTNESS: Record<string, number> = {
-  "50": 0.97, "100": 0.93, "200": 0.87, "300": 0.78,
-  "400": 0.68, "500": 0.58, "600": 0.48, "700": 0.39,
-  "800": 0.30, "900": 0.22,
+  "50": 0.97, "100": 0.93, "200": 0.86, "300": 0.76,
+  "400": 0.64, "500": 0.54, "600": 0.44, "700": 0.35,
+  "800": 0.25, "900": 0.15,
 };
 
 /**
  * Chroma factor for each step, normalized so peak (500–600) = 1.0.
- * Matches Tailwind's natural saturation curve: vivid at mid-tones, soft at extremes.
+ * Matches Tailwind's natural saturation curve: vivid at mid-tones, muted at extremes.
  */
 export const PALETTE_CHROMA_FACTOR: Record<string, number> = {
   "50":  0.08, "100": 0.21, "200": 0.42, "300": 0.63,
@@ -71,14 +75,15 @@ export const PALETTE_CHROMA_FACTOR: Record<string, number> = {
 /**
  * Generate a full 50-900 color scale from a hex color.
  *
- * Algorithm:
- * - Hue & chroma are extracted from the input hex.
- * - Each step uses the ABSOLUTE lightness from PALETTE_LIGHTNESS (no shifting).
- *   This prevents all light steps from clamping to L≈0.98 when the input is
- *   lighter than the canonical step-600 lightness (0.48).
- * - Step 600 stores the original hex for exact round-trip fidelity.
- * - All other steps use `oklch(L C H)` with L from the canonical curve
- *   and C = inputC × PALETTE_CHROMA_FACTOR[step].
+ * Algorithm (oklch-based, perceptually uniform):
+ * - Extract hue (H) and chroma (C) from the input hex via oklch conversion.
+ * - Every step uses PALETTE_LIGHTNESS[step] as the absolute L value.
+ *   This ensures 50→900 spans the full perceptual brightness range regardless
+ *   of the input color's original lightness.
+ * - Chroma is scaled per step: stepC = inputC × PALETTE_CHROMA_FACTOR[step].
+ * - All steps output `oklch(L C H)` — no special-casing for 600.
+ *   This prevents the "600 pops, others look flat" artifact that occurred
+ *   when 600 stored the raw hex while other steps used computed oklch values.
  */
 export function generatePaletteFromHex(hex: string): Record<string, string> | null {
   const oklch = hexToOklch(hex);
@@ -87,10 +92,6 @@ export function generatePaletteFromHex(hex: string): Record<string, string> | nu
   const steps = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900"];
   const result: Record<string, string> = {};
   for (const step of steps) {
-    if (step === "600") {
-      result[step] = hex;
-      continue;
-    }
     const targetL = PALETTE_LIGHTNESS[step];
     const stepC = Math.max(0, c * PALETTE_CHROMA_FACTOR[step]);
     result[step] = `oklch(${targetL.toFixed(3)} ${stepC.toFixed(3)} ${Math.round(h)})`;
