@@ -38,7 +38,7 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/registry
 import { Toaster } from "@/registry/new-york/ui/sonner";
 import { TypographyH1, TypographyH2, TypographyH3, TypographyH4, TypographyP, TypographyBlockquote, TypographyCode, TypographyLead, TypographyMuted } from "@/registry/new-york/ui/typography";
 
-import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as CalendarIcon, Smile, Music, Search, Settings, User, LayoutDashboard, FileText } from "lucide-react";
+import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as CalendarIcon, Smile, Settings, User, LayoutDashboard, FileText } from "lucide-react";
 
 type PreviewCategory = "form" | "overlay" | "navigation" | "display" | "feedback";
 
@@ -554,7 +554,7 @@ function DisplayPreview() {
           <TypographyLead>A lead paragraph introduces the section with slightly larger text.</TypographyLead>
           <TypographyP>Regular paragraph text. The quick brown fox jumps over the lazy dog.</TypographyP>
           <TypographyBlockquote>
-            "Design is not just what it looks like. Design is how it works." — Steve Jobs
+            &ldquo;Design is not just what it looks like. Design is how it works.&rdquo; &mdash; Steve Jobs
           </TypographyBlockquote>
           <TypographyCode>npm install @designsync/ui</TypographyCode>
           <TypographyMuted>This is muted / helper text for secondary information.</TypographyMuted>
