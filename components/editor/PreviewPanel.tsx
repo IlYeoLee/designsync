@@ -19,7 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/registry/new-york/ui
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/registry/new-york/ui/accordion";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/registry/new-york/ui/table";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/registry/new-york/ui/breadcrumb";
-import { AlertCircle, CheckCircle2, Info, Home, ChevronRight } from "lucide-react";
+import { AlertCircle, CheckCircle2, Info, Home } from "lucide-react";
 
 type PreviewCategory = "form" | "overlay" | "navigation" | "display" | "feedback";
 
