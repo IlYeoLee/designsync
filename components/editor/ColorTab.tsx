@@ -77,6 +77,19 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
 
   function handlePickerChange(scale: ColorScaleName, step: string, hex: string) {
     setPickerHex(hex);
+    // Step 600 is the anchor — changing it regenerates the full palette
+    if (step === "600" && scale !== "neutral") {
+      const palette = generatePaletteFromHex(hex);
+      if (palette) {
+        const changes = Object.entries(palette).map(([s, value]) => ({
+          variable: `--${scale}-${s}`,
+          value,
+        }));
+        onBatchChange(changes);
+        setScalePicker((prev) => ({ ...prev, [scale]: hex }));
+        return;
+      }
+    }
     onTokenChange(`--${scale}-${step}`, hex);
   }
 

@@ -78,13 +78,10 @@ function isInSRGBGamut(l: number, c: number, h: number): boolean {
   );
 }
 
-/**
- * Clamp chroma to the sRGB gamut boundary at fixed (L, H).
- * Uses binary search — H is never modified, preventing hue drift.
- */
-function clampChromaToGamut(l: number, c: number, h: number): number {
-  if (isInSRGBGamut(l, c, h)) return c;
-  let lo = 0, hi = c;
+/** Maximum in-gamut chroma at (L, H) via binary search. */
+function maxGamutChroma(l: number, h: number): number {
+  if (isInSRGBGamut(l, 0.5, h)) return 0.5;
+  let lo = 0, hi = 0.5;
   for (let i = 0; i < 24; i++) {
     const mid = (lo + hi) / 2;
     if (isInSRGBGamut(l, mid, h)) lo = mid;
@@ -93,51 +90,72 @@ function clampChromaToGamut(l: number, c: number, h: number): number {
   return lo;
 }
 
-// ─── Tone curve ───────────────────────────────────────────────────────────────
+// ─── Palette generator ────────────────────────────────────────────────────────
 
 /**
- * Fixed lightness values for each palette step.
- * Monotonically decreasing: 50 (lightest) → 900 (darkest).
- * H and C are derived from the seed color — L is never influenced by it.
+ * Reference lightness values for a mid-tone seed (L≈0.50 at step 600).
+ * Used by other editor tabs for display. Actual generated L values are
+ * adaptive per seed — see generatePaletteFromHex.
  */
-const TONE_LIGHTNESS: Record<string, number> = {
-  "50":  0.97,
-  "100": 0.94,
-  "200": 0.88,
-  "300": 0.80,
-  "400": 0.70,
-  "500": 0.58,
-  "600": 0.46,
-  "700": 0.36,
-  "800": 0.26,
-  "900": 0.16,
+export const PALETTE_LIGHTNESS: Record<string, number> = {
+  "50":  0.947, "100": 0.866, "200": 0.773, "300": 0.679,
+  "400": 0.594, "500": 0.538, "600": 0.500,
+  "700": 0.420, "800": 0.300, "900": 0.180,
 };
 
-/** Keep PALETTE_LIGHTNESS exported — used in other editor tabs. */
-export const PALETTE_LIGHTNESS: Record<string, number> = TONE_LIGHTNESS;
-
-// ─── Main palette generator ───────────────────────────────────────────────────
-
 /**
- * Generate a full 50–900 oklch palette from a seed hex color.
+ * Generate a full 50–900 oklch palette anchored at step 600.
  *
  * Algorithm:
- * 1. Convert hex → oklch and extract H (hue).
- * 2. For every step, L is taken from TONE_LIGHTNESS (always monotonic).
- * 3. C = maximum in-gamut chroma at (L, H) via binary search.
- *    H is never modified — no hue drift, no hShift corrections.
- * 4. Result: vibrant, correctly ordered palette regardless of seed brightness.
+ * 1. Extract (inputL, inputC, inputH) from the seed hex.
+ * 2. Compute satRatio = inputC / maxGamutChroma(inputL, inputH).
+ *    This captures "how saturated the seed is relative to its gamut max."
+ * 3. Step 600 = original hex exactly (pixel-perfect anchor).
+ * 4. Other steps use adaptive lightness:
+ *    - Steps 50–500: interpolate upward from inputL → 0.97
+ *    - Steps 700–900: interpolate downward from inputL → 0.10
+ * 5. Each step's C = satRatio × maxGamutChroma(targetL, inputH).
+ *    This preserves the seed's relative vividness across all tones.
+ * 6. H is never modified — no hue drift.
  */
 export function generatePaletteFromHex(hex: string): Record<string, string> | null {
   const oklch = hexToOklch(hex);
   if (!oklch) return null;
-  const { h: inputH } = oklch;
+  const { l: inputL, c: inputC, h: inputH } = oklch;
+
+  // Saturation ratio: how vivid is the seed relative to its gamut ceiling?
+  const maxCSeed = maxGamutChroma(inputL, inputH);
+  const satRatio = maxCSeed > 0.005 ? Math.min(inputC / maxCSeed, 1) : 0;
+
+  // Adaptive L spread: light steps go up to 0.97, dark steps down to 0.10
+  const lightRange = Math.max(0.97 - inputL, 0.01);
+  const darkRange  = Math.max(inputL - 0.10, 0.01);
+  const lLight = (f: number) => inputL + f * lightRange;
+  const lDark  = (f: number) => inputL - f * darkRange;
+
+  // Fractional positions relative to the anchor (tuned for perceptual evenness)
+  const stepL: Record<string, number | null> = {
+    "50":  lLight(0.95),
+    "100": lLight(0.78),
+    "200": lLight(0.58),
+    "300": lLight(0.38),
+    "400": lLight(0.20),
+    "500": lLight(0.08),
+    "600": null,        // exact anchor
+    "700": lDark(0.20),
+    "800": lDark(0.50),
+    "900": lDark(0.80),
+  };
 
   const result: Record<string, string> = {};
 
-  for (const [step, targetL] of Object.entries(TONE_LIGHTNESS)) {
-    const maxC = clampChromaToGamut(targetL, 0.5, inputH);
-    result[step] = `oklch(${targetL.toFixed(3)} ${maxC.toFixed(4)} ${inputH.toFixed(2)})`;
+  for (const [step, tL] of Object.entries(stepL)) {
+    if (tL === null) {
+      result[step] = hex;
+      continue;
+    }
+    const c = satRatio * maxGamutChroma(tL, inputH);
+    result[step] = `oklch(${tL.toFixed(3)} ${c.toFixed(4)} ${inputH.toFixed(2)})`;
   }
 
   return result;
