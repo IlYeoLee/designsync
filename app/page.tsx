@@ -292,7 +292,7 @@ export default function Home() {
           squircleSmoothing={squircleSmoothing}
           onSquircleChange={handleSquircleChange}
         />
-        <PreviewPanel />
+        <PreviewPanel squircleEnabled={squircleEnabled} />
       </div>
     </div>
   );

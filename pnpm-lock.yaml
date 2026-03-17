@@ -96,6 +96,12 @@ importers:
       '@squircle/core':
         specifier: ^1.0.6
         version: 1.0.6(@squircle/paint-polyfill@1.0.6)
+      '@squircle/paint-polyfill':
+        specifier: ^1.0.6
+        version: 1.0.6
+      '@squircle/tailwindcss':
+        specifier: ^1.0.6
+        version: 1.0.6
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -1369,6 +1375,9 @@ packages:
 
   '@squircle/paint-polyfill@1.0.6':
     resolution: {integrity: sha512-w3FotA1v53MG+R6eGM37wv1aVoW3jwymwGteGCGXEM10Gq7zYeCus5dTgcyW6fhc9piRqsFLyU8MIl+EbtM9RA==}
+
+  '@squircle/tailwindcss@1.0.6':
+    resolution: {integrity: sha512-tmOWdpX7lzBAJzuvajn4NVBtC7mVORmzf/jKREYMw8iJ806Xq4FCUkrtbxkd9blzOx7TG2JwLF3avh5It/Z6TQ==}
 
   '@standard-schema/utils@0.3.0':
     resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
@@ -5083,6 +5092,8 @@ snapshots:
       '@squircle/paint-polyfill': 1.0.6
 
   '@squircle/paint-polyfill@1.0.6': {}
+
+  '@squircle/tailwindcss@1.0.6': {}
 
   '@standard-schema/utils@0.3.0': {}
 
