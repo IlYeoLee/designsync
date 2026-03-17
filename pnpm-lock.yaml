@@ -96,6 +96,9 @@ importers:
       '@squircle/core':
         specifier: ^1.0.6
         version: 1.0.6(@squircle/paint-polyfill@1.0.6)
+      '@squircle/paint-polyfill':
+        specifier: ^1.0.6
+        version: 1.0.6
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1

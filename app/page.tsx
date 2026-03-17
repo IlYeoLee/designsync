@@ -21,6 +21,7 @@ export default function Home() {
     applyTokensToDocument(DEFAULT_TOKENS);
     // Register CSS Houdini paint worklet for squircle preview
     import("@squircle/core").then(({ init }) => init()).catch(() => {});
+    import("@squircle/paint-polyfill").catch(() => {});
   }, []);
 
   // ── Squircle: apply --squircle-smooth CSS variable ──────────────
@@ -292,7 +293,7 @@ export default function Home() {
           squircleSmoothing={squircleSmoothing}
           onSquircleChange={handleSquircleChange}
         />
-        <PreviewPanel />
+        <PreviewPanel squircleEnabled={squircleEnabled} />
       </div>
     </div>
   );
