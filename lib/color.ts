@@ -93,69 +93,41 @@ function maxGamutChroma(l: number, h: number): number {
 // ─── Palette generator ────────────────────────────────────────────────────────
 
 /**
- * Reference lightness values for a mid-tone seed (L≈0.50 at step 600).
- * Used by other editor tabs for display. Actual generated L values are
- * adaptive per seed — see generatePaletteFromHex.
+ * Fixed lightness values for palette generation.
+ * These are absolute — no adaptive scaling from input color.
  */
 export const PALETTE_LIGHTNESS: Record<string, number> = {
-  "50":  0.947, "100": 0.866, "200": 0.773, "300": 0.679,
-  "400": 0.594, "500": 0.538, "600": 0.500,
-  "700": 0.420, "800": 0.300, "900": 0.180,
+  "50":  0.97, "100": 0.94, "200": 0.88, "300": 0.80,
+  "400": 0.70, "500": 0.58, "600": 0.48,
+  "700": 0.38, "800": 0.28, "900": 0.18,
 };
 
 /**
- * Generate a full 50–900 oklch palette anchored at step 600.
+ * Generate a full 50–900 oklch palette from a seed hex color.
  *
  * Algorithm:
  * 1. Extract (inputL, inputC, inputH) from the seed hex.
- * 2. Compute satRatio = inputC / maxGamutChroma(inputL, inputH).
- *    This captures "how saturated the seed is relative to its gamut max."
- * 3. Step 600 = original hex exactly (pixel-perfect anchor).
- * 4. Other steps use adaptive lightness:
- *    - Steps 50–500: interpolate upward from inputL → 0.97
- *    - Steps 700–900: interpolate downward from inputL → 0.10
- * 5. Each step's C = satRatio × maxGamutChroma(targetL, inputH).
- *    This preserves the seed's relative vividness across all tones.
- * 6. H is never modified — no hue drift.
+ * 2. Compute cRatio at L=0.48 (step 600 reference lightness):
+ *    cRatio = inputC / maxGamutChroma(0.48, inputH)
+ * 3. Every step uses a fixed L from PALETTE_LIGHTNESS.
+ * 4. Each step's C = cRatio × maxGamutChroma(stepL, inputH).
+ * 5. H is never modified — no hue drift.
+ * 6. No anchor — step 600 also uses L=0.48, not the original hex.
  */
 export function generatePaletteFromHex(hex: string): Record<string, string> | null {
   const oklch = hexToOklch(hex);
   if (!oklch) return null;
-  const { l: inputL, c: inputC, h: inputH } = oklch;
+  const { c: inputC, h: inputH } = oklch;
 
-  // Saturation ratio: how vivid is the seed relative to its gamut ceiling?
-  const maxCSeed = maxGamutChroma(inputL, inputH);
-  const satRatio = maxCSeed > 0.005 ? Math.min(inputC / maxCSeed, 1) : 0;
-
-  // Adaptive L spread: light steps go up to 0.97, dark steps down to 0.10
-  const lightRange = Math.max(0.97 - inputL, 0.01);
-  const darkRange  = Math.max(inputL - 0.10, 0.01);
-  const lLight = (f: number) => inputL + f * lightRange;
-  const lDark  = (f: number) => inputL - f * darkRange;
-
-  // Fractional positions relative to the anchor (tuned for perceptual evenness)
-  const stepL: Record<string, number | null> = {
-    "50":  lLight(0.95),
-    "100": lLight(0.78),
-    "200": lLight(0.58),
-    "300": lLight(0.38),
-    "400": lLight(0.20),
-    "500": lLight(0.08),
-    "600": null,        // exact anchor
-    "700": lDark(0.20),
-    "800": lDark(0.50),
-    "900": lDark(0.80),
-  };
+  // Saturation ratio: measured at reference L=0.48 (step 600)
+  const refMaxC = maxGamutChroma(0.48, inputH);
+  const cRatio = refMaxC > 0.005 ? Math.min(inputC / refMaxC, 1) : 0;
 
   const result: Record<string, string> = {};
 
-  for (const [step, tL] of Object.entries(stepL)) {
-    if (tL === null) {
-      result[step] = hex;
-      continue;
-    }
-    const c = satRatio * maxGamutChroma(tL, inputH);
-    result[step] = `oklch(${tL.toFixed(3)} ${c.toFixed(4)} ${inputH.toFixed(2)})`;
+  for (const [step, stepL] of Object.entries(PALETTE_LIGHTNESS)) {
+    const c = cRatio * maxGamutChroma(stepL, inputH);
+    result[step] = `oklch(${stepL.toFixed(3)} ${c.toFixed(4)} ${inputH.toFixed(2)})`;
   }
 
   return result;

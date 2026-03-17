@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getFontImportUrl } from "@/lib/fonts";
 
 function getHeaders() {
   const token = process.env.GITHUB_TOKEN;
@@ -173,7 +174,33 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 4b. Apply squircle settings
+    // 4b. Apply font + typography tokens
+    const fontFamily = tokens.primitives?.fontFamily || 'Geist';
+    if (fontFamily !== 'Geist') {
+      lightVars["font-sans"] = `'${fontFamily}', sans-serif`;
+      darkVars["font-sans"] = `'${fontFamily}', sans-serif`;
+    }
+
+    if (tokens.primitives?.fontSize) {
+      for (const [key, val] of Object.entries(tokens.primitives.fontSize as Record<string, string>)) {
+        lightVars[`font-size-${key}`] = val;
+        darkVars[`font-size-${key}`] = val;
+      }
+    }
+    if (tokens.primitives?.fontWeight) {
+      for (const [key, val] of Object.entries(tokens.primitives.fontWeight as Record<string, string>)) {
+        lightVars[`font-weight-${key}`] = val;
+        darkVars[`font-weight-${key}`] = val;
+      }
+    }
+    if (tokens.primitives?.lineHeight) {
+      for (const [key, val] of Object.entries(tokens.primitives.lineHeight as Record<string, string>)) {
+        lightVars[`line-height-${key}`] = val;
+        darkVars[`line-height-${key}`] = val;
+      }
+    }
+
+    // 4c. Apply squircle settings
     if (squircle.enabled) {
       lightVars["squircle-smooth"] = String(squircle.smoothing / 100);
       darkVars["squircle-smooth"] = String(squircle.smoothing / 100);
@@ -184,30 +211,51 @@ export async function POST(req: NextRequest) {
 
     tokensJson.cssVars = { light: lightVars, dark: darkVars };
 
+    // Build files array and dependencies
+    const files: Array<{ path: string; type: string; target?: string; content: string }> = [];
+    const deps: string[] = [];
+
     // Squircle: add npm dependencies + SquircleProvider layout file
     if (squircle.enabled) {
-      tokensJson.dependencies = [
-        "@squircle/core",
-      ];
-      tokensJson.files = [
-        {
-          path: "app/layout.tsx",
+      deps.push("@squircle/core");
+      files.push({
+        path: "app/layout.tsx",
+        type: "registry:file",
+        content: [
+          '"use client"',
+          'import { init } from "@squircle/core"',
+          'import { useEffect } from "react"',
+          "",
+          "export function SquircleProvider({ children }: { children: React.ReactNode }) {",
+          "  useEffect(() => void init(), [])",
+          "  return <>{children}</>",
+          "}",
+        ].join("\n"),
+      });
+    }
+
+    // Font: add CSS import file for non-Geist fonts
+    if (fontFamily !== 'Geist') {
+      const importUrl = getFontImportUrl(fontFamily);
+      if (importUrl) {
+        files.push({
+          path: "styles/font.css",
           type: "registry:file",
-          content: [
-            '"use client"',
-            'import { init } from "@squircle/core"',
-            'import { useEffect } from "react"',
-            "",
-            "export function SquircleProvider({ children }: { children: React.ReactNode }) {",
-            "  useEffect(() => void init(), [])",
-            "  return <>{children}</>",
-            "}",
-          ].join("\n"),
-        },
-      ];
+          target: "app/font.css",
+          content: `@import url('${importUrl}');`,
+        });
+      }
+    }
+
+    if (files.length > 0) {
+      tokensJson.files = files;
+    } else {
+      delete tokensJson.files;
+    }
+    if (deps.length > 0) {
+      tokensJson.dependencies = deps;
     } else {
       delete tokensJson.dependencies;
-      delete tokensJson.files;
     }
 
     const updatedContent = JSON.stringify(tokensJson, null, 2);

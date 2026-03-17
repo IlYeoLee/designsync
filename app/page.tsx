@@ -20,7 +20,10 @@ export default function Home() {
   React.useEffect(() => {
     applyTokensToDocument(DEFAULT_TOKENS);
     // Register CSS Houdini paint worklet for squircle preview
-    import("@squircle/core").then(({ init }) => init()).catch(() => {});
+    import("@squircle/core").then(({ init }) => {
+      init();
+      console.log("[DesignSync] squircle paint worklet registered");
+    }).catch((e) => console.warn("[DesignSync] squircle init failed:", e));
   }, []);
 
   // ── Squircle: apply --squircle-smooth CSS variable ──────────────

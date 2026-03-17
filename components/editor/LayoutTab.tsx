@@ -275,6 +275,9 @@ export function LayoutTab({ tokens, onTokenChange, squircleEnabled, squircleSmoo
             <p className="text-[10px] text-muted-foreground">
               0% = normal · 60% = Apple/Figma · 100% = superellipse
             </p>
+            <p className="text-[10px] text-muted-foreground/70">
+              Chrome/Edge only · Firefox/Safari는 일반 border-radius 유지
+            </p>
           </div>
         )}
       </div>

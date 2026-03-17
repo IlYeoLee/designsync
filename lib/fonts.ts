@@ -69,3 +69,20 @@ export function injectGoogleFont(fontFamily: string): void {
   link.href = getGoogleFontUrl(fontFamily);
   document.head.appendChild(link);
 }
+
+/** Korean font CDN URLs (not available on standard Google Fonts API) */
+export const KOREAN_FONT_URLS: Record<string, string> = {
+  'Pretendard': 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css',
+  'Noto Sans KR': 'https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap',
+  'Nanum Gothic': 'https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap',
+};
+
+/**
+ * Get the CSS import URL for a font family.
+ * Returns null for Geist (bundled via next/font).
+ */
+export function getFontImportUrl(fontFamily: string): string | null {
+  if (fontFamily === 'Geist') return null;
+  if (KOREAN_FONT_URLS[fontFamily]) return KOREAN_FONT_URLS[fontFamily];
+  return getGoogleFontUrl(fontFamily);
+}

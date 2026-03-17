@@ -1,6 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "designsync-all",
+  "type": "registry:ui",
   "title": "DesignSync All Components",
   "description": "Install all DesignSync components and design tokens in one command.",
   "registryDependencies": [
@@ -38,8 +39,20 @@
     "https://designsync-omega.vercel.app/r/tabs.json",
     "https://designsync-omega.vercel.app/r/toggle.json",
     "https://designsync-omega.vercel.app/r/toggle-group.json",
-    "https://designsync-omega.vercel.app/r/tooltip.json"
+    "https://designsync-omega.vercel.app/r/tooltip.json",
+    "https://designsync-omega.vercel.app/r/calendar.json",
+    "https://designsync-omega.vercel.app/r/carousel.json",
+    "https://designsync-omega.vercel.app/r/chart.json",
+    "https://designsync-omega.vercel.app/r/command.json",
+    "https://designsync-omega.vercel.app/r/context-menu.json",
+    "https://designsync-omega.vercel.app/r/drawer.json",
+    "https://designsync-omega.vercel.app/r/input-otp.json",
+    "https://designsync-omega.vercel.app/r/menubar.json",
+    "https://designsync-omega.vercel.app/r/navigation-menu.json",
+    "https://designsync-omega.vercel.app/r/resizable.json",
+    "https://designsync-omega.vercel.app/r/sidebar.json",
+    "https://designsync-omega.vercel.app/r/sonner.json",
+    "https://designsync-omega.vercel.app/r/typography.json"
   ],
-  "files": [],
-  "type": "registry:ui"
+  "files": []
 }
