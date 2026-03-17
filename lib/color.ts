@@ -102,15 +102,15 @@ function clampChromaToGamut(l: number, c: number, h: number): number {
  */
 const TONE_LIGHTNESS: Record<string, number> = {
   "50":  0.97,
-  "100": 0.93,
-  "200": 0.87,
-  "300": 0.79,
-  "400": 0.71,
-  "500": 0.64,
-  "600": 0.54,
-  "700": 0.44,
-  "800": 0.34,
-  "900": 0.24,
+  "100": 0.94,
+  "200": 0.88,
+  "300": 0.80,
+  "400": 0.70,
+  "500": 0.58,
+  "600": 0.46,
+  "700": 0.36,
+  "800": 0.26,
+  "900": 0.16,
 };
 
 /** Keep PALETTE_LIGHTNESS exported — used in other editor tabs. */
