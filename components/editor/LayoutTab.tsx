@@ -6,6 +6,9 @@ import { TokenState } from "@/lib/tokens";
 interface LayoutTabProps {
   tokens: TokenState;
   onTokenChange: (variable: string, value: string) => void;
+  squircleEnabled: boolean;
+  squircleSmoothing: number;
+  onSquircleChange: (enabled: boolean, smoothing: number) => void;
 }
 
 const RADIUS_OPTIONS = [
@@ -88,7 +91,7 @@ function RemPxInput({
   );
 }
 
-export function LayoutTab({ tokens, onTokenChange }: LayoutTabProps) {
+export function LayoutTab({ tokens, onTokenChange, squircleEnabled, squircleSmoothing, onSquircleChange }: LayoutTabProps) {
   return (
     <div className="space-y-6 p-4">
       {/* Border Radius */}
@@ -231,6 +234,103 @@ export function LayoutTab({ tokens, onTokenChange }: LayoutTabProps) {
           Spacing changes affect all <code className="font-mono text-xs">p-*</code>, <code className="font-mono text-xs">gap-*</code> utilities.
         </p>
       </div>
+
+      {/* Corner Smoothing */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-xs font-medium text-foreground">Corner Smoothing</p>
+            <p className="text-[10px] text-muted-foreground">Figma-style squircle corners</p>
+          </div>
+          {/* Toggle switch */}
+          <button
+            role="switch"
+            aria-checked={squircleEnabled}
+            onClick={() => onSquircleChange(!squircleEnabled, squircleSmoothing)}
+            className={`relative w-9 h-5 rounded-full transition-colors flex-shrink-0 ${
+              squircleEnabled ? "bg-primary" : "bg-muted-foreground/30"
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${
+                squircleEnabled ? "translate-x-4" : "translate-x-0.5"
+              }`}
+            />
+          </button>
+        </div>
+
+        {squircleEnabled && (
+          <div className="space-y-3">
+            {/* Slider */}
+            <div className="flex items-center gap-3">
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                value={squircleSmoothing}
+                onChange={(e) => onSquircleChange(true, +e.target.value)}
+                className="flex-1 h-1.5 accent-primary"
+              />
+              <span className="text-xs font-mono text-muted-foreground w-8 text-right">
+                {squircleSmoothing}%
+              </span>
+            </div>
+
+            {/* Preview */}
+            <SquirclePreview
+              smoothing={squircleSmoothing}
+              radiusPx={parseFloat(tokens.primitives.radius.md) * 16 || 6}
+            />
+            <p className="text-[10px] text-muted-foreground">
+              0% = normal · 60% = Apple/Figma · 100% = superellipse
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/** Inline squircle preview using CSS Houdini paint(squircle) */
+function SquirclePreview({ smoothing, radiusPx }: { smoothing: number; radiusPx: number }) {
+  const smooth = (smoothing / 100).toFixed(2);
+  const r = `${Math.max(radiusPx, 4)}px`;
+
+  const squircleStyle = (extraStyle?: React.CSSProperties): React.CSSProperties => ({
+    maskImage: "paint(squircle)",
+    WebkitMaskImage: "paint(squircle)",
+    ["--squircle-smooth" as string]: smooth,
+    ["--squircle-radius" as string]: r,
+    ...extraStyle,
+  });
+
+  return (
+    <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-md border border-border">
+      {/* Button shape */}
+      <div
+        className="h-7 px-3 flex items-center text-[11px] font-medium bg-primary text-primary-foreground flex-shrink-0"
+        style={squircleStyle()}
+      >
+        Button
+      </div>
+
+      {/* Card shape */}
+      <div
+        className="h-10 w-14 bg-card flex-shrink-0"
+        style={squircleStyle({
+          boxShadow: "0 1px 4px oklch(0 0 0 / 0.12)",
+          ["--squircle-radius" as string]: `${Math.max(radiusPx * 1.5, 6)}px`,
+        })}
+      />
+
+      {/* Input shape */}
+      <div
+        className="h-7 flex-1 bg-background"
+        style={squircleStyle({
+          boxShadow: "inset 0 0 0 1px oklch(0 0 0 / 0.15)",
+        })}
+      />
     </div>
   );
 }

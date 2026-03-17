@@ -86,7 +86,11 @@ export async function POST(req: NextRequest) {
     const headers = getHeaders();
 
     const body = await req.json();
-    const { tokens, commitMessage = "chore: update design tokens" } = body;
+    const {
+      tokens,
+      squircle = { enabled: false, smoothing: 60 },
+      commitMessage = "chore: update design tokens",
+    } = body;
 
     if (!tokens) {
       return NextResponse.json({ error: "Missing tokens" }, { status: 400 });
@@ -169,7 +173,45 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // 4b. Apply squircle settings
+    if (squircle.enabled) {
+      lightVars["squircle-smooth"] = String(squircle.smoothing / 100);
+      darkVars["squircle-smooth"] = String(squircle.smoothing / 100);
+    } else {
+      delete lightVars["squircle-smooth"];
+      delete darkVars["squircle-smooth"];
+    }
+
     tokensJson.cssVars = { light: lightVars, dark: darkVars };
+
+    // Squircle: add npm dependencies + SquircleProvider layout file
+    if (squircle.enabled) {
+      tokensJson.dependencies = [
+        "@squircle/core",
+        "@squircle/paint-polyfill",
+        "@squircle/tailwindcss",
+      ];
+      tokensJson.files = [
+        {
+          path: "app/layout.tsx",
+          type: "registry:file",
+          content: [
+            '"use client"',
+            'import { init } from "@squircle/core"',
+            'import { useEffect } from "react"',
+            "",
+            "export function SquircleProvider({ children }: { children: React.ReactNode }) {",
+            "  useEffect(() => void init(), [])",
+            "  return <>{children}</>",
+            "}",
+          ].join("\n"),
+        },
+      ];
+    } else {
+      delete tokensJson.dependencies;
+      delete tokensJson.files;
+    }
+
     const updatedContent = JSON.stringify(tokensJson, null, 2);
 
     // 5. Commit to GitHub (Vercel auto-deploys on push via GitHub integration)
@@ -186,6 +228,9 @@ export async function POST(req: NextRequest) {
       success: true,
       message: "Tokens saved. Vercel will auto-deploy from the GitHub commit.",
       deployUrl: "https://designsync-omega.vercel.app",
+      squircle: squircle.enabled
+        ? { enabled: true, smoothing: squircle.smoothing }
+        : { enabled: false },
     });
   } catch (err) {
     console.error("Save route error:", err);

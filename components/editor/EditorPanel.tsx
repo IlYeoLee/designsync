@@ -16,6 +16,9 @@ interface EditorPanelProps {
   onSemanticChange: (mode: "light" | "dark", key: string, value: string) => void;
   onFontFamilyChange: (font: string) => void;
   history: HistoryEntry[];
+  squircleEnabled: boolean;
+  squircleSmoothing: number;
+  onSquircleChange: (enabled: boolean, smoothing: number) => void;
 }
 
 export function EditorPanel({
@@ -25,6 +28,9 @@ export function EditorPanel({
   onSemanticChange,
   onFontFamilyChange,
   history,
+  squircleEnabled,
+  squircleSmoothing,
+  onSquircleChange,
 }: EditorPanelProps) {
   const [activeTab, setActiveTab] = React.useState<Tab>("colors");
   const [historyOpen, setHistoryOpen] = React.useState(true);
@@ -81,7 +87,13 @@ export function EditorPanel({
           />
         )}
         {activeTab === "layout" && (
-          <LayoutTab tokens={tokens} onTokenChange={onTokenChange} />
+          <LayoutTab
+            tokens={tokens}
+            onTokenChange={onTokenChange}
+            squircleEnabled={squircleEnabled}
+            squircleSmoothing={squircleSmoothing}
+            onSquircleChange={onSquircleChange}
+          />
         )}
       </div>
 

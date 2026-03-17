@@ -13,11 +13,32 @@ export default function Home() {
   const [saveSuccess, setSaveSuccess] = React.useState(false);
   const [history, setHistory] = React.useState<HistoryEntry[]>([]);
   const [snapshots, setSnapshots] = React.useState<TokenState[]>([]);
+  const [squircleEnabled, setSquircleEnabled] = React.useState(false);
+  const [squircleSmoothing, setSquircleSmoothing] = React.useState(60);
 
-  // ── Mount: apply primitive tokens ──────────────────────────────
+  // ── Mount: apply primitive tokens + init squircle worklet ──────
   React.useEffect(() => {
     applyTokensToDocument(DEFAULT_TOKENS);
+    // Register CSS Houdini paint worklet for squircle preview
+    import("@squircle/core").then(({ init }) => init()).catch(() => {});
   }, []);
+
+  // ── Squircle: apply --squircle-smooth CSS variable ──────────────
+  React.useEffect(() => {
+    if (squircleEnabled) {
+      document.documentElement.style.setProperty(
+        "--squircle-smooth",
+        String(squircleSmoothing / 100)
+      );
+    } else {
+      document.documentElement.style.removeProperty("--squircle-smooth");
+    }
+  }, [squircleEnabled, squircleSmoothing]);
+
+  function handleSquircleChange(enabled: boolean, smoothing: number) {
+    setSquircleEnabled(enabled);
+    setSquircleSmoothing(smoothing);
+  }
 
   // ── Dark mode class ─────────────────────────────────────────────
   React.useEffect(() => {
@@ -228,7 +249,11 @@ export default function Home() {
       const response = await fetch("/api/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tokens, commitMessage: "chore: update design tokens via DesignSync editor" }),
+        body: JSON.stringify({
+          tokens,
+          squircle: { enabled: squircleEnabled, smoothing: squircleSmoothing },
+          commitMessage: "chore: update design tokens via DesignSync editor",
+        }),
       });
       if (!response.ok) {
         const err = await response.json();
@@ -263,6 +288,9 @@ export default function Home() {
           onSemanticChange={handleSemanticChange}
           onFontFamilyChange={handleFontFamilyChange}
           history={history.slice(0, 3)}
+          squircleEnabled={squircleEnabled}
+          squircleSmoothing={squircleSmoothing}
+          onSquircleChange={handleSquircleChange}
         />
         <PreviewPanel />
       </div>
