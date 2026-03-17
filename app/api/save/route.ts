@@ -188,7 +188,6 @@ export async function POST(req: NextRequest) {
     if (squircle.enabled) {
       tokensJson.dependencies = [
         "@squircle/core",
-        "@squircle/paint-polyfill",
       ];
       tokensJson.files = [
         {
