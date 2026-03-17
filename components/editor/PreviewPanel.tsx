@@ -1147,7 +1147,7 @@ function FeedbackPreview() {
 
 // ─── Root ──────────────────────────────────────────────────────────────────────
 
-export function PreviewPanel({ squircleEnabled = false }: { squircleEnabled?: boolean }) {
+export function PreviewPanel() {
   const [category, setCategory] = React.useState<PreviewCategory>("form");
 
   return (
@@ -1168,7 +1168,7 @@ export function PreviewPanel({ squircleEnabled = false }: { squircleEnabled?: bo
         ))}
       </div>
 
-      <div className={`flex-1 overflow-y-auto p-6 ${squircleEnabled ? "squircle-preview" : ""}`}>
+      <div className="flex-1 overflow-y-auto p-6">
         <div className="max-w-2xl mx-auto">
           {category === "form" && <FormPreview />}
           {category === "overlay" && <OverlayPreview />}

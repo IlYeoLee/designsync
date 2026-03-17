@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { TokenState } from "@/lib/tokens";
-import { Switch } from "@/registry/new-york/ui/switch";
 
 interface LayoutTabProps {
   tokens: TokenState;
@@ -243,10 +242,21 @@ export function LayoutTab({ tokens, onTokenChange, squircleEnabled, squircleSmoo
             <p className="text-xs font-medium text-foreground">Corner Smoothing</p>
             <p className="text-[10px] text-muted-foreground">Figma-style squircle corners</p>
           </div>
-          <Switch
-            checked={squircleEnabled}
-            onCheckedChange={(checked) => onSquircleChange(checked, squircleSmoothing)}
-          />
+          {/* Toggle switch */}
+          <button
+            role="switch"
+            aria-checked={squircleEnabled}
+            onClick={() => onSquircleChange(!squircleEnabled, squircleSmoothing)}
+            className={`relative w-9 h-5 rounded-full transition-colors flex-shrink-0 ${
+              squircleEnabled ? "bg-primary" : "bg-muted-foreground/30"
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${
+                squircleEnabled ? "translate-x-4" : "translate-x-0.5"
+              }`}
+            />
+          </button>
         </div>
 
         {squircleEnabled && (
