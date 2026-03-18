@@ -8,7 +8,7 @@
       "type": "registry:style",
       "title": "DesignSync Design Tokens",
       "description": "CSS custom properties (design tokens) for DesignSync — colors, radius, chart, sidebar.",
-      "dependencies": ["@cornerkit/core", "@cornerkit/react"],
+      "dependencies": ["tailwind-corner-smoothing"],
       "cssVars": {
         "light": {
           "radius": "0.625rem",
@@ -637,7 +637,7 @@
       "type": "registry:ui",
       "title": "Squircle Provider",
       "description": "iOS/Figma-style corner smoothing provider — wraps your app and applies squircle corners to all shadcn/ui components automatically.",
-      "dependencies": ["@cornerkit/core", "@cornerkit/react"],
+      "dependencies": ["tailwind-corner-smoothing"],
       "files": [{"path": "registry/new-york/ui/squircle-provider.tsx", "type": "registry:ui"}]
     },
     {

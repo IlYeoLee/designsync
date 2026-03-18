@@ -54,52 +54,6 @@ import { TypographyH1, TypographyH2, TypographyH3, TypographyH4, TypographyP, Ty
 
 import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as CalendarIcon, Smile, Settings, User, LayoutDashboard, FileText, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, ChevronsUpDown, ChevronDown } from "lucide-react";
 
-// --- Squircle helpers (mirrors squircle-provider.tsx, mask-border approach) ---
-const PILL_THRESHOLD = 9000;
-
-const EXCLUDED_TAGS = new Set([
-  "HTML", "BODY", "HEAD", "SCRIPT", "STYLE", "LINK", "META",
-  "SVG", "PATH", "CIRCLE", "RECT", "LINE", "POLYGON",
-  "IFRAME", "VIDEO", "CANVAS", "IMG",
-]);
-
-const EXCLUDED_SLOTS = new Set([
-  "carousel", "carousel-content",
-  "resizable-panel", "resizable-handle",
-  "scroll-area", "scroll-area-viewport",
-  "sidebar",
-]);
-
-const SMOOTH_CLASSES = ["smooth-corners-sm", "smooth-corners-md", "smooth-corners-lg"] as const;
-
-function getSmoothClass(radiusPx: number): typeof SMOOTH_CLASSES[number] {
-  if (radiusPx <= 10) return "smooth-corners-sm";
-  if (radiusPx <= 30) return "smooth-corners-md";
-  return "smooth-corners-lg";
-}
-
-function pvApplySmooth(el: HTMLElement): void {
-  if (EXCLUDED_TAGS.has(el.tagName)) return;
-  const slot = el.getAttribute("data-slot");
-  if (slot && EXCLUDED_SLOTS.has(slot)) return;
-  if (el.offsetWidth < 8 || el.offsetHeight < 8) return;
-
-  const cr = parseFloat(getComputedStyle(el).borderRadius) || 0;
-  if (cr <= 0 || cr >= PILL_THRESHOLD) return;
-
-  const cls = getSmoothClass(cr);
-  if (!el.classList.contains(cls)) {
-    SMOOTH_CLASSES.forEach((c) => el.classList.remove(c));
-    el.classList.add(cls);
-    el.setAttribute("data-squircle-applied", "true");
-  }
-}
-
-function pvRemoveSmooth(el: HTMLElement): void {
-  SMOOTH_CLASSES.forEach((c) => el.classList.remove(c));
-  el.removeAttribute("data-squircle-applied");
-}
-
 type PreviewCategory = "form" | "overlay" | "navigation" | "display" | "feedback";
 
 const PREVIEW_CATEGORIES: { id: PreviewCategory; label: string }[] = [
@@ -1193,66 +1147,8 @@ function FeedbackPreview() {
 
 // ─── Root ──────────────────────────────────────────────────────────────────────
 
-export function PreviewPanel({
-  squircleEnabled = false,
-  squircleSmoothing = 60,
-  radiusKey,
-  tokenKey,
-}: {
-  squircleEnabled?: boolean;
-  squircleSmoothing?: number;
-  radiusKey?: string;
-  tokenKey?: string;
-}) {
+export function PreviewPanel() {
   const [category, setCategory] = React.useState<PreviewCategory>("form");
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const rafRef = React.useRef<number | null>(null);
-
-  const applyAllSmooth = React.useCallback(() => {
-    if (!containerRef.current) return;
-    containerRef.current.querySelectorAll("*").forEach((el) => {
-      pvApplySmooth(el as HTMLElement);
-    });
-    document.querySelectorAll(
-      "[data-radix-portal] *, [data-sonner-toast], [data-sonner-toast] *"
-    ).forEach((el) => {
-      const htmlEl = el as HTMLElement;
-      if (containerRef.current?.contains(htmlEl)) return;
-      pvApplySmooth(htmlEl);
-    });
-  }, []);
-
-  const removeAllSmooth = React.useCallback(() => {
-    if (containerRef.current) {
-      containerRef.current.querySelectorAll("[data-squircle-applied]").forEach((el) => {
-        pvRemoveSmooth(el as HTMLElement);
-      });
-    }
-    document.querySelectorAll("[data-squircle-applied]").forEach((el) => {
-      pvRemoveSmooth(el as HTMLElement);
-    });
-  }, []);
-
-  // Apply mask-border squircle to preview elements
-  React.useEffect(() => {
-    if (!squircleEnabled || !containerRef.current) {
-      removeAllSmooth();
-      return;
-    }
-
-    const timer = setTimeout(applyAllSmooth, 50);
-
-    const portalObserver = new MutationObserver(() => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(applyAllSmooth);
-    });
-    portalObserver.observe(document.body, { childList: true, subtree: true });
-
-    return () => {
-      clearTimeout(timer);
-      portalObserver.disconnect();
-    };
-  }, [squircleEnabled, squircleSmoothing, category, radiusKey, tokenKey, applyAllSmooth, removeAllSmooth]);
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-background">

@@ -187,9 +187,6 @@ importers:
       eslint-config-next:
         specifier: 15.3.1
         version: 15.3.1(eslint@9.32.0(jiti@2.5.1))(typescript@5.9.2)
-      tailwind-corner-smoothing:
-        specifier: ^1.2.0
-        version: 1.2.0
       tailwindcss:
         specifier: ^4.1.11
         version: 4.1.11
@@ -3617,9 +3614,6 @@ packages:
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
-
-  tailwind-corner-smoothing@1.2.0:
-    resolution: {integrity: sha512-lKeE58pOeIhrNbOjl6nxNSM8OMm7iTkuT01hpaipoZtVxzeN7K/Tsu4MrKdKtX/aTAwgOjaDcJghKUG1N4HcuQ==}
 
   tailwind-merge@3.3.1:
     resolution: {integrity: sha512-gBXpgUm/3rp1lMZZrM/w7D8GKqshif0zAymAhbCyIt8KMe+0v9DQ7cdYLR4FHH/cKpdTXb+A/tKKU3eolfsI+g==}
@@ -7548,8 +7542,6 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
-
-  tailwind-corner-smoothing@1.2.0: {}
 
   tailwind-merge@3.3.1: {}
 

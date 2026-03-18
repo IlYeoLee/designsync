@@ -89,7 +89,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       tokens,
-      squircle = { enabled: false, smoothing: 60 },
       commitMessage = "chore: update design tokens",
     } = body;
 
@@ -200,35 +199,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 4c. Apply squircle settings (cornerKit uses JS, store smoothing as metadata)
-    if (squircle.enabled) {
-      lightVars["squircle-smoothing"] = String(squircle.smoothing / 100);
-      darkVars["squircle-smoothing"] = String(squircle.smoothing / 100);
-    } else {
-      delete lightVars["squircle-smoothing"];
-      delete darkVars["squircle-smoothing"];
-    }
-
     tokensJson.cssVars = { light: lightVars, dark: darkVars };
 
     // Build files array and dependencies
     const files: Array<{ path: string; type: string; target?: string; content: string }> = [];
     const deps: string[] = [];
-
-    // Squircle: add npm dependency + SquircleProvider usage hint
-    if (squircle.enabled) {
-      deps.push("tailwind-corner-smoothing");
-      files.push({
-        path: "components/squircle-provider.tsx",
-        type: "registry:file",
-        content: [
-          '// Install via: shadcn add <your-registry-url>/r/squircle-provider.json',
-          '// Then wrap your app with <SquircleProvider>',
-          '// Also add @plugin "tailwind-corner-smoothing" to your globals.css',
-          'export { SquircleProvider } from "@/registry/new-york/ui/squircle-provider"',
-        ].join("\n"),
-      });
-    }
 
     // Font: add CSS import file for non-Geist fonts
     if (fontFamily !== 'Geist') {
@@ -270,9 +245,6 @@ export async function POST(req: NextRequest) {
       success: true,
       message: "Tokens saved. Vercel will auto-deploy from the GitHub commit.",
       deployUrl: "https://designsync-omega.vercel.app",
-      squircle: squircle.enabled
-        ? { enabled: true, smoothing: squircle.smoothing }
-        : { enabled: false },
     });
   } catch (err) {
     console.error("Save route error:", err);

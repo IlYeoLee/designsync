@@ -13,18 +13,10 @@ export default function Home() {
   const [saveSuccess, setSaveSuccess] = React.useState(false);
   const [history, setHistory] = React.useState<HistoryEntry[]>([]);
   const [snapshots, setSnapshots] = React.useState<TokenState[]>([]);
-  const [squircleEnabled, setSquircleEnabled] = React.useState(false);
-  const [squircleSmoothing, setSquircleSmoothing] = React.useState(60);
-
   // ── Mount: apply primitive tokens ──────
   React.useEffect(() => {
     applyTokensToDocument(DEFAULT_TOKENS);
   }, []);
-
-  function handleSquircleChange(enabled: boolean, smoothing: number) {
-    setSquircleEnabled(enabled);
-    setSquircleSmoothing(smoothing);
-  }
 
   // ── Dark mode class ─────────────────────────────────────────────
   React.useEffect(() => {
@@ -237,7 +229,6 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           tokens,
-          squircle: { enabled: squircleEnabled, smoothing: squircleSmoothing },
           commitMessage: "chore: update design tokens via DesignSync editor",
         }),
       });
@@ -274,11 +265,8 @@ export default function Home() {
           onSemanticChange={handleSemanticChange}
           onFontFamilyChange={handleFontFamilyChange}
           history={history.slice(0, 3)}
-          squircleEnabled={squircleEnabled}
-          squircleSmoothing={squircleSmoothing}
-          onSquircleChange={handleSquircleChange}
         />
-        <PreviewPanel squircleEnabled={squircleEnabled} squircleSmoothing={squircleSmoothing} radiusKey={JSON.stringify(tokens.primitives.radius)} tokenKey={JSON.stringify(tokens.primitives.shadows)} />
+        <PreviewPanel />
       </div>
     </div>
   );
