@@ -1,3 +1,12 @@
+/* Ubuntu (self-hosted via DesignSync) */
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://designsync-omega.vercel.app/fonts/ubuntu-400.woff2') format('woff2');
+}
+
 /* Raleway (self-hosted via DesignSync) */
 @font-face {
   font-family: 'Raleway';
