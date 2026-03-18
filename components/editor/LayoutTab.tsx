@@ -290,40 +290,42 @@ function SquirclePreview({ smoothing, radiusPx }: { smoothing: number; radiusPx:
   const smooth = (smoothing / 100).toFixed(2);
   const r = `${Math.max(radiusPx, 4)}px`;
 
-  const squircleStyle = (extraStyle?: React.CSSProperties): React.CSSProperties => ({
-    maskImage: "paint(squircle)",
-    WebkitMaskImage: "paint(squircle)",
+  const baseStyle = (bg: string, extra?: React.CSSProperties): React.CSSProperties => ({
+    backgroundImage: "paint(squircle)",
+    backgroundColor: "transparent",
+    borderRadius: 0,
     ["--squircle-border-smoothing" as string]: smooth,
     ["--squircle-border-radius" as string]: r,
-    ["--squircle-background-color" as string]: "transparent",
-    ["--squircle-mode" as string]: "mask-image",
-    ...extraStyle,
+    ["--squircle-background-color" as string]: bg,
+    ...extra,
   });
 
   return (
     <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-md border border-border">
       {/* Button shape */}
       <div
-        className="h-7 px-3 flex items-center text-[11px] font-medium bg-primary text-primary-foreground flex-shrink-0"
-        style={squircleStyle()}
+        className="h-7 px-3 flex items-center text-[11px] font-medium text-primary-foreground flex-shrink-0"
+        style={baseStyle("var(--primary)")}
       >
         Button
       </div>
 
       {/* Card shape */}
       <div
-        className="h-10 w-14 bg-card flex-shrink-0"
-        style={squircleStyle({
-          boxShadow: "0 1px 4px oklch(0 0 0 / 0.12)",
+        className="h-10 w-14 flex-shrink-0"
+        style={baseStyle("var(--card)", {
           ["--squircle-border-radius" as string]: `${Math.max(radiusPx * 1.5, 6)}px`,
+          ["--squircle-border-width" as string]: "1",
+          ["--squircle-border-color" as string]: "var(--border)",
         })}
       />
 
       {/* Input shape */}
       <div
-        className="h-7 flex-1 bg-background"
-        style={squircleStyle({
-          boxShadow: "inset 0 0 0 1px oklch(0 0 0 / 0.15)",
+        className="h-7 flex-1"
+        style={baseStyle("var(--background)", {
+          ["--squircle-border-width" as string]: "1",
+          ["--squircle-border-color" as string]: "var(--border)",
         })}
       />
     </div>
