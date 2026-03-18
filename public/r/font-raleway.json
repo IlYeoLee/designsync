@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "font-raleway",
+  "type": "registry:style",
+  "description": "Raleway font — self-hosted from DesignSync CDN. Auto-injects @font-face into globals.css.",
+  "css": {
+    "@font-face": {
+      "font-family": "'Raleway'",
+      "font-style": "normal",
+      "font-weight": "100 900",
+      "font-display": "swap",
+      "src": "url('https://designsync-omega.vercel.app/fonts/raleway-variable.woff2') format('woff2')"
+    }
+  }
+}
