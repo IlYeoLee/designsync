@@ -6,6 +6,18 @@ import { EditorPanel } from "@/components/editor/EditorPanel";
 import { PreviewPanel } from "@/components/editor/PreviewPanel";
 import { DEFAULT_TOKENS, TokenState, HistoryEntry, applyTokensToDocument } from "@/lib/tokens";
 
+/** lang="ko" 시 한글 폰트 우선 적용 — style 태그로 주입 */
+function applyLangKoOverride(stackKo: string) {
+  const styleId = 'ds-font-lang-override';
+  let el = document.getElementById(styleId) as HTMLStyleElement | null;
+  if (stackKo) {
+    if (!el) { el = document.createElement('style'); el.id = styleId; document.head.appendChild(el); }
+    el.textContent = `:root:lang(ko) { --font-sans: ${stackKo}; font-family: ${stackKo}; }`;
+  } else if (el) {
+    el.remove();
+  }
+}
+
 export default function Home() {
   const [tokens, setTokens] = React.useState<TokenState>(DEFAULT_TOKENS);
   const [isDark, setIsDark] = React.useState(false);
@@ -168,15 +180,19 @@ export default function Home() {
     setSnapshots((prev) => [...prev.slice(-19), tokens]);
     const ko = tokens.primitives.fontFamilyKo;
     let stack = '';
+    let stackKo = '';
     if (ko && font !== 'Geist') {
       stack = `'${font}', '${ko}', sans-serif`;
+      stackKo = `'${ko}', '${font}', sans-serif`;
     } else if (font !== 'Geist') {
       stack = `'${font}', sans-serif`;
+      stackKo = stack;
     }
     if (stack) {
       document.documentElement.style.setProperty('--font-sans', stack);
       document.body.style.fontFamily = stack;
     }
+    applyLangKoOverride(stackKo !== stack ? stackKo : '');
     document.documentElement.style.setProperty("--custom-font-family", font);
     setTokens((prev) => ({ ...prev, primitives: { ...prev.primitives, fontFamily: font } }));
     setHistory((prev) => [
@@ -190,15 +206,19 @@ export default function Home() {
     // 즉시 CSS 반영
     const en = tokens.primitives.fontFamily;
     let stack = '';
+    let stackKo = '';
     if (font && en && en !== 'Geist') {
       stack = `'${en}', '${font}', sans-serif`;
+      stackKo = `'${font}', '${en}', sans-serif`;
     } else if (font) {
       stack = `'${font}', sans-serif`;
+      stackKo = stack;
     }
     if (stack) {
       document.documentElement.style.setProperty('--font-sans', stack);
       document.body.style.fontFamily = stack;
     }
+    applyLangKoOverride(stackKo !== stack ? stackKo : '');
   }
 
   // ── Undo ────────────────────────────────────────────────────────

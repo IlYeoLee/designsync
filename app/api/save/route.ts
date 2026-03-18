@@ -179,7 +179,7 @@ export async function POST(req: NextRequest) {
     const fontFamily = tokens.primitives?.fontFamily || 'Geist';
     const fontFamilyKo = tokens.primitives?.fontFamilyKo || '';
 
-    // font-sans 스택 구성: 한글 폰트 우선
+    // font-sans 기본 스택: 영문 폰트 먼저 (영문 자는 영문 폰트, 한글 자는 한글 폰트로 fallback)
     let fontSansValue = '';
     if (fontFamilyKo && fontFamily !== 'Geist') {
       fontSansValue = `'${fontFamily}', '${fontFamilyKo}', sans-serif`;
@@ -192,6 +192,18 @@ export async function POST(req: NextRequest) {
     if (fontSansValue) {
       lightVars["font-sans"] = fontSansValue;
       darkVars["font-sans"] = fontSansValue;
+    }
+
+    // lang="ko" 오버라이드: 한글 폰트 먼저 → 한글+영문 혼합 문장도 한글 폰트 하나로 통일
+    // (Pretendard/Noto Sans KR은 Latin 글리프 포함하므로 영문도 커버 가능)
+    // 번역 플러그인이 lang 어트리뷰트 변경 시 자동 전환됨
+    let fontSansKoValue = '';
+    if (fontFamilyKo && fontFamily !== 'Geist') {
+      fontSansKoValue = `'${fontFamilyKo}', '${fontFamily}', sans-serif`;
+    } else if (fontFamilyKo) {
+      fontSansKoValue = `'${fontFamilyKo}', sans-serif`;
+    } else if (fontFamily !== 'Geist') {
+      fontSansKoValue = `'${fontFamily}', sans-serif`;
     }
 
     if (tokens.primitives?.fontSize) {
@@ -215,6 +227,17 @@ export async function POST(req: NextRequest) {
 
     tokensJson.cssVars = { light: lightVars, dark: darkVars };
     tokensJson.type = "registry:style";
+
+    // lang="ko" 시 한글 폰트 우선 오버라이드
+    if (fontSansKoValue && fontSansKoValue !== fontSansValue) {
+      tokensJson.css = {
+        ":root:lang(ko)": {
+          "--font-sans": fontSansKoValue,
+        },
+      };
+    } else {
+      delete tokensJson.css;
+    }
 
     // Clean up stale squircle/cornerkit artifacts from old saves
     delete tokensJson.files;

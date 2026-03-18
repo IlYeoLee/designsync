@@ -243,21 +243,42 @@ export function applyTokensToDocument(tokens: TokenState): void {
   root.style.setProperty('--ds-shadow-md', tokens.primitives.shadows.md);
   root.style.setProperty('--ds-shadow-lg', tokens.primitives.shadows.lg);
 
-  // Apply font family: 한글 폰트 우선, 영문 폰트 뒤에
+  // Apply font family
+  // 기본: 영문 폰트 먼저 (영문 자 → 영문 폰트, 한글 자 → 한글 폰트 fallback)
+  // lang="ko" 오버라이드: 한글 폰트 먼저 → 혼합 문장도 한글 폰트로 통일
   const fontEn = tokens.primitives.fontFamily;
   const fontKo = tokens.primitives.fontFamilyKo;
   let fontStack = '';
+  let fontStackKo = '';
   if (fontKo && fontEn && fontEn !== 'Geist') {
     fontStack = `'${fontEn}', '${fontKo}', sans-serif`;
+    fontStackKo = `'${fontKo}', '${fontEn}', sans-serif`;
   } else if (fontKo) {
     fontStack = `'${fontKo}', sans-serif`;
+    fontStackKo = fontStack;
   } else if (fontEn && fontEn !== 'Geist') {
     fontStack = `'${fontEn}', sans-serif`;
+    fontStackKo = fontStack;
   }
   if (fontStack) {
     root.style.setProperty('--font-sans', fontStack);
     document.body.style.fontFamily = fontStack;
   }
+
+  // Inject :lang(ko) override style tag (한글 문서/번역 시 자동 전환)
+  const styleId = 'ds-font-lang-override';
+  let styleEl = document.getElementById(styleId) as HTMLStyleElement | null;
+  if (fontStackKo && fontStackKo !== fontStack) {
+    if (!styleEl) {
+      styleEl = document.createElement('style');
+      styleEl.id = styleId;
+      document.head.appendChild(styleEl);
+    }
+    styleEl.textContent = `:root:lang(ko) { --font-sans: ${fontStackKo}; font-family: ${fontStackKo}; }`;
+  } else if (styleEl) {
+    styleEl.remove();
+  }
+
   // 기존 --custom-font-family도 유지
   root.style.setProperty('--custom-font-family', fontEn || 'Geist');
 }
