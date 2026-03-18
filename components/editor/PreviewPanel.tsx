@@ -54,65 +54,59 @@ import { TypographyH1, TypographyH2, TypographyH3, TypographyH4, TypographyP, Ty
 
 import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as CalendarIcon, Smile, Settings, User, LayoutDashboard, FileText, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, ChevronsUpDown, ChevronDown } from "lucide-react";
 
-// --- Squircle slot definitions (mirrors squircle-provider.tsx) ---
+// --- Squircle helpers (mirrors squircle-provider.tsx) ---
 const PILL_THRESHOLD = 9000;
 
-// Excluded: carousel (clips arrows), resizable (clips handles), scroll-area (clips scrollbar)
-const PV_CONTAINER_SLOTS: Record<string, number> = {
-  button: 1, card: 1.5, input: 1, textarea: 1, "select-trigger": 1,
-  badge: 1, alert: 1, checkbox: 0.5, toggle: 1, "toggle-group-item": 1,
-  "tabs-list": 1, "tabs-trigger": 0.8, command: 1, skeleton: 1,
-  "input-otp-slot": 1, calendar: 1, chart: 1, "accordion-item": 1,
-  "table-container": 1, menubar: 1,
-};
+const EXCLUDED_TAGS = new Set([
+  "HTML", "BODY", "HEAD", "SCRIPT", "STYLE", "LINK", "META",
+  "SVG", "PATH", "CIRCLE", "RECT", "LINE", "POLYGON",
+  "IFRAME", "VIDEO", "CANVAS", "IMG",
+]);
 
-const PV_PORTAL_SLOTS: Record<string, number> = {
-  "dialog-content": 1.5, "sheet-content": 1.5, "alert-dialog-content": 1.5,
-  "drawer-content": 1.5, "popover-content": 1, "dropdown-menu-content": 1,
-  "context-menu-content": 1, "menubar-content": 1, "tooltip-content": 0.8,
-  "hover-card-content": 1, "select-content": 1, "navigation-menu-content": 1,
-  "navigation-menu-viewport": 1,
-};
+const EXCLUDED_SLOTS = new Set([
+  "carousel", "carousel-content",
+  "resizable-panel", "resizable-handle",
+  "scroll-area", "scroll-area-viewport",
+  "sidebar",
+]);
 
-function buildSel(slots: Record<string, number>): string {
-  return Object.keys(slots).map((s) => `[data-slot='${s}']`).join(",");
-}
-const PV_CONTAINER_SEL = buildSel(PV_CONTAINER_SLOTS);
-const PV_PORTAL_SEL = buildSel(PV_PORTAL_SLOTS);
-
-function pvApply(
+function pvApplyEl(
   ck: import("@cornerkit/core").default,
-  el: HTMLElement, mult: number, baseR: number, smoothing: number,
+  el: HTMLElement, smoothing: number,
   prefix: string, idx: number,
 ): void {
-  if (!el.id) el.id = `${prefix}-${idx}-${Date.now()}`;
+  if (EXCLUDED_TAGS.has(el.tagName)) return;
+  const slot = el.getAttribute("data-slot");
+  if (slot && EXCLUDED_SLOTS.has(slot)) return;
+  if (el.hasAttribute("data-squircle-applied")) return;
+
   const styles = getComputedStyle(el);
-  if ((parseFloat(styles.borderRadius) || 0) >= PILL_THRESHOLD) return;
+  const cr = parseFloat(styles.borderRadius) || 0;
+  if (cr <= 0 || cr >= PILL_THRESHOLD) return;
+  if (el.offsetWidth < 8 || el.offsetHeight < 8) return;
 
-  const r = Math.min(mult * baseR, 9999);
-  if (r <= 0) return;
-
-  const opts = { radius: r, smoothing };
+  if (!el.id) el.id = `${prefix}-${idx}-${Date.now()}`;
 
   try {
-    if (el.hasAttribute("data-squircle-applied")) {
-      ck.update(`#${el.id}`, opts);
-    } else {
-      ck.apply(`#${el.id}`, opts);
-      el.setAttribute("data-squircle-applied", "true");
-    }
-  } catch {
-    try { ck.apply(`#${el.id}`, opts); el.setAttribute("data-squircle-applied", "true"); } catch {}
-  }
+    ck.apply(`#${el.id}`, { radius: cr, smoothing });
+    el.setAttribute("data-squircle-applied", "true");
+  } catch { /* not ready */ }
 
-  // Shadow: clip-path clips box-shadow — remove entirely
   const bs = styles.boxShadow;
   if (bs && bs !== "none") {
-    if (!el.dataset.origShadow) {
-      el.dataset.origShadow = el.style.boxShadow || "";
-    }
+    if (!el.dataset.origShadow) el.dataset.origShadow = el.style.boxShadow || "";
     el.style.boxShadow = "none";
   }
+}
+
+function pvUpdateEl(
+  ck: import("@cornerkit/core").default,
+  el: HTMLElement, smoothing: number,
+): void {
+  const styles = getComputedStyle(el);
+  const cr = parseFloat(styles.borderRadius) || 0;
+  if (cr <= 0 || cr >= PILL_THRESHOLD) return;
+  try { ck.update(`#${el.id}`, { radius: cr, smoothing }); } catch { /* ignore */ }
 }
 
 type PreviewCategory = "form" | "overlay" | "navigation" | "display" | "feedback";
@@ -1250,13 +1244,6 @@ export function PreviewPanel({
     }
 
     const smoothing = squircleSmoothing / 100;
-    const baseR = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--radius-md-prim")) * 16 || 8;
-
-    // Skip if radius is 0
-    if (baseR <= 0) {
-      cleanupAll();
-      return;
-    }
 
     // Small delay to let React render the category content
     const timer = setTimeout(() => {
@@ -1267,45 +1254,38 @@ export function PreviewPanel({
         ckRef.current = new CornerKit();
         const ck = ckRef.current;
 
-        // 1. Container elements
-        const containerEls = containerRef.current!.querySelectorAll(PV_CONTAINER_SEL);
-        containerEls.forEach((el, i) => {
+        // Scan ALL elements inside container
+        containerRef.current!.querySelectorAll("*").forEach((el, i) => {
           const htmlEl = el as HTMLElement;
-          const slot = htmlEl.getAttribute("data-slot") || "";
-          const cfg = PV_CONTAINER_SLOTS[slot];
-          if (!cfg) return;
-          pvApply(ck, htmlEl, cfg, baseR, smoothing, "sq-pv", i);
+          if (htmlEl.hasAttribute("data-squircle-applied")) {
+            pvUpdateEl(ck, htmlEl, smoothing);
+          } else {
+            pvApplyEl(ck, htmlEl, smoothing, "sq-pv", i);
+          }
         });
 
-        // 2. Portal elements (dialog, popover, dropdown, etc.)
-        const portalEls = document.querySelectorAll(PV_PORTAL_SEL);
-        portalEls.forEach((el, i) => {
+        // Portal elements (rendered outside container)
+        document.querySelectorAll("[data-radix-portal] *, [data-slot]").forEach((el, i) => {
           const htmlEl = el as HTMLElement;
-          const slot = htmlEl.getAttribute("data-slot") || "";
-          const cfg = PV_PORTAL_SLOTS[slot];
-          if (!cfg) return;
-          pvApply(ck, htmlEl, cfg, baseR, smoothing, "sq-pt", i);
+          if (containerRef.current?.contains(htmlEl)) return;
+          if (htmlEl.hasAttribute("data-squircle-applied")) {
+            pvUpdateEl(ck, htmlEl, smoothing);
+          } else {
+            pvApplyEl(ck, htmlEl, smoothing, "sq-pt", i);
+          }
         });
       });
     }, 50);
 
-    // Also observe document.body for portal elements
+    // Observe document.body for portal elements
     const portalObserver = new MutationObserver(() => {
-      if (!squircleEnabled) return;
-      import("@cornerkit/core").then(({ default: CornerKit }) => {
-        if (!ckRef.current) ckRef.current = new CornerKit();
-        const ck = ckRef.current;
-        const smoothVal = squircleSmoothing / 100;
-        const r = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--radius-md-prim")) * 16 || 8;
-        const portalEls = document.querySelectorAll(PV_PORTAL_SEL);
-        portalEls.forEach((el, i) => {
-          const htmlEl = el as HTMLElement;
-          if (htmlEl.hasAttribute("data-squircle-applied")) return;
-          const slot = htmlEl.getAttribute("data-slot") || "";
-          const cfg = PV_PORTAL_SLOTS[slot];
-          if (!cfg) return;
-          pvApply(ck, htmlEl, cfg, r, smoothVal, "sq-pt", i);
-        });
+      if (!squircleEnabled || !ckRef.current) return;
+      const ck = ckRef.current;
+      document.querySelectorAll("[data-radix-portal] *, [data-slot]").forEach((el, i) => {
+        const htmlEl = el as HTMLElement;
+        if (containerRef.current?.contains(htmlEl)) return;
+        if (htmlEl.hasAttribute("data-squircle-applied")) return;
+        pvApplyEl(ck, htmlEl, squircleSmoothing / 100, "sq-pt", i);
       });
     });
     portalObserver.observe(document.body, { childList: true, subtree: true });
