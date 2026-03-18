@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "font-geist",
+  "type": "registry:file",
+  "description": "Geist font — served from DesignSync CDN. After install, add @import './font-geist.css' to your globals.css.",
+  "files": [
+    {
+      "path": "registry/styles/font-geist.css",
+      "type": "registry:file",
+      "target": "app/font-geist.css",
+      "content": "@font-face {\n  font-family: 'Geist';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url('https://designsync-omega.vercel.app/fonts/Geist-400.woff2') format('woff2');\n  unicode-range: U+0000-00FF;\n}\n\n@font-face {\n  font-family: 'Geist';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url('https://designsync-omega.vercel.app/fonts/Geist-500.woff2') format('woff2');\n  unicode-range: U+0000-00FF;\n}\n\n@font-face {\n  font-family: 'Geist';\n  font-style: normal;\n  font-weight: 700;\n  font-display: swap;\n  src: url('https://designsync-omega.vercel.app/fonts/Geist-700.woff2') format('woff2');\n  unicode-range: U+0000-00FF;\n}"
+    }
+  ]
+}
