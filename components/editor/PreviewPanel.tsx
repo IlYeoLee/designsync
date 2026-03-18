@@ -70,7 +70,7 @@ const EXCLUDED_SLOTS = new Set([
   "sidebar",
 ]);
 
-function pvApplyEl(
+function pvProcessEl(
   ck: import("@cornerkit/core").default,
   el: HTMLElement, smoothing: number,
   prefix: string, idx: number,
@@ -78,45 +78,34 @@ function pvApplyEl(
   if (EXCLUDED_TAGS.has(el.tagName)) return;
   const slot = el.getAttribute("data-slot");
   if (slot && EXCLUDED_SLOTS.has(slot)) return;
-  if (el.hasAttribute("data-squircle-applied")) return;
+  if (el.offsetWidth < 8 || el.offsetHeight < 8) return;
 
   const styles = getComputedStyle(el);
   const cr = parseFloat(styles.borderRadius) || 0;
   if (cr <= 0 || cr >= PILL_THRESHOLD) return;
-  if (el.offsetWidth < 8 || el.offsetHeight < 8) return;
 
   if (!el.id) el.id = `${prefix}-${idx}-${Date.now()}`;
 
-  // Build CornerKit options — pass border so it uses SVG mode (no clip-path clipping)
+  const opts: Record<string, unknown> = { radius: cr, smoothing };
   const bw = parseFloat(styles.borderWidth) || 0;
   const bc = styles.borderColor || "";
-  const opts: Record<string, unknown> = { radius: cr, smoothing };
   if (bw > 0 && bc && bc !== "transparent" && bc !== "rgba(0, 0, 0, 0)") {
     opts.border = { width: bw, color: bc };
-    if (!el.dataset.origBorderWidth) el.dataset.origBorderWidth = el.style.borderWidth || "";
-    el.style.borderWidth = "0";
   }
 
   try {
-    ck.apply(`#${el.id}`, opts);
-    el.setAttribute("data-squircle-applied", "true");
-  } catch { /* not ready */ }
-}
-
-function pvUpdateEl(
-  ck: import("@cornerkit/core").default,
-  el: HTMLElement, smoothing: number,
-): void {
-  const styles = getComputedStyle(el);
-  const cr = parseFloat(styles.borderRadius) || 0;
-  if (cr <= 0 || cr >= PILL_THRESHOLD) return;
-  const opts: Record<string, unknown> = { radius: cr, smoothing };
-  const bw = parseFloat(styles.borderWidth) || 0;
-  const bc = styles.borderColor || "";
-  if (bw > 0 && bc && bc !== "transparent" && bc !== "rgba(0, 0, 0, 0)") {
-    opts.border = { width: bw, color: bc };
+    if (el.hasAttribute("data-squircle-applied")) {
+      ck.update(`#${el.id}`, opts);
+    } else {
+      ck.apply(`#${el.id}`, opts);
+      el.setAttribute("data-squircle-applied", "true");
+    }
+  } catch {
+    try {
+      ck.apply(`#${el.id}`, opts);
+      el.setAttribute("data-squircle-applied", "true");
+    } catch { /* not ready */ }
   }
-  try { ck.update(`#${el.id}`, opts); } catch { /* ignore */ }
 }
 
 type PreviewCategory = "form" | "overlay" | "navigation" | "display" | "feedback";
@@ -1229,27 +1218,10 @@ export function PreviewPanel({
 
   // Apply cornerKit squircle to preview elements
   React.useEffect(() => {
-    // Cleanup: destroy CornerKit instance and restore shadows
+    // Cleanup: destroy CornerKit instance (it restores styles internally)
     const cleanupAll = () => {
       try { ckRef.current?.destroy(); } catch { /* ignore */ }
       ckRef.current = null;
-      // Restore shadows on all squircle-applied elements
-      const restoreEls = [
-        ...(containerRef.current?.querySelectorAll("[data-squircle-applied]") ?? []),
-        ...document.querySelectorAll("[data-squircle-applied]"),
-      ];
-      restoreEls.forEach((el) => {
-        const htmlEl = el as HTMLElement;
-        htmlEl.removeAttribute("data-squircle-applied");
-        if (htmlEl.dataset.origShadow !== undefined) {
-          htmlEl.style.boxShadow = htmlEl.dataset.origShadow || "";
-          delete htmlEl.dataset.origShadow;
-        }
-        if (htmlEl.dataset.origBorderWidth !== undefined) {
-          htmlEl.style.borderWidth = htmlEl.dataset.origBorderWidth || "";
-          delete htmlEl.dataset.origBorderWidth;
-        }
-      });
     };
 
     if (!squircleEnabled || !containerRef.current) {
@@ -1263,30 +1235,21 @@ export function PreviewPanel({
     const timer = setTimeout(() => {
       import("@cornerkit/core").then(({ default: CornerKit }) => {
         if (!containerRef.current) return;
-        // Destroy previous instance to avoid stale references
-        try { ckRef.current?.destroy(); } catch { /* ignore */ }
-        ckRef.current = new CornerKit();
+        if (!ckRef.current) ckRef.current = new CornerKit();
         const ck = ckRef.current;
 
         // Scan ALL elements inside container
         containerRef.current!.querySelectorAll("*").forEach((el, i) => {
-          const htmlEl = el as HTMLElement;
-          if (htmlEl.hasAttribute("data-squircle-applied")) {
-            pvUpdateEl(ck, htmlEl, smoothing);
-          } else {
-            pvApplyEl(ck, htmlEl, smoothing, "sq-pv", i);
-          }
+          pvProcessEl(ck, el as HTMLElement, smoothing, "sq-pv", i);
         });
 
-        // Portal elements (rendered outside container)
-        document.querySelectorAll("[data-radix-portal] *, [data-slot]").forEach((el, i) => {
+        // Portal elements (Radix portals + Sonner toasts)
+        document.querySelectorAll(
+          "[data-radix-portal] *, [data-sonner-toast], [data-sonner-toast] *"
+        ).forEach((el, i) => {
           const htmlEl = el as HTMLElement;
           if (containerRef.current?.contains(htmlEl)) return;
-          if (htmlEl.hasAttribute("data-squircle-applied")) {
-            pvUpdateEl(ck, htmlEl, smoothing);
-          } else {
-            pvApplyEl(ck, htmlEl, smoothing, "sq-pt", i);
-          }
+          pvProcessEl(ck, htmlEl, smoothing, "sq-pt", i);
         });
       });
     }, 50);
@@ -1295,11 +1258,12 @@ export function PreviewPanel({
     const portalObserver = new MutationObserver(() => {
       if (!squircleEnabled || !ckRef.current) return;
       const ck = ckRef.current;
-      document.querySelectorAll("[data-radix-portal] *, [data-slot]").forEach((el, i) => {
+      document.querySelectorAll(
+        "[data-radix-portal] *, [data-sonner-toast], [data-sonner-toast] *"
+      ).forEach((el, i) => {
         const htmlEl = el as HTMLElement;
         if (containerRef.current?.contains(htmlEl)) return;
-        if (htmlEl.hasAttribute("data-squircle-applied")) return;
-        pvApplyEl(ck, htmlEl, squircleSmoothing / 100, "sq-pt", i);
+        pvProcessEl(ck, htmlEl, squircleSmoothing / 100, "sq-pt", i);
       });
     });
     portalObserver.observe(document.body, { childList: true, subtree: true });
@@ -1307,7 +1271,6 @@ export function PreviewPanel({
     return () => {
       clearTimeout(timer);
       portalObserver.disconnect();
-      cleanupAll();
     };
   }, [squircleEnabled, squircleSmoothing, category, radiusKey, tokenKey]);
 
