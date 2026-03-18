@@ -7,7 +7,7 @@ import * as React from "react";
  *
  * Applies iOS/Figma-style squircle corners via @cornerkit/core.
  * Uses clip-path internally — known limitations:
- *   - box-shadow is clipped → converted to filter: drop-shadow() on parent
+ *   - box-shadow is clipped → removed entirely when squircle is active
  *   - overflow content is clipped → container components with overflow children excluded
  *   - pill/circle elements (border-radius ≥ 9999px) auto-skipped
  */
@@ -69,27 +69,6 @@ function buildSelector(slots: Record<string, number>): string {
 const CONTAINER_SEL = buildSelector(CONTAINER_SLOTS);
 const PORTAL_SEL = buildSelector(PORTAL_SLOTS);
 
-/**
- * Convert box-shadow → filter: drop-shadow().
- * drop-shadow() follows clip-path shape and renders OUTSIDE the clip.
- * Limitation: no spread support, no inset support.
- */
-function boxShadowToDropShadow(boxShadow: string): string {
-  return boxShadow
-    .split(/,(?![^(]*\))/)
-    .map((s) => {
-      const t = s.trim();
-      if (t.startsWith("inset")) return null;
-      // Computed style: "color x y blur [spread]"
-      const m = t.match(
-        /^(rgba?\([^)]+\)|oklch\([^)]+\))\s+([-\d.]+)px\s+([-\d.]+)px\s+([-\d.]+)px/i
-      );
-      if (m) return `drop-shadow(${m[2]}px ${m[3]}px ${m[4]}px ${m[1]})`;
-      return null;
-    })
-    .filter(Boolean)
-    .join(" ");
-}
 
 function applyToElement(
   ck: import("@cornerkit/core").default,
@@ -123,15 +102,10 @@ function applyToElement(
     } catch { /* not ready */ }
   }
 
-  // Shadow: clip-path clips box-shadow, so move it to filter: drop-shadow()
-  // drop-shadow renders OUTSIDE clip-path → shadow visible around squircle shape
+  // Shadow: clip-path clips box-shadow — remove it entirely when squircle is active
   const bs = styles.boxShadow;
   if (bs && bs !== "none") {
-    const ds = boxShadowToDropShadow(bs);
-    if (ds) {
-      el.style.boxShadow = "none";
-      el.style.filter = ds;
-    }
+    el.style.boxShadow = "none";
   }
 }
 

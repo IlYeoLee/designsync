@@ -80,16 +80,6 @@ function buildSel(slots: Record<string, number>): string {
 const PV_CONTAINER_SEL = buildSel(PV_CONTAINER_SLOTS);
 const PV_PORTAL_SEL = buildSel(PV_PORTAL_SLOTS);
 
-function boxShadowToDropShadow(bs: string): string {
-  return bs.split(/,(?![^(]*\))/).map((s) => {
-    const t = s.trim();
-    if (t.startsWith("inset")) return null;
-    const m = t.match(/^(rgba?\([^)]+\)|oklch\([^)]+\))\s+([-\d.]+)px\s+([-\d.]+)px\s+([-\d.]+)px/i);
-    if (m) return `drop-shadow(${m[2]}px ${m[3]}px ${m[4]}px ${m[1]})`;
-    return null;
-  }).filter(Boolean).join(" ");
-}
-
 function pvApply(
   ck: import("@cornerkit/core").default,
   el: HTMLElement, mult: number, baseR: number, smoothing: number,
@@ -111,15 +101,13 @@ function pvApply(
     try { ck.apply(`#${el.id}`, { radius: r, smoothing }); el.setAttribute("data-squircle-applied", "true"); } catch {}
   }
 
-  // Shadow: convert box-shadow → drop-shadow (renders outside clip-path)
+  // Shadow: clip-path clips box-shadow — remove it entirely when squircle is active
   const bs = styles.boxShadow;
   if (bs && bs !== "none") {
     if (!el.dataset.origShadow) {
       el.dataset.origShadow = el.style.boxShadow || "";
-      el.dataset.origFilter = el.style.filter || "";
     }
-    const ds = boxShadowToDropShadow(bs);
-    if (ds) { el.style.boxShadow = "none"; el.style.filter = ds; }
+    el.style.boxShadow = "none";
   }
 }
 
@@ -1242,9 +1230,7 @@ export function PreviewPanel({
         htmlEl.removeAttribute("data-squircle-applied");
         if (htmlEl.dataset.origShadow !== undefined) {
           htmlEl.style.boxShadow = htmlEl.dataset.origShadow || "";
-          htmlEl.style.filter = htmlEl.dataset.origFilter || "";
           delete htmlEl.dataset.origShadow;
-          delete htmlEl.dataset.origFilter;
         }
       });
       // Restore portal elements
@@ -1255,9 +1241,7 @@ export function PreviewPanel({
         htmlEl.removeAttribute("data-squircle-applied");
         if (htmlEl.dataset.origShadow !== undefined) {
           htmlEl.style.boxShadow = htmlEl.dataset.origShadow || "";
-          htmlEl.style.filter = htmlEl.dataset.origFilter || "";
           delete htmlEl.dataset.origShadow;
-          delete htmlEl.dataset.origFilter;
         }
       });
     };

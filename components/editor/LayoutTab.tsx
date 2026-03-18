@@ -322,9 +322,12 @@ export function LayoutTab({ tokens, onTokenChange, squircleEnabled, squircleSmoo
             <p className="text-[10px] text-muted-foreground">
               0% = normal · 60% = Apple/Figma · 100% = superellipse
             </p>
-            <p className="text-[10px] text-muted-foreground/70">
-              SVG clip-path 기반 · 모든 브라우저 지원
-            </p>
+            <div className="rounded-md bg-muted/50 p-2.5 border border-border">
+              <p className="text-[10px] text-muted-foreground leading-relaxed">
+                ⚠ 코너 스무싱 활성화 시 <strong>그림자(box-shadow)는 자동으로 제거</strong>됩니다.
+                SVG clip-path 특성상 그림자가 잘리기 때문입니다. 보더와 면은 정상 적용됩니다.
+              </p>
+            </div>
           </div>
         )}
       </div>
@@ -344,7 +347,6 @@ function SquirclePreview({ smoothing, radiusPx }: { smoothing: number; radiusPx:
         radius={r}
         smoothing={s}
         className="h-7 px-3 flex items-center text-[11px] font-medium bg-primary text-primary-foreground flex-shrink-0"
-        style={{ filter: "drop-shadow(0 1px 2px oklch(0 0 0 / 0.1))" }}
       >
         Button
       </Squircle>
@@ -355,7 +357,6 @@ function SquirclePreview({ smoothing, radiusPx }: { smoothing: number; radiusPx:
         smoothing={s}
         border={{ width: 1, color: "var(--border)" }}
         className="h-10 w-14 bg-card flex-shrink-0"
-        style={{ filter: "drop-shadow(0 1px 4px oklch(0 0 0 / 0.12))" }}
       />
 
       {/* Input shape */}
