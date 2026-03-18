@@ -130,7 +130,7 @@ function parseBoxShadowToDropShadow(boxShadow: string): string {
 function applySquircleToElement(
   ck: import("@cornerkit/core").default,
   htmlEl: HTMLElement,
-  cfg: { radiusMult: number; border: boolean },
+  cfg: { radiusMult: number },
   baseR: number,
   smoothing: number,
   idPrefix: string,
@@ -145,16 +145,9 @@ function applySquircleToElement(
   if (computedRadius >= PILL_RADIUS_THRESHOLD) return;
 
   const r = Math.min(cfg.radiusMult * baseR, 9999);
-  const borderWidth = parseFloat(styles.borderWidth) || 0;
-  const boxShadow = styles.boxShadow;
 
-  const opts: { radius: number; smoothing: number; border?: { width: number; color: string } } = {
-    radius: r,
-    smoothing,
-  };
-  if (cfg.border && borderWidth > 0) {
-    opts.border = { width: borderWidth, color: styles.borderColor };
-  }
+  // Only shape — no border option. CSS borders are naturally clipped by clip-path.
+  const opts = { radius: r, smoothing };
 
   try {
     if (htmlEl.hasAttribute("data-squircle-applied")) {
@@ -170,17 +163,8 @@ function applySquircleToElement(
     } catch { /* ignore */ }
   }
 
-  // Remove CSS border to prevent doubling
-  if (cfg.border && borderWidth > 0) {
-    if (!htmlEl.dataset.origBorder) {
-      htmlEl.dataset.origBorder = htmlEl.style.borderColor || "";
-      htmlEl.dataset.origBorderWidth = htmlEl.style.borderWidth || "";
-    }
-    htmlEl.style.borderColor = "transparent";
-    htmlEl.style.borderWidth = "0";
-  }
-
-  // Convert box-shadow → drop-shadow
+  // Convert box-shadow → drop-shadow (clip-path clips box-shadow)
+  const boxShadow = styles.boxShadow;
   if (boxShadow && boxShadow !== "none") {
     if (!htmlEl.dataset.origShadow) {
       htmlEl.dataset.origShadow = htmlEl.style.boxShadow || "";
@@ -1293,10 +1277,12 @@ export function PreviewPanel({
   squircleEnabled = false,
   squircleSmoothing = 60,
   radiusKey,
+  tokenKey,
 }: {
   squircleEnabled?: boolean;
   squircleSmoothing?: number;
   radiusKey?: string;
+  tokenKey?: string;
 }) {
   const [category, setCategory] = React.useState<PreviewCategory>("form");
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -1311,12 +1297,6 @@ export function PreviewPanel({
         const htmlEl = el as HTMLElement;
         try { ckRef.current?.remove(`#${htmlEl.id}`); } catch { /* ignore */ }
         htmlEl.removeAttribute("data-squircle-applied");
-        if (htmlEl.dataset.origBorder !== undefined) {
-          htmlEl.style.borderColor = htmlEl.dataset.origBorder || "";
-          htmlEl.style.borderWidth = htmlEl.dataset.origBorderWidth || "";
-          delete htmlEl.dataset.origBorder;
-          delete htmlEl.dataset.origBorderWidth;
-        }
         if (htmlEl.dataset.origShadow !== undefined) {
           htmlEl.style.boxShadow = htmlEl.dataset.origShadow || "";
           htmlEl.style.filter = htmlEl.dataset.origFilter || "";
@@ -1330,12 +1310,6 @@ export function PreviewPanel({
         if (!htmlEl.id.startsWith("sq-pt-")) return;
         try { ckRef.current?.remove(`#${htmlEl.id}`); } catch { /* ignore */ }
         htmlEl.removeAttribute("data-squircle-applied");
-        if (htmlEl.dataset.origBorder !== undefined) {
-          htmlEl.style.borderColor = htmlEl.dataset.origBorder || "";
-          htmlEl.style.borderWidth = htmlEl.dataset.origBorderWidth || "";
-          delete htmlEl.dataset.origBorder;
-          delete htmlEl.dataset.origBorderWidth;
-        }
         if (htmlEl.dataset.origShadow !== undefined) {
           htmlEl.style.boxShadow = htmlEl.dataset.origShadow || "";
           htmlEl.style.filter = htmlEl.dataset.origFilter || "";
@@ -1357,7 +1331,8 @@ export function PreviewPanel({
     const timer = setTimeout(() => {
       import("@cornerkit/core").then(({ default: CornerKit }) => {
         if (!containerRef.current) return;
-        if (!ckRef.current) ckRef.current = new CornerKit();
+        // Fresh instance on each apply to avoid stale references from tab switches
+        ckRef.current = new CornerKit();
         const ck = ckRef.current;
 
         // 1. Container elements
@@ -1407,7 +1382,7 @@ export function PreviewPanel({
       clearTimeout(timer);
       portalObserver.disconnect();
     };
-  }, [squircleEnabled, squircleSmoothing, category, radiusKey]);
+  }, [squircleEnabled, squircleSmoothing, category, radiusKey, tokenKey]);
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-background">

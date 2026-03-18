@@ -118,7 +118,7 @@ function parseBoxShadowToDropShadow(boxShadow: string): string {
 function applyToElement(
   ck: import("@cornerkit/core").default,
   htmlEl: HTMLElement,
-  cfg: { radiusMult: number; border: boolean },
+  cfg: { radiusMult: number },
   radius: number,
   smoothing: number,
   idPrefix: string,
@@ -133,15 +133,9 @@ function applyToElement(
   if (computedRadius >= PILL_RADIUS_THRESHOLD) return false;
 
   const r = Math.min(cfg.radiusMult * radius, 9999);
-  const borderWidth = parseFloat(styles.borderWidth) || 0;
 
-  const opts: { radius: number; smoothing: number; border?: { width: number; color: string } } = {
-    radius: r,
-    smoothing,
-  };
-  if (cfg.border && borderWidth > 0) {
-    opts.border = { width: borderWidth, color: styles.borderColor };
-  }
+  // Shape only — CSS borders are naturally clipped by clip-path
+  const opts = { radius: r, smoothing };
 
   try {
     if (htmlEl.hasAttribute("data-squircle-applied")) {
@@ -157,19 +151,12 @@ function applyToElement(
     } catch { /* element not ready */ }
   }
 
-  // Remove CSS border to prevent doubling with CornerKit SVG border
-  if (cfg.border && borderWidth > 0) {
-    htmlEl.style.borderColor = "transparent";
-    htmlEl.style.borderWidth = "0";
-  }
-
-  // Convert box-shadow → filter: drop-shadow() to prevent clip-path clipping
+  // Convert box-shadow → filter: drop-shadow() (clip-path clips box-shadow)
   const boxShadow = styles.boxShadow;
   if (boxShadow && boxShadow !== "none") {
     const dropShadows = parseBoxShadowToDropShadow(boxShadow);
     if (dropShadows) {
       htmlEl.style.boxShadow = "none";
-      // Preserve existing non-shadow filters
       const existingFilter = styles.filter;
       const hasExisting = existingFilter && existingFilter !== "none" && !existingFilter.includes("drop-shadow");
       htmlEl.style.filter = hasExisting ? `${existingFilter} ${dropShadows}` : dropShadows;
