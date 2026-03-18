@@ -112,6 +112,14 @@ function pvApply(
     try { ck.apply(`#${el.id}`, opts); el.setAttribute("data-squircle-applied", "true"); } catch {}
   }
 
+  // Hide CSS border — CornerKit SVG border replaces it
+  if (bw > 0) {
+    if (!el.dataset.origBorderColor) {
+      el.dataset.origBorderColor = el.style.borderColor || "";
+    }
+    el.style.borderColor = "transparent";
+  }
+
   // Shadow: clip-path clips box-shadow — remove it entirely when squircle is active
   const bs = styles.boxShadow;
   if (bs && bs !== "none") {
@@ -1247,6 +1255,10 @@ export function PreviewPanel({
         if (htmlEl.dataset.origShadow !== undefined) {
           htmlEl.style.boxShadow = htmlEl.dataset.origShadow || "";
           delete htmlEl.dataset.origShadow;
+        }
+        if (htmlEl.dataset.origBorderColor !== undefined) {
+          htmlEl.style.borderColor = htmlEl.dataset.origBorderColor || "";
+          delete htmlEl.dataset.origBorderColor;
         }
       });
     };

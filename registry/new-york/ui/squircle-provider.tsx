@@ -111,6 +111,11 @@ function applyToElement(
     } catch { /* not ready */ }
   }
 
+  // Hide CSS border — CornerKit SVG border replaces it
+  if (bw > 0) {
+    el.style.borderColor = "transparent";
+  }
+
   // Shadow: clip-path clips box-shadow — remove it entirely when squircle is active
   const bs = styles.boxShadow;
   if (bs && bs !== "none") {
