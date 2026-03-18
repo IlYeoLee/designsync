@@ -86,7 +86,16 @@ function applyToElement(
   if (cr >= PILL_THRESHOLD) return;
 
   const r = Math.min(radiusMult * baseRadius, 9999);
-  const opts = { radius: r, smoothing };
+  // Skip if effective radius is 0 — no smoothing needed
+  if (r <= 0) return;
+
+  // Read existing border so CornerKit renders it via SVG (not clipped)
+  const bw = parseFloat(styles.borderWidth) || 0;
+  const bc = styles.borderColor || "";
+  const opts: Record<string, unknown> = { radius: r, smoothing };
+  if (bw > 0 && bc) {
+    opts.border = { width: bw, color: bc };
+  }
 
   try {
     if (el.hasAttribute("data-squircle-applied")) {

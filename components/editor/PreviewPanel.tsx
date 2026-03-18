@@ -90,15 +90,26 @@ function pvApply(
   if ((parseFloat(styles.borderRadius) || 0) >= PILL_THRESHOLD) return;
 
   const r = Math.min(mult * baseR, 9999);
+  // Skip if effective radius is 0 — no smoothing needed
+  if (r <= 0) return;
+
+  // Read existing border so CornerKit renders it via SVG (not clipped)
+  const bw = parseFloat(styles.borderWidth) || 0;
+  const bc = styles.borderColor || "";
+  const opts: Record<string, unknown> = { radius: r, smoothing };
+  if (bw > 0 && bc) {
+    opts.border = { width: bw, color: bc };
+  }
+
   try {
     if (el.hasAttribute("data-squircle-applied")) {
-      ck.update(`#${el.id}`, { radius: r, smoothing });
+      ck.update(`#${el.id}`, opts);
     } else {
-      ck.apply(`#${el.id}`, { radius: r, smoothing });
+      ck.apply(`#${el.id}`, opts);
       el.setAttribute("data-squircle-applied", "true");
     }
   } catch {
-    try { ck.apply(`#${el.id}`, { radius: r, smoothing }); el.setAttribute("data-squircle-applied", "true"); } catch {}
+    try { ck.apply(`#${el.id}`, opts); el.setAttribute("data-squircle-applied", "true"); } catch {}
   }
 
   // Shadow: clip-path clips box-shadow — remove it entirely when squircle is active
@@ -1221,23 +1232,17 @@ export function PreviewPanel({
 
   // Apply cornerKit squircle to preview elements
   React.useEffect(() => {
-    // Cleanup function for restoring styles when squircle is disabled
-    const restoreAll = () => {
-      // Restore container elements
-      containerRef.current?.querySelectorAll("[data-squircle-applied]").forEach((el) => {
+    // Cleanup: destroy CornerKit instance and restore shadows
+    const cleanupAll = () => {
+      try { ckRef.current?.destroy(); } catch { /* ignore */ }
+      ckRef.current = null;
+      // Restore shadows on all squircle-applied elements
+      const restoreEls = [
+        ...(containerRef.current?.querySelectorAll("[data-squircle-applied]") ?? []),
+        ...document.querySelectorAll("[data-squircle-applied]"),
+      ];
+      restoreEls.forEach((el) => {
         const htmlEl = el as HTMLElement;
-        try { ckRef.current?.remove(`#${htmlEl.id}`); } catch { /* ignore */ }
-        htmlEl.removeAttribute("data-squircle-applied");
-        if (htmlEl.dataset.origShadow !== undefined) {
-          htmlEl.style.boxShadow = htmlEl.dataset.origShadow || "";
-          delete htmlEl.dataset.origShadow;
-        }
-      });
-      // Restore portal elements
-      document.querySelectorAll("[data-squircle-applied]").forEach((el) => {
-        const htmlEl = el as HTMLElement;
-        if (!htmlEl.id.startsWith("sq-pt-")) return;
-        try { ckRef.current?.remove(`#${htmlEl.id}`); } catch { /* ignore */ }
         htmlEl.removeAttribute("data-squircle-applied");
         if (htmlEl.dataset.origShadow !== undefined) {
           htmlEl.style.boxShadow = htmlEl.dataset.origShadow || "";
@@ -1247,18 +1252,25 @@ export function PreviewPanel({
     };
 
     if (!squircleEnabled || !containerRef.current) {
-      if (ckRef.current) restoreAll();
+      cleanupAll();
       return;
     }
 
     const smoothing = squircleSmoothing / 100;
     const baseR = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--radius-md-prim")) * 16 || 8;
 
+    // Skip if radius is 0
+    if (baseR <= 0) {
+      cleanupAll();
+      return;
+    }
+
     // Small delay to let React render the category content
     const timer = setTimeout(() => {
       import("@cornerkit/core").then(({ default: CornerKit }) => {
         if (!containerRef.current) return;
-        // Fresh instance on each apply to avoid stale references from tab switches
+        // Destroy previous instance to avoid stale references
+        try { ckRef.current?.destroy(); } catch { /* ignore */ }
         ckRef.current = new CornerKit();
         const ck = ckRef.current;
 
@@ -1308,6 +1320,7 @@ export function PreviewPanel({
     return () => {
       clearTimeout(timer);
       portalObserver.disconnect();
+      cleanupAll();
     };
   }, [squircleEnabled, squircleSmoothing, category, radiusKey, tokenKey]);
 
