@@ -248,7 +248,7 @@
 /* ============================================================
    CORNER SMOOTHING (squircle)
    .squircle-preview 클래스가 붙은 컨테이너 안의 컴포넌트에 일괄 적용.
-   --squircle-smooth는 JS에서 documentElement에 직접 주입됨.
+   --squircle-border-smoothing은 JS에서 documentElement에 직접 주입됨.
    ============================================================ */
 .squircle-preview [data-slot="button"],
 .squircle-preview [data-slot="input"],
@@ -260,8 +260,10 @@
 .squircle-preview [data-slot="avatar"] {
   mask-image: paint(squircle);
   -webkit-mask-image: paint(squircle);
-  --squircle-radius: var(--radius, 0.5rem);
+  --squircle-border-radius: var(--radius, 0.5rem);
+  --squircle-background-color: transparent;
+  --squircle-mode: mask-image;
 }
 .squircle-preview [data-slot="card"] {
-  --squircle-radius: var(--radius-xl-prim, 0.75rem);
+  --squircle-border-radius: var(--radius-xl-prim, 0.75rem);
 }

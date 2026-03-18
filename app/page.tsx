@@ -26,15 +26,15 @@ export default function Home() {
     }).catch((e) => console.warn("[DesignSync] squircle init failed:", e));
   }, []);
 
-  // ── Squircle: apply --squircle-smooth CSS variable ──────────────
+  // ── Squircle: apply --squircle-border-smoothing CSS variable ────
   React.useEffect(() => {
     if (squircleEnabled) {
       document.documentElement.style.setProperty(
-        "--squircle-smooth",
+        "--squircle-border-smoothing",
         String(squircleSmoothing / 100)
       );
     } else {
-      document.documentElement.style.removeProperty("--squircle-smooth");
+      document.documentElement.style.removeProperty("--squircle-border-smoothing");
     }
   }, [squircleEnabled, squircleSmoothing]);
 

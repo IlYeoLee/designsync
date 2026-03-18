@@ -202,11 +202,11 @@ export async function POST(req: NextRequest) {
 
     // 4c. Apply squircle settings
     if (squircle.enabled) {
-      lightVars["squircle-smooth"] = String(squircle.smoothing / 100);
-      darkVars["squircle-smooth"] = String(squircle.smoothing / 100);
+      lightVars["squircle-border-smoothing"] = String(squircle.smoothing / 100);
+      darkVars["squircle-border-smoothing"] = String(squircle.smoothing / 100);
     } else {
-      delete lightVars["squircle-smooth"];
-      delete darkVars["squircle-smooth"];
+      delete lightVars["squircle-border-smoothing"];
+      delete darkVars["squircle-border-smoothing"];
     }
 
     tokensJson.cssVars = { light: lightVars, dark: darkVars };

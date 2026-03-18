@@ -293,8 +293,10 @@ function SquirclePreview({ smoothing, radiusPx }: { smoothing: number; radiusPx:
   const squircleStyle = (extraStyle?: React.CSSProperties): React.CSSProperties => ({
     maskImage: "paint(squircle)",
     WebkitMaskImage: "paint(squircle)",
-    ["--squircle-smooth" as string]: smooth,
-    ["--squircle-radius" as string]: r,
+    ["--squircle-border-smoothing" as string]: smooth,
+    ["--squircle-border-radius" as string]: r,
+    ["--squircle-background-color" as string]: "transparent",
+    ["--squircle-mode" as string]: "mask-image",
     ...extraStyle,
   });
 
@@ -313,7 +315,7 @@ function SquirclePreview({ smoothing, radiusPx }: { smoothing: number; radiusPx:
         className="h-10 w-14 bg-card flex-shrink-0"
         style={squircleStyle({
           boxShadow: "0 1px 4px oklch(0 0 0 / 0.12)",
-          ["--squircle-radius" as string]: `${Math.max(radiusPx * 1.5, 6)}px`,
+          ["--squircle-border-radius" as string]: `${Math.max(radiusPx * 1.5, 6)}px`,
         })}
       />
 
