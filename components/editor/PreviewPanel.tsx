@@ -54,7 +54,7 @@ import { TypographyH1, TypographyH2, TypographyH3, TypographyH4, TypographyP, Ty
 
 import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as CalendarIcon, Smile, Settings, User, LayoutDashboard, FileText, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, ChevronsUpDown, ChevronDown } from "lucide-react";
 
-// --- Squircle helpers (mirrors squircle-provider.tsx) ---
+// --- Squircle helpers (mirrors squircle-provider.tsx, mask-border approach) ---
 const PILL_THRESHOLD = 9000;
 
 const EXCLUDED_TAGS = new Set([
@@ -70,42 +70,34 @@ const EXCLUDED_SLOTS = new Set([
   "sidebar",
 ]);
 
-function pvProcessEl(
-  ck: import("@cornerkit/core").default,
-  el: HTMLElement, smoothing: number,
-  prefix: string, idx: number,
-): void {
+const SMOOTH_CLASSES = ["smooth-corners-sm", "smooth-corners-md", "smooth-corners-lg"] as const;
+
+function getSmoothClass(radiusPx: number): typeof SMOOTH_CLASSES[number] {
+  if (radiusPx <= 10) return "smooth-corners-sm";
+  if (radiusPx <= 30) return "smooth-corners-md";
+  return "smooth-corners-lg";
+}
+
+function pvApplySmooth(el: HTMLElement): void {
   if (EXCLUDED_TAGS.has(el.tagName)) return;
   const slot = el.getAttribute("data-slot");
   if (slot && EXCLUDED_SLOTS.has(slot)) return;
   if (el.offsetWidth < 8 || el.offsetHeight < 8) return;
 
-  const styles = getComputedStyle(el);
-  const cr = parseFloat(styles.borderRadius) || 0;
+  const cr = parseFloat(getComputedStyle(el).borderRadius) || 0;
   if (cr <= 0 || cr >= PILL_THRESHOLD) return;
 
-  if (!el.id) el.id = `${prefix}-${idx}-${Date.now()}`;
-
-  const opts: Record<string, unknown> = { radius: cr, smoothing };
-  const bw = parseFloat(styles.borderWidth) || 0;
-  const bc = styles.borderColor || "";
-  if (bw > 0 && bc && bc !== "transparent" && bc !== "rgba(0, 0, 0, 0)") {
-    opts.border = { width: bw, color: bc };
+  const cls = getSmoothClass(cr);
+  if (!el.classList.contains(cls)) {
+    SMOOTH_CLASSES.forEach((c) => el.classList.remove(c));
+    el.classList.add(cls);
+    el.setAttribute("data-squircle-applied", "true");
   }
+}
 
-  try {
-    if (el.hasAttribute("data-squircle-applied")) {
-      ck.update(`#${el.id}`, opts);
-    } else {
-      ck.apply(`#${el.id}`, opts);
-      el.setAttribute("data-squircle-applied", "true");
-    }
-  } catch {
-    try {
-      ck.apply(`#${el.id}`, opts);
-      el.setAttribute("data-squircle-applied", "true");
-    } catch { /* not ready */ }
-  }
+function pvRemoveSmooth(el: HTMLElement): void {
+  SMOOTH_CLASSES.forEach((c) => el.classList.remove(c));
+  el.removeAttribute("data-squircle-applied");
 }
 
 type PreviewCategory = "form" | "overlay" | "navigation" | "display" | "feedback";
@@ -1214,57 +1206,45 @@ export function PreviewPanel({
 }) {
   const [category, setCategory] = React.useState<PreviewCategory>("form");
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const ckRef = React.useRef<import("@cornerkit/core").default | null>(null);
+  const rafRef = React.useRef<number | null>(null);
 
-  // Apply cornerKit squircle to preview elements
+  const applyAllSmooth = React.useCallback(() => {
+    if (!containerRef.current) return;
+    containerRef.current.querySelectorAll("*").forEach((el) => {
+      pvApplySmooth(el as HTMLElement);
+    });
+    document.querySelectorAll(
+      "[data-radix-portal] *, [data-sonner-toast], [data-sonner-toast] *"
+    ).forEach((el) => {
+      const htmlEl = el as HTMLElement;
+      if (containerRef.current?.contains(htmlEl)) return;
+      pvApplySmooth(htmlEl);
+    });
+  }, []);
+
+  const removeAllSmooth = React.useCallback(() => {
+    if (containerRef.current) {
+      containerRef.current.querySelectorAll("[data-squircle-applied]").forEach((el) => {
+        pvRemoveSmooth(el as HTMLElement);
+      });
+    }
+    document.querySelectorAll("[data-squircle-applied]").forEach((el) => {
+      pvRemoveSmooth(el as HTMLElement);
+    });
+  }, []);
+
+  // Apply mask-border squircle to preview elements
   React.useEffect(() => {
-    // Cleanup: destroy CornerKit instance (it restores styles internally)
-    const cleanupAll = () => {
-      try { ckRef.current?.destroy(); } catch { /* ignore */ }
-      ckRef.current = null;
-    };
-
     if (!squircleEnabled || !containerRef.current) {
-      cleanupAll();
+      removeAllSmooth();
       return;
     }
 
-    const smoothing = squircleSmoothing / 100;
+    const timer = setTimeout(applyAllSmooth, 50);
 
-    // Small delay to let React render the category content
-    const timer = setTimeout(() => {
-      import("@cornerkit/core").then(({ default: CornerKit }) => {
-        if (!containerRef.current) return;
-        if (!ckRef.current) ckRef.current = new CornerKit();
-        const ck = ckRef.current;
-
-        // Scan ALL elements inside container
-        containerRef.current!.querySelectorAll("*").forEach((el, i) => {
-          pvProcessEl(ck, el as HTMLElement, smoothing, "sq-pv", i);
-        });
-
-        // Portal elements (Radix portals + Sonner toasts)
-        document.querySelectorAll(
-          "[data-radix-portal] *, [data-sonner-toast], [data-sonner-toast] *"
-        ).forEach((el, i) => {
-          const htmlEl = el as HTMLElement;
-          if (containerRef.current?.contains(htmlEl)) return;
-          pvProcessEl(ck, htmlEl, smoothing, "sq-pt", i);
-        });
-      });
-    }, 50);
-
-    // Observe document.body for portal elements
     const portalObserver = new MutationObserver(() => {
-      if (!squircleEnabled || !ckRef.current) return;
-      const ck = ckRef.current;
-      document.querySelectorAll(
-        "[data-radix-portal] *, [data-sonner-toast], [data-sonner-toast] *"
-      ).forEach((el, i) => {
-        const htmlEl = el as HTMLElement;
-        if (containerRef.current?.contains(htmlEl)) return;
-        pvProcessEl(ck, htmlEl, squircleSmoothing / 100, "sq-pt", i);
-      });
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(applyAllSmooth);
     });
     portalObserver.observe(document.body, { childList: true, subtree: true });
 
@@ -1272,7 +1252,7 @@ export function PreviewPanel({
       clearTimeout(timer);
       portalObserver.disconnect();
     };
-  }, [squircleEnabled, squircleSmoothing, category, radiusKey, tokenKey]);
+  }, [squircleEnabled, squircleSmoothing, category, radiusKey, tokenKey, applyAllSmooth, removeAllSmooth]);
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-background">

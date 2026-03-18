@@ -3,7 +3,6 @@
 import * as React from "react";
 import { TokenState } from "@/lib/tokens";
 import { Switch } from "@/registry/new-york/ui/switch";
-import { Squircle } from "@cornerkit/react";
 
 interface LayoutTabProps {
   tokens: TokenState;
@@ -316,16 +315,11 @@ export function LayoutTab({ tokens, onTokenChange, squircleEnabled, squircleSmoo
 
             {/* Preview */}
             <SquirclePreview
-              smoothing={squircleSmoothing}
               radiusPx={parseFloat(tokens.primitives.radius.md) * 16 || 6}
             />
-            <p className="text-[10px] text-muted-foreground">
-              0% = normal · 60% = Apple/Figma · 100% = superellipse
-            </p>
             <div className="rounded-md bg-muted/50 p-2.5 border border-border">
               <p className="text-[10px] text-muted-foreground leading-relaxed">
-                ⚠ 코너 스무싱 활성화 시 <strong>그림자(box-shadow)는 자동으로 제거</strong>됩니다.
-                SVG clip-path 특성상 그림자가 잘리기 때문입니다. 보더와 면은 정상 적용됩니다.
+                CSS mask-border 기반으로 작동합니다. 보더, 그림자, overflow가 정상 유지됩니다.
               </p>
             </div>
           </div>
@@ -335,36 +329,31 @@ export function LayoutTab({ tokens, onTokenChange, squircleEnabled, squircleSmoo
   );
 }
 
-/** Inline squircle preview using @cornerkit/react */
-function SquirclePreview({ smoothing, radiusPx }: { smoothing: number; radiusPx: number }) {
-  const s = smoothing / 100;
+/** Inline squircle preview using mask-border (tailwind-corner-smoothing) */
+function SquirclePreview({ radiusPx }: { radiusPx: number }) {
   const r = Math.max(radiusPx, 4);
+  const smoothClass = r <= 10 ? "smooth-corners-sm" : r <= 30 ? "smooth-corners-md" : "smooth-corners-lg";
 
   return (
     <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-md border border-border">
       {/* Button shape */}
-      <Squircle
-        radius={r}
-        smoothing={s}
-        className="h-7 px-3 flex items-center text-[11px] font-medium bg-primary text-primary-foreground flex-shrink-0"
+      <div
+        className={`h-7 px-3 flex items-center text-[11px] font-medium bg-primary text-primary-foreground flex-shrink-0 ${smoothClass}`}
+        style={{ borderRadius: `${r}px` }}
       >
         Button
-      </Squircle>
+      </div>
 
       {/* Card shape */}
-      <Squircle
-        radius={Math.max(r * 1.5, 6)}
-        smoothing={s}
-        border={{ width: 1, color: "var(--border)" }}
-        className="h-10 w-14 bg-card flex-shrink-0"
+      <div
+        className={`h-10 w-14 bg-card flex-shrink-0 border border-border ${smoothClass}`}
+        style={{ borderRadius: `${Math.max(r * 1.5, 6)}px` }}
       />
 
       {/* Input shape */}
-      <Squircle
-        radius={r}
-        smoothing={s}
-        border={{ width: 1, color: "var(--border)" }}
-        className="h-7 flex-1 bg-background"
+      <div
+        className={`h-7 flex-1 bg-background border border-border ${smoothClass}`}
+        style={{ borderRadius: `${r}px` }}
       />
     </div>
   );

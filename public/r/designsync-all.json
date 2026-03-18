@@ -52,7 +52,8 @@
     "https://designsync-omega.vercel.app/r/resizable.json",
     "https://designsync-omega.vercel.app/r/sidebar.json",
     "https://designsync-omega.vercel.app/r/sonner.json",
-    "https://designsync-omega.vercel.app/r/typography.json"
+    "https://designsync-omega.vercel.app/r/typography.json",
+    "https://designsync-omega.vercel.app/r/squircle-provider.json"
   ],
   "files": []
 }

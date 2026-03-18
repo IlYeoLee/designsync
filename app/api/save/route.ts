@@ -215,16 +215,16 @@ export async function POST(req: NextRequest) {
     const files: Array<{ path: string; type: string; target?: string; content: string }> = [];
     const deps: string[] = [];
 
-    // Squircle: add npm dependencies + SquircleProvider usage hint
+    // Squircle: add npm dependency + SquircleProvider usage hint
     if (squircle.enabled) {
-      deps.push("@cornerkit/core");
-      deps.push("@cornerkit/react");
+      deps.push("tailwind-corner-smoothing");
       files.push({
         path: "components/squircle-provider.tsx",
         type: "registry:file",
         content: [
           '// Install via: shadcn add <your-registry-url>/r/squircle-provider.json',
-          '// Then wrap your app with <SquircleProvider smoothing={' + (squircle.smoothing / 100) + '}>',
+          '// Then wrap your app with <SquircleProvider>',
+          '// Also add @plugin "tailwind-corner-smoothing" to your globals.css',
           'export { SquircleProvider } from "@/registry/new-york/ui/squircle-provider"',
         ].join("\n"),
       });
