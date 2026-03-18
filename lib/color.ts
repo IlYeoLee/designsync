@@ -1,34 +1,11 @@
 /**
  * OKLCH-based deterministic color palette generator for DesignSync.
  *
- * Core design:
- * - Step 600 = exact input hex anchor (NEVER modified or recalculated)
- * - Other steps use fixed target L values with chroma multipliers
- * - Gamut mapping: reduce chroma only, preserve L and H
- * - Hue correction for yellow-green/lime (H 90°–140°) to prevent olive/khaki
- *
- * Color pipeline: hex → sRGB → linear sRGB → OKLab → OKLCH → tone → gamut fit → hex
+ * Uses colorizr's scale() for palette generation with step 600 locked to the input color.
+ * Pure-math OKLCH ↔ hex conversions are kept for other modules.
  */
 
-// ─── Types ──────────────────────────────────────────────────────────────────────
-
-type PaletteStep = 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
-
-// ─── Constants ──────────────────────────────────────────────────────────────────
-
-/** Target OKLCH L for each palette step. 600 is a placeholder — uses base L. */
-const TARGET_L: Record<PaletteStep, number> = {
-  50: 0.97, 100: 0.93, 200: 0.87, 300: 0.79, 400: 0.71,
-  500: 0.63, 600: 0,   700: 0.49, 800: 0.37, 900: 0.24,
-};
-
-/** Chroma multiplier relative to base chroma for each step. */
-const CHROMA_MULT: Record<PaletteStep, number> = {
-  50: 0.18, 100: 0.32, 200: 0.55, 300: 0.78, 400: 0.92,
-  500: 0.98, 600: 1.00, 700: 0.88, 800: 0.72, 900: 0.52,
-};
-
-const PALETTE_STEPS: PaletteStep[] = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
+import { scale } from 'colorizr';
 
 /** Backward-compatible export for modules that reference PALETTE_LIGHTNESS. */
 export const PALETTE_LIGHTNESS: Record<string, number> = {
@@ -170,129 +147,36 @@ export function oklchToHex(lOrCss: number | string, cVal?: number, hVal?: number
   return `#${rr.toString(16).padStart(2, '0')}${gg.toString(16).padStart(2, '0')}${bb.toString(16).padStart(2, '0')}`;
 }
 
-// ─── Gamut mapping ──────────────────────────────────────────────────────────────
-
-/**
- * Fit an OKLCH color into sRGB gamut by reducing chroma only.
- * L and H are strictly preserved. Uses binary search (32 iterations).
- */
-export function fitOklchToSrgbGamut(
-  l: number, c: number, h: number
-): { l: number; c: number; h: number; clipped: boolean } {
-  const [r, g, b] = oklchToLinearRgb(l, c, h);
-  if (isInGamut(r, g, b)) {
-    return { l, c, h, clipped: false };
-  }
-
-  // Binary search: keep L & H, reduce C until in gamut
-  let lo = 0, hi = c;
-  for (let i = 0; i < 32; i++) {
-    const mid = (lo + hi) / 2;
-    const [rm, gm, bm] = oklchToLinearRgb(l, mid, h);
-    if (isInGamut(rm, gm, bm)) lo = mid;
-    else hi = mid;
-  }
-
-  return { l, c: lo, h, clipped: true };
-}
-
-// ─── Step tone generation ───────────────────────────────────────────────────────
-
-/**
- * Compute the corrected hue for yellow-green/lime colors.
- *
- * Problem: OKLCH H 90°–140° (yellow-green) produces olive/khaki when
- * lightness or chroma changes, because sRGB gamut is narrow in the
- * green direction at extreme lightness.
- *
- * Solution: shift hue toward "safe green" (H≈148°) for non-anchor steps.
- * Steps further from the 600 anchor get stronger correction.
- * This makes the palette read as "green family" instead of "olive".
- */
-function correctHueForLimeRange(baseH: number, step: PaletteStep): number {
-  if (baseH < 90 || baseH > 140 || step === 600) return baseH;
-
-  const SAFE_GREEN_H = 148;
-  const drift = SAFE_GREEN_H - baseH; // positive = toward green
-
-  // Correction strength: stronger for steps far from anchor (600)
-  // Ranges from 0.25 (near 600) to 0.70 (at extremes like 50, 900)
-  const distFrom600 = Math.abs(step - 600) / 550;
-  const strength = 0.25 + distFrom600 * 0.45;
-
-  return baseH + drift * strength;
-}
-
-/**
- * Generate OKLCH values for a single palette step.
- *
- * - Step 600 = exact base values (anchor, never modified)
- * - L = fixed target from TARGET_L
- * - C = baseC × CHROMA_MULT[step], then gamut-fitted
- * - H = baseH with lime correction if applicable
- */
-export function generateStepTone(
-  base: { l: number; c: number; h: number },
-  step: PaletteStep
-): { l: number; c: number; h: number; clipped: boolean } {
-  if (step === 600) {
-    return { ...base, clipped: false };
-  }
-
-  const targetL = TARGET_L[step];
-  const targetC = base.c * CHROMA_MULT[step];
-  const targetH = correctHueForLimeRange(base.h, step);
-
-  return fitOklchToSrgbGamut(targetL, targetC, targetH);
-}
-
 // ─── Main palette generator ─────────────────────────────────────────────────────
 
 /**
  * Generate a 50–900 OKLCH palette with the input hex anchored at step 600.
  *
- * - palette[600] === inputHex (exact, never recalculated)
- * - All other steps returned as hex strings
- * - Debug info logged to console
+ * Uses colorizr's scale() with lock: 600 to preserve the input color exactly.
  *
  * @param hex - Base color as #rrggbb, becomes palette[600]
  */
 export function generatePaletteFromHex(hex: string): Record<string, string> | null {
-  const base = hexToOklch(hex);
-  if (!base) return null;
+  try {
+    const palette = scale(hex, {
+      steps: 10,
+      lock: 600,
+      minLightness: 0.16,
+      maxLightness: 0.97,
+      lightnessCurve: 1.5,
+    });
 
-  const result: Record<string, string> = {};
-
-  for (const step of PALETTE_STEPS) {
-    if (step === 600) {
-      // Exact anchor — original hex, no conversion
-      result[String(step)] = hex;
-      console.log("[palette]", {
-        step, l: +base.l.toFixed(4), c: +base.c.toFixed(4), h: +base.h.toFixed(2),
-        hex, clipped: false,
-      });
-      continue;
+    // Convert numeric keys to string keys for backward compatibility
+    const result: Record<string, string> = {};
+    for (const [step, color] of Object.entries(palette)) {
+      result[step] = color;
     }
 
-    const tone = generateStepTone(base, step);
-    const stepHex = oklchToHex(tone.l, tone.c, tone.h);
-
-    result[String(step)] = stepHex;
-    console.log("[palette]", {
-      step,
-      l: +tone.l.toFixed(4),
-      c: +tone.c.toFixed(4),
-      h: +tone.h.toFixed(2),
-      hex: stepHex,
-      clipped: tone.clipped,
-    });
+    return result;
+  } catch {
+    return null;
   }
-
-  return result;
 }
-
-/** Alias for explicit naming */
-export const generateBrandPaletteFrom600 = generatePaletteFromHex;
 
 // ─── Utility ────────────────────────────────────────────────────────────────────
 
