@@ -1123,14 +1123,11 @@ function FeedbackPreview() {
             <AlertDescription>Your account has been successfully updated.</AlertDescription>
           </Alert>
           <Alert
-            style={{
-              borderColor: "var(--success-300)",
-              backgroundColor: "var(--success-50)",
-            }}
+            className="border-[var(--success-300)] bg-[var(--success-50)] dark:border-[var(--success-700)] dark:bg-[var(--success-900)]"
           >
-            <CheckCircle2 className="h-4 w-4" style={{ color: "var(--success-600)" }} />
-            <AlertTitle style={{ color: "var(--success-800)" }}>Success</AlertTitle>
-            <AlertDescription style={{ color: "var(--success-700)" }}>
+            <CheckCircle2 className="h-4 w-4 text-[var(--success-600)] dark:text-[var(--success-400)]" />
+            <AlertTitle className="text-[var(--success-800)] dark:text-[var(--success-100)]">Success</AlertTitle>
+            <AlertDescription className="text-[var(--success-700)] dark:text-[var(--success-200)]">
               Your changes have been saved and deployed successfully.
             </AlertDescription>
           </Alert>

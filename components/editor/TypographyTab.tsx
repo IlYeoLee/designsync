@@ -2,12 +2,13 @@
 
 import * as React from "react";
 import { TokenState } from "@/lib/tokens";
-import { GOOGLE_FONTS, injectGoogleFont } from "@/lib/fonts";
+import { GOOGLE_FONTS, KOREAN_FONTS, injectGoogleFont, injectKoreanFont } from "@/lib/fonts";
 
 interface TypographyTabProps {
   tokens: TokenState;
   onTokenChange: (variable: string, value: string) => void;
   onFontFamilyChange: (font: string) => void;
+  onFontFamilyKoChange: (font: string) => void;
   onFontUpload?: (fontName: string) => void;
 }
 
@@ -64,12 +65,13 @@ function RemPxInput({
   );
 }
 
-export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFontUpload }: TypographyTabProps) {
+export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFontFamilyKoChange, onFontUpload }: TypographyTabProps) {
   const [fontSearch, setFontSearch] = React.useState("");
   const [localFonts, setLocalFonts] = React.useState<string[]>([]);
   const [localFontsLoading, setLocalFontsLoading] = React.useState(false);
   const [fontSection, setFontSection] = React.useState<"google" | "local">("google");
   const [fontUploadStatus, setFontUploadStatus] = React.useState<{ loading: boolean; font: string; result: Record<string, unknown> | null } | null>(null);
+  const [koFontSearch, setKoFontSearch] = React.useState("");
 
   const filteredGoogleFonts = GOOGLE_FONTS.filter((f) =>
     f.toLowerCase().includes(fontSearch.toLowerCase())
@@ -113,15 +115,20 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
     }
   }
 
-  const fontSizeKeys = ["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl", "5xl"] as const;
+  function handleSelectKoFont(font: string) {
+    injectKoreanFont(font);
+    onFontFamilyKoChange(font);
+  }
+
+  const fontSizeKeys = ["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl"] as const;
   const fontWeightKeys = ["normal", "medium", "bold"] as const;
   const lineHeightKeys = ["tight", "normal", "loose"] as const;
 
   return (
     <div className="space-y-6 p-4">
-      {/* Font Family */}
+      {/* English Font */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-2">Font Family</p>
+        <p className="text-xs font-medium text-foreground mb-2">English Font</p>
         <div
           className="w-full p-3 rounded-md border border-border bg-muted/30 mb-3"
           style={{ fontFamily: tokens.primitives.fontFamily }}
@@ -192,7 +199,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
             )) : <p className="text-xs text-muted-foreground p-3">No fonts found</p>
           ) : localFontsLoading ? (
             <p className="text-xs text-muted-foreground p-3">Loading local fonts...</p>
-          ) : filteredLocalFonts.length > 0 ? filteredLocalFonts.slice(0, 50).map((font) => (
+          ) : filteredLocalFonts.length > 0 ? filteredLocalFonts.map((font) => (
             <button
               key={font}
               onClick={() => handleSelectFont(font, false)}
@@ -207,6 +214,43 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
                 : "No fonts found"}
             </p>
           )}
+        </div>
+      </div>
+
+      {/* Korean Font */}
+      <div>
+        <p className="text-xs font-medium text-foreground mb-2">Korean Font</p>
+        <div className="w-full p-3 rounded-md border border-border bg-muted/30 mb-3">
+          <p className="text-base" style={{ fontFamily: tokens.primitives.fontFamilyKo || undefined }}>
+            안녕하세요 Hello
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {tokens.primitives.fontFamilyKo || '(없음 — 영문 폰트 사용)'}
+          </p>
+        </div>
+        <input
+          type="text"
+          placeholder="한글 폰트 검색..."
+          value={koFontSearch}
+          onChange={(e) => setKoFontSearch(e.target.value)}
+          className="w-full h-8 text-xs px-2.5 rounded-md border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring mb-2"
+        />
+        <div className="max-h-40 overflow-y-auto border border-border rounded-md">
+          <button
+            onClick={() => onFontFamilyKoChange('')}
+            className="w-full text-left px-3 py-1.5 text-xs text-muted-foreground hover:bg-accent"
+          >
+            없음 (영문 폰트 사용)
+          </button>
+          {KOREAN_FONTS.filter(f => f.toLowerCase().includes(koFontSearch.toLowerCase())).map(font => (
+            <button
+              key={font}
+              onClick={() => handleSelectKoFont(font)}
+              className={`w-full text-left px-3 py-1.5 text-xs hover:bg-accent ${tokens.primitives.fontFamilyKo === font ? 'bg-accent font-medium' : ''}`}
+            >
+              {font}
+            </button>
+          ))}
         </div>
       </div>
 

@@ -12,7 +12,8 @@ export type TokenState = {
     success: ColorScale;
     warning: ColorScale;
     fontFamily: string;
-    fontSize: Record<'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl', string>;
+    fontFamilyKo: string;
+    fontSize: Record<'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl', string>;
     fontWeight: Record<'normal' | 'medium' | 'bold', string>;
     lineHeight: Record<'tight' | 'normal' | 'loose', string>;
     spacing: Record<'1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16', string>;
@@ -95,6 +96,7 @@ export const DEFAULT_TOKENS: TokenState = {
       '900': 'oklch(0.24 0.10 85)',
     },
     fontFamily: 'Geist',
+    fontFamilyKo: '',
     fontSize: {
       'xs': '0.75rem',
       'sm': '0.875rem',
@@ -103,8 +105,7 @@ export const DEFAULT_TOKENS: TokenState = {
       'xl': '1.25rem',
       '2xl': '1.5rem',
       '3xl': '1.875rem',
-      '4xl': '2.25rem',
-      '5xl': '3rem',
+      '4xl': '3rem',
     },
     fontWeight: {
       'normal': '400',
@@ -242,9 +243,21 @@ export function applyTokensToDocument(tokens: TokenState): void {
   root.style.setProperty('--ds-shadow-md', tokens.primitives.shadows.md);
   root.style.setProperty('--ds-shadow-lg', tokens.primitives.shadows.lg);
 
-  // Apply font family via --custom-font-family (used in @theme inline fallback chain)
-  root.style.setProperty('--custom-font-family', tokens.primitives.fontFamily);
-  if (typeof document !== 'undefined') {
-    document.body.style.fontFamily = tokens.primitives.fontFamily;
+  // Apply font family: 한글 폰트 우선, 영문 폰트 뒤에
+  const fontEn = tokens.primitives.fontFamily;
+  const fontKo = tokens.primitives.fontFamilyKo;
+  let fontStack = '';
+  if (fontKo && fontEn && fontEn !== 'Geist') {
+    fontStack = `'${fontKo}', '${fontEn}', sans-serif`;
+  } else if (fontKo) {
+    fontStack = `'${fontKo}', sans-serif`;
+  } else if (fontEn && fontEn !== 'Geist') {
+    fontStack = `'${fontEn}', sans-serif`;
   }
+  if (fontStack) {
+    root.style.setProperty('--font-sans', fontStack);
+    document.body.style.fontFamily = fontStack;
+  }
+  // 기존 --custom-font-family도 유지
+  root.style.setProperty('--custom-font-family', fontEn || 'Geist');
 }

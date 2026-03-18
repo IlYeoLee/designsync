@@ -15,6 +15,7 @@ interface EditorPanelProps {
   onBatchChange: (changes: { variable: string; value: string }[]) => void;
   onSemanticChange: (mode: "light" | "dark", key: string, value: string) => void;
   onFontFamilyChange: (font: string) => void;
+  onFontFamilyKoChange: (font: string) => void;
   history: HistoryEntry[];
 }
 
@@ -24,6 +25,7 @@ export function EditorPanel({
   onBatchChange,
   onSemanticChange,
   onFontFamilyChange,
+  onFontFamilyKoChange,
   history,
 }: EditorPanelProps) {
   const [activeTab, setActiveTab] = React.useState<Tab>("colors");
@@ -78,6 +80,7 @@ export function EditorPanel({
             tokens={tokens}
             onTokenChange={onTokenChange}
             onFontFamilyChange={onFontFamilyChange}
+            onFontFamilyKoChange={onFontFamilyKoChange}
           />
         )}
         {activeTab === "layout" && (

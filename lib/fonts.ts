@@ -77,6 +77,43 @@ export const KOREAN_FONT_URLS: Record<string, string> = {
   'Nanum Gothic': 'https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap',
 };
 
+export const KOREAN_FONTS: string[] = [
+  'Pretendard',
+  'Noto Sans KR',
+  'Nanum Gothic',
+  'Nanum Myeongjo',
+  'Black Han Sans',
+  'Do Hyeon',
+  'Jua',
+  'Gowun Dodum',
+  'Gowun Batang',
+  'Poor Story',
+  'Gamja Flower',
+  'Hi Melody',
+  'Single Day',
+  'Sunflower',
+  'Gothic A1',
+  'Nanum Pen Script',
+];
+
+export function injectKoreanFont(fontFamily: string): void {
+  if (typeof document === 'undefined') return;
+  const id = `kf-${fontFamily.replace(/ /g, '-').toLowerCase()}`;
+  if (document.getElementById(id)) return;
+  const link = document.createElement('link');
+  link.id = id;
+  link.rel = 'stylesheet';
+  // Pretendard은 jsDelivr CDN
+  if (fontFamily === 'Pretendard') {
+    link.href = 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css';
+  } else {
+    // 나머지는 Google Fonts (한글 폰트들)
+    const encoded = fontFamily.replace(/ /g, '+');
+    link.href = `https://fonts.googleapis.com/css2?family=${encoded}:wght@400;700&display=swap&subset=korean`;
+  }
+  document.head.appendChild(link);
+}
+
 /**
  * Get the CSS import URL for a font family.
  * Returns null for Geist (bundled via next/font).

@@ -100,6 +100,12 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
       variable: `--${scale}-${step}`,
       value,
     }));
+    // neutral-50 is always white
+    if (scale === "neutral") {
+      const idx = changes.findIndex((c) => c.variable === "--neutral-50");
+      if (idx !== -1) changes[idx].value = "oklch(1 0 0)";
+      else changes.push({ variable: "--neutral-50", value: "oklch(1 0 0)" });
+    }
     onBatchChange(changes);
 
     // Brand 팔레트 변경 시 primary-foreground 자동 반전 (colorizr readableColor 기반)
@@ -175,9 +181,11 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
           </div>
 
           <div className="grid grid-cols-10 gap-1">
-            {STEPS.map((step) => {
+            {STEPS.map((step, stepIdx) => {
               const value = tokens.primitives[scale][step as keyof ColorScale];
               const isActive = activeColor?.scale === scale && activeColor?.step === step;
+              // Position popup: left for first 3 steps, right for last 3, center otherwise
+              const popupAlign = stepIdx <= 2 ? "left-0" : stepIdx >= 7 ? "right-0" : "left-1/2 -translate-x-1/2";
               return (
                 <div key={step} className="relative">
                   <button
@@ -189,7 +197,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
                     onClick={() => handleSwatchClick(scale, step)}
                   />
                   {isActive && mounted && (
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 z-20 bg-card border border-border rounded-md shadow-lg p-2 min-w-[130px]">
+                    <div className={`absolute top-full ${popupAlign} mt-1 z-20 bg-card border border-border rounded-md shadow-lg p-2 min-w-[130px]`}>
                       <p className="text-xs text-muted-foreground mb-1 font-mono">{scale}-{step}</p>
                       <input
                         type="color"
@@ -202,11 +210,22 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
                         value={pickerHex}
                         className="w-full h-6 text-[10px] px-1.5 mt-1 rounded border border-input bg-background font-mono text-center focus:outline-none focus:ring-1 focus:ring-ring"
                         onChange={(e) => {
-                          if (/^#[0-9a-fA-F]{0,6}$/.test(e.target.value)) {
-                            setPickerHex(e.target.value);
-                            if (e.target.value.length === 7) {
-                              handlePickerChange(scale, step, e.target.value);
+                          const raw = e.target.value;
+                          // Allow typing with or without '#'
+                          const withHash = raw.startsWith("#") ? raw : `#${raw}`;
+                          if (/^#[0-9a-fA-F]{0,6}$/.test(withHash)) {
+                            setPickerHex(withHash);
+                            if (withHash.length === 7) {
+                              handlePickerChange(scale, step, withHash);
                             }
+                          }
+                        }}
+                        onBlur={(e) => {
+                          // On blur, if valid 7-char hex, apply
+                          const raw = e.target.value;
+                          const withHash = raw.startsWith("#") ? raw : `#${raw}`;
+                          if (/^#[0-9a-fA-F]{6}$/.test(withHash)) {
+                            handlePickerChange(scale, step, withHash);
                           }
                         }}
                       />

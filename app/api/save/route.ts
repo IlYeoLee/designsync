@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GOOGLE_FONTS } from "@/lib/fonts";
+import { GOOGLE_FONTS, KOREAN_FONTS } from "@/lib/fonts";
 
 const CDN_BASE = "https://designsync-omega.vercel.app";
 
@@ -177,9 +177,21 @@ export async function POST(req: NextRequest) {
 
     // 4b. Apply font + typography tokens
     const fontFamily = tokens.primitives?.fontFamily || 'Geist';
-    if (fontFamily !== 'Geist') {
-      lightVars["font-sans"] = `'${fontFamily}', sans-serif`;
-      darkVars["font-sans"] = `'${fontFamily}', sans-serif`;
+    const fontFamilyKo = tokens.primitives?.fontFamilyKo || '';
+
+    // font-sans 스택 구성: 한글 폰트 우선
+    let fontSansValue = '';
+    if (fontFamilyKo && fontFamily !== 'Geist') {
+      fontSansValue = `'${fontFamilyKo}', '${fontFamily}', sans-serif`;
+    } else if (fontFamilyKo) {
+      fontSansValue = `'${fontFamilyKo}', sans-serif`;
+    } else if (fontFamily !== 'Geist') {
+      fontSansValue = `'${fontFamily}', sans-serif`;
+    }
+
+    if (fontSansValue) {
+      lightVars["font-sans"] = fontSansValue;
+      darkVars["font-sans"] = fontSansValue;
     }
 
     if (tokens.primitives?.fontSize) {
@@ -212,11 +224,19 @@ export async function POST(req: NextRequest) {
     // so `shadcn add designsync-tokens.json` also installs the font CSS file.
     // Local fonts (not in GOOGLE_FONTS) are device-specific — only set --font-sans var.
     const isGoogleFont = fontFamily !== 'Geist' && GOOGLE_FONTS.includes(fontFamily);
+    const registryDependencies: string[] = [];
     if (isGoogleFont) {
       const fontSlug = fontFamily.replace(/ /g, '-').toLowerCase();
-      tokensJson.registryDependencies = [
-        `${CDN_BASE}/r/font-${fontSlug}.json`,
-      ];
+      registryDependencies.push(`${CDN_BASE}/r/font-${fontSlug}.json`);
+    }
+    // 한글 폰트도 (Noto Sans KR, Nanum Gothic 등 Google Fonts에 있는 것)
+    const koIsGoogleFont = KOREAN_FONTS.includes(fontFamilyKo) && fontFamilyKo !== 'Pretendard';
+    if (koIsGoogleFont) {
+      const koSlug = fontFamilyKo.replace(/ /g, '-').toLowerCase();
+      registryDependencies.push(`${CDN_BASE}/r/font-${koSlug}.json`);
+    }
+    if (registryDependencies.length > 0) {
+      tokensJson.registryDependencies = registryDependencies;
     } else {
       delete tokensJson.registryDependencies;
     }

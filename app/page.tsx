@@ -166,13 +166,39 @@ export default function Home() {
   // AND set body.style.fontFamily directly for immediate effect on all children.
   function handleFontFamilyChange(font: string) {
     setSnapshots((prev) => [...prev.slice(-19), tokens]);
+    const ko = tokens.primitives.fontFamilyKo;
+    let stack = '';
+    if (ko && font !== 'Geist') {
+      stack = `'${ko}', '${font}', sans-serif`;
+    } else if (font !== 'Geist') {
+      stack = `'${font}', sans-serif`;
+    }
+    if (stack) {
+      document.documentElement.style.setProperty('--font-sans', stack);
+      document.body.style.fontFamily = stack;
+    }
     document.documentElement.style.setProperty("--custom-font-family", font);
-    document.body.style.fontFamily = font;
     setTokens((prev) => ({ ...prev, primitives: { ...prev.primitives, fontFamily: font } }));
     setHistory((prev) => [
       { variable: "font-family", from: tokens.primitives.fontFamily, to: font, timestamp: new Date() },
       ...prev,
     ].slice(0, 10));
+  }
+
+  function handleFontFamilyKoChange(font: string) {
+    setTokens((prev) => ({ ...prev, primitives: { ...prev.primitives, fontFamilyKo: font } }));
+    // 즉시 CSS 반영
+    const en = tokens.primitives.fontFamily;
+    let stack = '';
+    if (font && en && en !== 'Geist') {
+      stack = `'${font}', '${en}', sans-serif`;
+    } else if (font) {
+      stack = `'${font}', sans-serif`;
+    }
+    if (stack) {
+      document.documentElement.style.setProperty('--font-sans', stack);
+      document.body.style.fontFamily = stack;
+    }
   }
 
   // ── Undo ────────────────────────────────────────────────────────
@@ -264,6 +290,7 @@ export default function Home() {
           onBatchChange={handleBatchChange}
           onSemanticChange={handleSemanticChange}
           onFontFamilyChange={handleFontFamilyChange}
+          onFontFamilyKoChange={handleFontFamilyKoChange}
           history={history.slice(0, 3)}
         />
         <PreviewPanel />
