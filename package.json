@@ -7,11 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "registry:build": "shadcn build"
+    "registry:build": "shadcn build && node scripts/build-designsync-all.mjs"
   },
   "dependencies": {
-    "@cornerkit/core": "^1.2.0",
-    "@cornerkit/react": "^1.0.1",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",

@@ -5,7 +5,7 @@
  * Pure-math OKLCH ↔ hex conversions are kept for other modules.
  */
 
-import { scale } from 'colorizr';
+import { scale, readableColor } from 'colorizr';
 
 /** Backward-compatible export for modules that reference PALETTE_LIGHTNESS. */
 export const PALETTE_LIGHTNESS: Record<string, number> = {
@@ -165,6 +165,23 @@ export function generatePaletteFromHex(hex: string): Record<string, string> | nu
     return result;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Returns readable foreground oklch string for a given hex background.
+ * Uses colorizr's readableColor (WCAG contrast-based).
+ */
+export function getPrimaryForeground(hex: string): { light: string; dark: string } {
+  try {
+    const fg600 = readableColor(hex); // '#ffffff' or '#000000' for brand-600
+    // Primary foreground for light mode is based on brand-600 (the primary color)
+    const lightFg = fg600 === '#ffffff' ? 'oklch(1 0 0)' : 'oklch(0.08 0 0)';
+    // Dark mode primary is typically brand-400 (lighter) — invert from light
+    const darkFg = fg600 === '#ffffff' ? 'oklch(0.08 0 0)' : 'oklch(1 0 0)';
+    return { light: lightFg, dark: darkFg };
+  } catch {
+    return { light: 'oklch(1 0 0)', dark: 'oklch(0.08 0 0)' };
   }
 }
 

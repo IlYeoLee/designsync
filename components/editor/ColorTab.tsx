@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { ColorScale, TokenState } from "@/lib/tokens";
-import { oklchToHex, generatePaletteFromHex } from "@/lib/color";
+import { oklchToHex, generatePaletteFromHex, getPrimaryForeground } from "@/lib/color";
 import { Wand2, ChevronDown } from "lucide-react";
 
 type ColorScaleName = "brand" | "neutral" | "error" | "success" | "warning";
@@ -101,6 +101,14 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
       value,
     }));
     onBatchChange(changes);
+
+    // Brand 팔레트 변경 시 primary-foreground 자동 반전 (colorizr readableColor 기반)
+    if (scale === "brand") {
+      const { light, dark } = getPrimaryForeground(hex);
+      onSemanticChange("light", "primary-foreground", light);
+      onSemanticChange("dark", "primary-foreground", dark);
+    }
+
     setOpenScalePicker(null);
   }
 
@@ -126,8 +134,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
         <div key={scale}>
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-foreground capitalize">{SCALE_LABELS[scale]}</span>
-            {scale !== "neutral" && (
-              <div className="relative">
+            <div className="relative">
                 <button
                   className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors px-1.5 py-0.5 rounded border border-border hover:border-primary/50"
                   onClick={() => setOpenScalePicker(openScalePicker === scale ? null : scale)}
@@ -165,7 +172,6 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
                   </div>
                 )}
               </div>
-            )}
           </div>
 
           <div className="grid grid-cols-10 gap-1">
