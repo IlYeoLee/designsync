@@ -54,129 +54,72 @@ import { TypographyH1, TypographyH2, TypographyH3, TypographyH4, TypographyP, Ty
 
 import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as CalendarIcon, Smile, Settings, User, LayoutDashboard, FileText, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, ChevronsUpDown, ChevronDown } from "lucide-react";
 
-// Threshold: elements with computed border-radius >= this are pill/circle → skip smoothing
-const PILL_RADIUS_THRESHOLD = 9000;
+// --- Squircle slot definitions (mirrors squircle-provider.tsx) ---
+const PILL_THRESHOLD = 9000;
 
-// Slots inside the preview container
-const PREVIEW_CONTAINER_SLOTS: Record<string, { radiusMult: number; border: boolean }> = {
-  button: { radiusMult: 1, border: false },
-  card: { radiusMult: 1.5, border: true },
-  input: { radiusMult: 1, border: true },
-  textarea: { radiusMult: 1, border: true },
-  "select-trigger": { radiusMult: 1, border: true },
-  badge: { radiusMult: 1, border: false },
-  alert: { radiusMult: 1, border: true },
-  checkbox: { radiusMult: 0.5, border: true },
-  toggle: { radiusMult: 1, border: true },
-  "toggle-group-item": { radiusMult: 1, border: true },
-  "tabs-list": { radiusMult: 1, border: true },
-  "tabs-trigger": { radiusMult: 0.8, border: false },
-  command: { radiusMult: 1, border: true },
-  skeleton: { radiusMult: 1, border: false },
-  "input-otp-slot": { radiusMult: 1, border: true },
-  calendar: { radiusMult: 1, border: false },
-  chart: { radiusMult: 1, border: true },
-  carousel: { radiusMult: 1, border: false },
-  "accordion-item": { radiusMult: 1, border: true },
-  "table-container": { radiusMult: 1, border: true },
-  menubar: { radiusMult: 1, border: true },
-  "resizable-panel-group": { radiusMult: 1, border: true },
-  "navigation-menu-content": { radiusMult: 1, border: true },
-  "navigation-menu-viewport": { radiusMult: 1, border: true },
+// Excluded: carousel (clips arrows), resizable (clips handles), scroll-area (clips scrollbar)
+const PV_CONTAINER_SLOTS: Record<string, number> = {
+  button: 1, card: 1.5, input: 1, textarea: 1, "select-trigger": 1,
+  badge: 1, alert: 1, checkbox: 0.5, toggle: 1, "toggle-group-item": 1,
+  "tabs-list": 1, "tabs-trigger": 0.8, command: 1, skeleton: 1,
+  "input-otp-slot": 1, calendar: 1, chart: 1, "accordion-item": 1,
+  "table-container": 1, menubar: 1,
 };
 
-// Portal-rendered overlay slots
-const PREVIEW_PORTAL_SLOTS: Record<string, { radiusMult: number; border: boolean }> = {
-  "dialog-content": { radiusMult: 1.5, border: true },
-  "sheet-content": { radiusMult: 1.5, border: true },
-  "alert-dialog-content": { radiusMult: 1.5, border: true },
-  "drawer-content": { radiusMult: 1.5, border: true },
-  "popover-content": { radiusMult: 1, border: true },
-  "dropdown-menu-content": { radiusMult: 1, border: true },
-  "context-menu-content": { radiusMult: 1, border: true },
-  "menubar-content": { radiusMult: 1, border: true },
-  "tooltip-content": { radiusMult: 0.8, border: true },
-  "hover-card-content": { radiusMult: 1, border: true },
-  "select-content": { radiusMult: 1, border: true },
+const PV_PORTAL_SLOTS: Record<string, number> = {
+  "dialog-content": 1.5, "sheet-content": 1.5, "alert-dialog-content": 1.5,
+  "drawer-content": 1.5, "popover-content": 1, "dropdown-menu-content": 1,
+  "context-menu-content": 1, "menubar-content": 1, "tooltip-content": 0.8,
+  "hover-card-content": 1, "select-content": 1, "navigation-menu-content": 1,
+  "navigation-menu-viewport": 1,
 };
 
-function buildPreviewSelector(slots: Record<string, unknown>): string {
+function buildSel(slots: Record<string, number>): string {
   return Object.keys(slots).map((s) => `[data-slot='${s}']`).join(",");
 }
+const PV_CONTAINER_SEL = buildSel(PV_CONTAINER_SLOTS);
+const PV_PORTAL_SEL = buildSel(PV_PORTAL_SLOTS);
 
-const PV_CONTAINER_SELECTOR = buildPreviewSelector(PREVIEW_CONTAINER_SLOTS);
-const PV_PORTAL_SELECTOR = buildPreviewSelector(PREVIEW_PORTAL_SLOTS);
-
-function parseBoxShadowToDropShadow(boxShadow: string): string {
-  return boxShadow
-    .split(/,(?![^(]*\))/)
-    .map((shadow) => {
-      const s = shadow.trim();
-      if (s.startsWith("inset")) return null;
-      const m = s.match(
-        /^(rgba?\([^)]+\)|oklch\([^)]+\/[^)]*\)|oklch\([^)]+\)|#[\da-f]+|\w+)\s+([-\d.]+)px\s+([-\d.]+)px\s+([-\d.]+)px(?:\s+[-\d.]+px)?/i
-      );
-      if (m) return `drop-shadow(${m[2]}px ${m[3]}px ${m[4]}px ${m[1]})`;
-      const m2 = s.match(
-        /([-\d.]+)px\s+([-\d.]+)px\s+([-\d.]+)px(?:\s+[-\d.]+px)?\s+(rgba?\([^)]+\)|oklch\([^)]+\/[^)]*\)|oklch\([^)]+\)|#[\da-f]+|\w+)/i
-      );
-      if (m2) return `drop-shadow(${m2[1]}px ${m2[2]}px ${m2[3]}px ${m2[4]})`;
-      return null;
-    })
-    .filter(Boolean)
-    .join(" ");
+function boxShadowToDropShadow(bs: string): string {
+  return bs.split(/,(?![^(]*\))/).map((s) => {
+    const t = s.trim();
+    if (t.startsWith("inset")) return null;
+    const m = t.match(/^(rgba?\([^)]+\)|oklch\([^)]+\))\s+([-\d.]+)px\s+([-\d.]+)px\s+([-\d.]+)px/i);
+    if (m) return `drop-shadow(${m[2]}px ${m[3]}px ${m[4]}px ${m[1]})`;
+    return null;
+  }).filter(Boolean).join(" ");
 }
 
-function applySquircleToElement(
+function pvApply(
   ck: import("@cornerkit/core").default,
-  htmlEl: HTMLElement,
-  cfg: { radiusMult: number },
-  baseR: number,
-  smoothing: number,
-  idPrefix: string,
-  index: number,
+  el: HTMLElement, mult: number, baseR: number, smoothing: number,
+  prefix: string, idx: number,
 ): void {
-  if (!htmlEl.id) htmlEl.id = `${idPrefix}-${index}-${Date.now()}`;
+  if (!el.id) el.id = `${prefix}-${idx}-${Date.now()}`;
+  const styles = getComputedStyle(el);
+  if ((parseFloat(styles.borderRadius) || 0) >= PILL_THRESHOLD) return;
 
-  const styles = getComputedStyle(htmlEl);
-
-  // Skip pill/circle elements
-  const computedRadius = parseFloat(styles.borderRadius) || 0;
-  if (computedRadius >= PILL_RADIUS_THRESHOLD) return;
-
-  const r = Math.min(cfg.radiusMult * baseR, 9999);
-
-  // Only shape — no border option. CSS borders are naturally clipped by clip-path.
-  const opts = { radius: r, smoothing };
-
+  const r = Math.min(mult * baseR, 9999);
   try {
-    if (htmlEl.hasAttribute("data-squircle-applied")) {
-      ck.update(`#${htmlEl.id}`, opts);
+    if (el.hasAttribute("data-squircle-applied")) {
+      ck.update(`#${el.id}`, { radius: r, smoothing });
     } else {
-      ck.apply(`#${htmlEl.id}`, opts);
-      htmlEl.setAttribute("data-squircle-applied", "true");
+      ck.apply(`#${el.id}`, { radius: r, smoothing });
+      el.setAttribute("data-squircle-applied", "true");
     }
   } catch {
-    try {
-      ck.apply(`#${htmlEl.id}`, opts);
-      htmlEl.setAttribute("data-squircle-applied", "true");
-    } catch { /* ignore */ }
+    try { ck.apply(`#${el.id}`, { radius: r, smoothing }); el.setAttribute("data-squircle-applied", "true"); } catch {}
   }
 
-  // Convert box-shadow → drop-shadow (clip-path clips box-shadow)
-  const boxShadow = styles.boxShadow;
-  if (boxShadow && boxShadow !== "none") {
-    if (!htmlEl.dataset.origShadow) {
-      htmlEl.dataset.origShadow = htmlEl.style.boxShadow || "";
-      htmlEl.dataset.origFilter = htmlEl.style.filter || "";
+  // Shadow: convert box-shadow → drop-shadow (renders outside clip-path)
+  const bs = styles.boxShadow;
+  if (bs && bs !== "none") {
+    if (!el.dataset.origShadow) {
+      el.dataset.origShadow = el.style.boxShadow || "";
+      el.dataset.origFilter = el.style.filter || "";
     }
-    const dropShadows = parseBoxShadowToDropShadow(boxShadow);
-    if (dropShadows) {
-      htmlEl.style.boxShadow = "none";
-      const existingFilter = styles.filter;
-      const hasExisting = existingFilter && existingFilter !== "none" && !existingFilter.includes("drop-shadow");
-      htmlEl.style.filter = hasExisting ? `${existingFilter} ${dropShadows}` : dropShadows;
-    }
+    const ds = boxShadowToDropShadow(bs);
+    if (ds) { el.style.boxShadow = "none"; el.style.filter = ds; }
   }
 }
 
@@ -1336,23 +1279,23 @@ export function PreviewPanel({
         const ck = ckRef.current;
 
         // 1. Container elements
-        const containerEls = containerRef.current!.querySelectorAll(PV_CONTAINER_SELECTOR);
+        const containerEls = containerRef.current!.querySelectorAll(PV_CONTAINER_SEL);
         containerEls.forEach((el, i) => {
           const htmlEl = el as HTMLElement;
           const slot = htmlEl.getAttribute("data-slot") || "";
-          const cfg = PREVIEW_CONTAINER_SLOTS[slot];
+          const cfg = PV_CONTAINER_SLOTS[slot];
           if (!cfg) return;
-          applySquircleToElement(ck, htmlEl, cfg, baseR, smoothing, "sq-pv", i);
+          pvApply(ck, htmlEl, cfg, baseR, smoothing, "sq-pv", i);
         });
 
         // 2. Portal elements (dialog, popover, dropdown, etc.)
-        const portalEls = document.querySelectorAll(PV_PORTAL_SELECTOR);
+        const portalEls = document.querySelectorAll(PV_PORTAL_SEL);
         portalEls.forEach((el, i) => {
           const htmlEl = el as HTMLElement;
           const slot = htmlEl.getAttribute("data-slot") || "";
-          const cfg = PREVIEW_PORTAL_SLOTS[slot];
+          const cfg = PV_PORTAL_SLOTS[slot];
           if (!cfg) return;
-          applySquircleToElement(ck, htmlEl, cfg, baseR, smoothing, "sq-pt", i);
+          pvApply(ck, htmlEl, cfg, baseR, smoothing, "sq-pt", i);
         });
       });
     }, 50);
@@ -1365,14 +1308,14 @@ export function PreviewPanel({
         const ck = ckRef.current;
         const smoothVal = squircleSmoothing / 100;
         const r = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--radius-md-prim")) * 16 || 8;
-        const portalEls = document.querySelectorAll(PV_PORTAL_SELECTOR);
+        const portalEls = document.querySelectorAll(PV_PORTAL_SEL);
         portalEls.forEach((el, i) => {
           const htmlEl = el as HTMLElement;
           if (htmlEl.hasAttribute("data-squircle-applied")) return;
           const slot = htmlEl.getAttribute("data-slot") || "";
-          const cfg = PREVIEW_PORTAL_SLOTS[slot];
+          const cfg = PV_PORTAL_SLOTS[slot];
           if (!cfg) return;
-          applySquircleToElement(ck, htmlEl, cfg, r, smoothVal, "sq-pt", i);
+          pvApply(ck, htmlEl, cfg, r, smoothVal, "sq-pt", i);
         });
       });
     });

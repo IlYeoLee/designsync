@@ -5,17 +5,11 @@ import * as React from "react";
 /**
  * SquircleProvider — DesignSync Corner Smoothing
  *
- * Wraps your app and applies iOS/Figma-style squircle corners
- * to all shadcn/ui components automatically using @cornerkit/core.
- *
- * Usage:
- *   <SquircleProvider smoothing={0.6} radius={8}>
- *     <App />
- *   </SquircleProvider>
- *
- * - smoothing: 0-1 (0.6 = Apple/Figma default)
- * - radius: base corner radius in px (default: 8)
- * - disabled: set true to turn off (default: false)
+ * Applies iOS/Figma-style squircle corners via @cornerkit/core.
+ * Uses clip-path internally — known limitations:
+ *   - box-shadow is clipped → converted to filter: drop-shadow() on parent
+ *   - overflow content is clipped → container components with overflow children excluded
+ *   - pill/circle elements (border-radius ≥ 9999px) auto-skipped
  */
 
 interface SquircleProviderProps {
@@ -25,145 +19,120 @@ interface SquircleProviderProps {
   disabled?: boolean;
 }
 
-// --- Slot definitions ---
-// Slots inside the provider container (non-portal elements)
-const CONTAINER_SLOTS: Record<string, { radiusMult: number; border: boolean }> = {
-  button: { radiusMult: 1, border: false },
-  card: { radiusMult: 1.5, border: true },
-  input: { radiusMult: 1, border: true },
-  textarea: { radiusMult: 1, border: true },
-  "select-trigger": { radiusMult: 1, border: true },
-  badge: { radiusMult: 1, border: false },
-  alert: { radiusMult: 1, border: true },
-  checkbox: { radiusMult: 0.5, border: true },
-  toggle: { radiusMult: 1, border: true },
-  "toggle-group-item": { radiusMult: 1, border: true },
-  "tabs-list": { radiusMult: 1, border: true },
-  "tabs-trigger": { radiusMult: 0.8, border: false },
-  command: { radiusMult: 1, border: true },
-  skeleton: { radiusMult: 1, border: false },
-  "input-otp-slot": { radiusMult: 1, border: true },
-  calendar: { radiusMult: 1, border: false },
-  chart: { radiusMult: 1, border: true },
-  carousel: { radiusMult: 1, border: false },
-  "accordion-item": { radiusMult: 1, border: true },
-  "table-container": { radiusMult: 1, border: true },
-  menubar: { radiusMult: 1, border: true },
-  "resizable-panel-group": { radiusMult: 1, border: true },
-  "navigation-menu-content": { radiusMult: 1, border: true },
-  "navigation-menu-viewport": { radiusMult: 1, border: true },
+// radiusMult: multiplier against base radius
+// Excluded: carousel (clips arrows), resizable (clips handles), scroll-area (clips scrollbar)
+const CONTAINER_SLOTS: Record<string, number> = {
+  button: 1,
+  card: 1.5,
+  input: 1,
+  textarea: 1,
+  "select-trigger": 1,
+  badge: 1,
+  alert: 1,
+  checkbox: 0.5,
+  toggle: 1,
+  "toggle-group-item": 1,
+  "tabs-list": 1,
+  "tabs-trigger": 0.8,
+  command: 1,
+  skeleton: 1,
+  "input-otp-slot": 1,
+  calendar: 1,
+  chart: 1,
+  "accordion-item": 1,
+  "table-container": 1,
+  menubar: 1,
 };
 
-// Slots rendered via React portals (outside provider container, in document.body)
-const PORTAL_SLOTS: Record<string, { radiusMult: number; border: boolean }> = {
-  "dialog-content": { radiusMult: 1.5, border: true },
-  "sheet-content": { radiusMult: 1.5, border: true },
-  "alert-dialog-content": { radiusMult: 1.5, border: true },
-  "drawer-content": { radiusMult: 1.5, border: true },
-  "popover-content": { radiusMult: 1, border: true },
-  "dropdown-menu-content": { radiusMult: 1, border: true },
-  "context-menu-content": { radiusMult: 1, border: true },
-  "menubar-content": { radiusMult: 1, border: true },
-  "tooltip-content": { radiusMult: 0.8, border: true },
-  "hover-card-content": { radiusMult: 1, border: true },
-  "select-content": { radiusMult: 1, border: true },
+const PORTAL_SLOTS: Record<string, number> = {
+  "dialog-content": 1.5,
+  "sheet-content": 1.5,
+  "alert-dialog-content": 1.5,
+  "drawer-content": 1.5,
+  "popover-content": 1,
+  "dropdown-menu-content": 1,
+  "context-menu-content": 1,
+  "menubar-content": 1,
+  "tooltip-content": 0.8,
+  "hover-card-content": 1,
+  "select-content": 1,
+  "navigation-menu-content": 1,
+  "navigation-menu-viewport": 1,
 };
 
-// Threshold: elements with computed border-radius >= this are already pill/circle shaped
-const PILL_RADIUS_THRESHOLD = 9000;
+const PILL_THRESHOLD = 9000;
 
-function buildSelector(slots: Record<string, unknown>): string {
+function buildSelector(slots: Record<string, number>): string {
   return Object.keys(slots).map((s) => `[data-slot='${s}']`).join(",");
 }
 
-const CONTAINER_SELECTOR = buildSelector(CONTAINER_SLOTS);
-const PORTAL_SELECTOR = buildSelector(PORTAL_SLOTS);
+const CONTAINER_SEL = buildSelector(CONTAINER_SLOTS);
+const PORTAL_SEL = buildSelector(PORTAL_SLOTS);
 
 /**
- * Parse computed box-shadow string → filter: drop-shadow().
- * drop-shadow does NOT support spread or inset.
+ * Convert box-shadow → filter: drop-shadow().
+ * drop-shadow() follows clip-path shape and renders OUTSIDE the clip.
+ * Limitation: no spread support, no inset support.
  */
-function parseBoxShadowToDropShadow(boxShadow: string): string {
+function boxShadowToDropShadow(boxShadow: string): string {
   return boxShadow
     .split(/,(?![^(]*\))/)
-    .map((shadow) => {
-      const s = shadow.trim();
-      if (s.startsWith("inset")) return null;
-      // Computed style: color x y blur [spread]
-      const m = s.match(
-        /^(rgba?\([^)]+\)|oklch\([^)]+\/[^)]*\)|oklch\([^)]+\)|#[\da-f]+|\w+)\s+([-\d.]+)px\s+([-\d.]+)px\s+([-\d.]+)px(?:\s+[-\d.]+px)?/i
+    .map((s) => {
+      const t = s.trim();
+      if (t.startsWith("inset")) return null;
+      // Computed style: "color x y blur [spread]"
+      const m = t.match(
+        /^(rgba?\([^)]+\)|oklch\([^)]+\))\s+([-\d.]+)px\s+([-\d.]+)px\s+([-\d.]+)px/i
       );
-      if (m) {
-        const [, color, x, y, blur] = m;
-        return `drop-shadow(${x}px ${y}px ${blur}px ${color})`;
-      }
-      // Fallback: x y blur [spread] color
-      const m2 = s.match(
-        /([-\d.]+)px\s+([-\d.]+)px\s+([-\d.]+)px(?:\s+[-\d.]+px)?\s+(rgba?\([^)]+\)|oklch\([^)]+\/[^)]*\)|oklch\([^)]+\)|#[\da-f]+|\w+)/i
-      );
-      if (m2) {
-        const [, x, y, blur, color] = m2;
-        return `drop-shadow(${x}px ${y}px ${blur}px ${color})`;
-      }
+      if (m) return `drop-shadow(${m[2]}px ${m[3]}px ${m[4]}px ${m[1]})`;
       return null;
     })
     .filter(Boolean)
     .join(" ");
 }
 
-/**
- * Apply squircle to a single element.
- * Returns false if skipped (e.g., pill-shaped element).
- */
 function applyToElement(
   ck: import("@cornerkit/core").default,
-  htmlEl: HTMLElement,
-  cfg: { radiusMult: number },
-  radius: number,
+  el: HTMLElement,
+  radiusMult: number,
+  baseRadius: number,
   smoothing: number,
-  idPrefix: string,
-  index: number,
-): boolean {
-  if (!htmlEl.id) htmlEl.id = `${idPrefix}-${index}-${Date.now()}`;
+  prefix: string,
+  idx: number,
+): void {
+  if (!el.id) el.id = `${prefix}-${idx}-${Date.now()}`;
 
-  const styles = getComputedStyle(htmlEl);
+  const styles = getComputedStyle(el);
+  const cr = parseFloat(styles.borderRadius) || 0;
+  if (cr >= PILL_THRESHOLD) return;
 
-  // Skip pill/circle elements (border-radius >= threshold)
-  const computedRadius = parseFloat(styles.borderRadius) || 0;
-  if (computedRadius >= PILL_RADIUS_THRESHOLD) return false;
-
-  const r = Math.min(cfg.radiusMult * radius, 9999);
-
-  // Shape only — CSS borders are naturally clipped by clip-path
+  const r = Math.min(radiusMult * baseRadius, 9999);
   const opts = { radius: r, smoothing };
 
   try {
-    if (htmlEl.hasAttribute("data-squircle-applied")) {
-      ck.update(`#${htmlEl.id}`, opts);
+    if (el.hasAttribute("data-squircle-applied")) {
+      ck.update(`#${el.id}`, opts);
     } else {
-      ck.apply(`#${htmlEl.id}`, opts);
-      htmlEl.setAttribute("data-squircle-applied", "true");
+      ck.apply(`#${el.id}`, opts);
+      el.setAttribute("data-squircle-applied", "true");
     }
   } catch {
     try {
-      ck.apply(`#${htmlEl.id}`, opts);
-      htmlEl.setAttribute("data-squircle-applied", "true");
-    } catch { /* element not ready */ }
+      ck.apply(`#${el.id}`, opts);
+      el.setAttribute("data-squircle-applied", "true");
+    } catch { /* not ready */ }
   }
 
-  // Convert box-shadow → filter: drop-shadow() (clip-path clips box-shadow)
-  const boxShadow = styles.boxShadow;
-  if (boxShadow && boxShadow !== "none") {
-    const dropShadows = parseBoxShadowToDropShadow(boxShadow);
-    if (dropShadows) {
-      htmlEl.style.boxShadow = "none";
-      const existingFilter = styles.filter;
-      const hasExisting = existingFilter && existingFilter !== "none" && !existingFilter.includes("drop-shadow");
-      htmlEl.style.filter = hasExisting ? `${existingFilter} ${dropShadows}` : dropShadows;
+  // Shadow: clip-path clips box-shadow, so move it to filter: drop-shadow()
+  // drop-shadow renders OUTSIDE clip-path → shadow visible around squircle shape
+  const bs = styles.boxShadow;
+  if (bs && bs !== "none") {
+    const ds = boxShadowToDropShadow(bs);
+    if (ds) {
+      el.style.boxShadow = "none";
+      el.style.filter = ds;
     }
   }
-
-  return true;
 }
 
 export function SquircleProvider({
@@ -177,78 +146,49 @@ export function SquircleProvider({
   const observerRef = React.useRef<MutationObserver | null>(null);
   const portalObserverRef = React.useRef<MutationObserver | null>(null);
 
-  const applySquircle = React.useCallback(() => {
+  const applyAll = React.useCallback(() => {
     if (disabled || !containerRef.current) return;
 
-    import("@cornerkit/core").then(({ default: CornerKit }) => {
+    import("@cornerkit/core").then(({ default: CK }) => {
       if (!containerRef.current) return;
-      if (!ckRef.current) ckRef.current = new CornerKit();
+      if (!ckRef.current) ckRef.current = new CK();
       const ck = ckRef.current;
 
-      // 1. Apply to container elements (non-portal)
-      const containerEls = containerRef.current.querySelectorAll(CONTAINER_SELECTOR);
-      containerEls.forEach((el, i) => {
-        const htmlEl = el as HTMLElement;
-        const slot = htmlEl.getAttribute("data-slot") || "";
-        const cfg = CONTAINER_SLOTS[slot];
-        if (!cfg) return;
-        applyToElement(ck, htmlEl, cfg, radius, smoothing, "ds-sq", i);
+      containerRef.current.querySelectorAll(CONTAINER_SEL).forEach((el, i) => {
+        const slot = el.getAttribute("data-slot") || "";
+        const mult = CONTAINER_SLOTS[slot];
+        if (mult == null) return;
+        applyToElement(ck, el as HTMLElement, mult, radius, smoothing, "ds-sq", i);
       });
 
-      // 2. Apply to portal elements (dialog, sheet, popover, etc.)
       if (typeof document === "undefined") return;
-      const portalEls = document.querySelectorAll(PORTAL_SELECTOR);
-      portalEls.forEach((el, i) => {
-        const htmlEl = el as HTMLElement;
-        const slot = htmlEl.getAttribute("data-slot") || "";
-        const cfg = PORTAL_SLOTS[slot];
-        if (!cfg) return;
-        applyToElement(ck, htmlEl, cfg, radius, smoothing, "ds-pt", i);
+      document.querySelectorAll(PORTAL_SEL).forEach((el, i) => {
+        const slot = el.getAttribute("data-slot") || "";
+        const mult = PORTAL_SLOTS[slot];
+        if (mult == null) return;
+        applyToElement(ck, el as HTMLElement, mult, radius, smoothing, "ds-pt", i);
       });
     });
   }, [smoothing, radius, disabled]);
 
-  // Container observer: watch for new elements inside provider
+  // Container observer
   React.useEffect(() => {
     if (disabled || !containerRef.current) return;
+    const timer = setTimeout(applyAll, 100);
+    observerRef.current = new MutationObserver(() => requestAnimationFrame(applyAll));
+    observerRef.current.observe(containerRef.current, { childList: true, subtree: true });
+    return () => { clearTimeout(timer); observerRef.current?.disconnect(); };
+  }, [applyAll, disabled]);
 
-    const timer = setTimeout(applySquircle, 100);
-
-    observerRef.current = new MutationObserver(() => {
-      requestAnimationFrame(applySquircle);
-    });
-    observerRef.current.observe(containerRef.current, {
-      childList: true,
-      subtree: true,
-    });
-
-    return () => {
-      clearTimeout(timer);
-      observerRef.current?.disconnect();
-    };
-  }, [applySquircle, disabled]);
-
-  // Portal observer: watch document.body for portals (dialog, popover, etc.)
+  // Portal observer
   React.useEffect(() => {
     if (disabled || typeof document === "undefined") return;
+    portalObserverRef.current = new MutationObserver(() => requestAnimationFrame(applyAll));
+    portalObserverRef.current.observe(document.body, { childList: true, subtree: true });
+    return () => { portalObserverRef.current?.disconnect(); };
+  }, [applyAll, disabled]);
 
-    portalObserverRef.current = new MutationObserver(() => {
-      requestAnimationFrame(applySquircle);
-    });
-    portalObserverRef.current.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    return () => {
-      portalObserverRef.current?.disconnect();
-    };
-  }, [applySquircle, disabled]);
-
-  // Re-apply when smoothing or radius changes
-  React.useEffect(() => {
-    if (!disabled) applySquircle();
-  }, [smoothing, radius, applySquircle, disabled]);
+  React.useEffect(() => { if (!disabled) applyAll(); }, [smoothing, radius, applyAll, disabled]);
 
   return (
     <div ref={containerRef} style={{ display: "contents" }}>
