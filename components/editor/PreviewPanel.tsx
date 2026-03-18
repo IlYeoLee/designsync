@@ -1292,9 +1292,11 @@ function FeedbackPreview() {
 export function PreviewPanel({
   squircleEnabled = false,
   squircleSmoothing = 60,
+  radiusKey,
 }: {
   squircleEnabled?: boolean;
   squircleSmoothing?: number;
+  radiusKey?: string;
 }) {
   const [category, setCategory] = React.useState<PreviewCategory>("form");
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -1405,7 +1407,7 @@ export function PreviewPanel({
       clearTimeout(timer);
       portalObserver.disconnect();
     };
-  }, [squircleEnabled, squircleSmoothing, category]);
+  }, [squircleEnabled, squircleSmoothing, category, radiusKey]);
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-background">

@@ -278,7 +278,7 @@ export default function Home() {
           squircleSmoothing={squircleSmoothing}
           onSquircleChange={handleSquircleChange}
         />
-        <PreviewPanel squircleEnabled={squircleEnabled} squircleSmoothing={squircleSmoothing} />
+        <PreviewPanel squircleEnabled={squircleEnabled} squircleSmoothing={squircleSmoothing} radiusKey={JSON.stringify(tokens.primitives.radius)} />
       </div>
     </div>
   );
