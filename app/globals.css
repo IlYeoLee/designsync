@@ -1,3 +1,26 @@
+/* Bricolage Grotesque (self-hosted via DesignSync) */
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/Bricolage-Grotesque-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/Bricolage-Grotesque-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/Bricolage-Grotesque-700.woff2') format('woff2');
+}
+
 /* Cal Sans (self-hosted via DesignSync) */
 @font-face {
   font-family: 'Cal Sans';
