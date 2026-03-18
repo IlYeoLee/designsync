@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "font-barlow",
+  "type": "registry:style",
+  "description": "Barlow font — self-hosted from DesignSync CDN. Auto-injects @font-face into globals.css.",
+  "css": {
+    "@font-face": {
+      "font-family": "'Barlow'",
+      "font-style": "normal",
+      "font-weight": "400",
+      "font-display": "swap",
+      "src": "url('https://designsync-omega.vercel.app/fonts/barlow-400.woff2') format('woff2')"
+    }
+  }
+}
