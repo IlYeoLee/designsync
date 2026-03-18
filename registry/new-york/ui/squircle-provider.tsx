@@ -86,16 +86,9 @@ function applyToElement(
   if (cr >= PILL_THRESHOLD) return;
 
   const r = Math.min(radiusMult * baseRadius, 9999);
-  // Skip if effective radius is 0 — no smoothing needed
   if (r <= 0) return;
 
-  // Read existing border so CornerKit renders it via SVG (not clipped)
-  const bw = parseFloat(styles.borderWidth) || 0;
-  const bc = styles.borderColor || "";
-  const opts: Record<string, unknown> = { radius: r, smoothing };
-  if (bw > 0 && bc) {
-    opts.border = { width: bw, color: bc };
-  }
+  const opts = { radius: r, smoothing };
 
   try {
     if (el.hasAttribute("data-squircle-applied")) {
@@ -111,12 +104,7 @@ function applyToElement(
     } catch { /* not ready */ }
   }
 
-  // Hide CSS border — CornerKit SVG border replaces it
-  if (bw > 0) {
-    el.style.borderColor = "transparent";
-  }
-
-  // Shadow: clip-path clips box-shadow — remove it entirely when squircle is active
+  // Shadow: clip-path clips box-shadow — remove entirely
   const bs = styles.boxShadow;
   if (bs && bs !== "none") {
     el.style.boxShadow = "none";

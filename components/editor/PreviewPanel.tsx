@@ -90,16 +90,9 @@ function pvApply(
   if ((parseFloat(styles.borderRadius) || 0) >= PILL_THRESHOLD) return;
 
   const r = Math.min(mult * baseR, 9999);
-  // Skip if effective radius is 0 — no smoothing needed
   if (r <= 0) return;
 
-  // Read existing border so CornerKit renders it via SVG (not clipped)
-  const bw = parseFloat(styles.borderWidth) || 0;
-  const bc = styles.borderColor || "";
-  const opts: Record<string, unknown> = { radius: r, smoothing };
-  if (bw > 0 && bc) {
-    opts.border = { width: bw, color: bc };
-  }
+  const opts = { radius: r, smoothing };
 
   try {
     if (el.hasAttribute("data-squircle-applied")) {
@@ -112,15 +105,7 @@ function pvApply(
     try { ck.apply(`#${el.id}`, opts); el.setAttribute("data-squircle-applied", "true"); } catch {}
   }
 
-  // Hide CSS border — CornerKit SVG border replaces it
-  if (bw > 0) {
-    if (!el.dataset.origBorderColor) {
-      el.dataset.origBorderColor = el.style.borderColor || "";
-    }
-    el.style.borderColor = "transparent";
-  }
-
-  // Shadow: clip-path clips box-shadow — remove it entirely when squircle is active
+  // Shadow: clip-path clips box-shadow — remove entirely
   const bs = styles.boxShadow;
   if (bs && bs !== "none") {
     if (!el.dataset.origShadow) {
@@ -1255,10 +1240,6 @@ export function PreviewPanel({
         if (htmlEl.dataset.origShadow !== undefined) {
           htmlEl.style.boxShadow = htmlEl.dataset.origShadow || "";
           delete htmlEl.dataset.origShadow;
-        }
-        if (htmlEl.dataset.origBorderColor !== undefined) {
-          htmlEl.style.borderColor = htmlEl.dataset.origBorderColor || "";
-          delete htmlEl.dataset.origBorderColor;
         }
       });
     };

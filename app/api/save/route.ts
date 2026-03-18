@@ -215,21 +215,17 @@ export async function POST(req: NextRequest) {
     const files: Array<{ path: string; type: string; target?: string; content: string }> = [];
     const deps: string[] = [];
 
-    // Squircle: add npm dependencies + SquircleProvider layout file
+    // Squircle: add npm dependencies + SquircleProvider usage hint
     if (squircle.enabled) {
-      deps.push("@squircle/core");
+      deps.push("@cornerkit/core");
+      deps.push("@cornerkit/react");
       files.push({
-        path: "app/layout.tsx",
+        path: "components/squircle-provider.tsx",
         type: "registry:file",
         content: [
-          '"use client"',
-          'import { init } from "@squircle/core"',
-          'import { useEffect } from "react"',
-          "",
-          "export function SquircleProvider({ children }: { children: React.ReactNode }) {",
-          "  useEffect(() => void init(), [])",
-          "  return <>{children}</>",
-          "}",
+          '// Install via: shadcn add <your-registry-url>/r/squircle-provider.json',
+          '// Then wrap your app with <SquircleProvider smoothing={' + (squircle.smoothing / 100) + '}>',
+          'export { SquircleProvider } from "@/registry/new-york/ui/squircle-provider"',
         ].join("\n"),
       });
     }
