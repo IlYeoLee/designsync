@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "font-montserrat",
+  "type": "registry:file",
+  "description": "Montserrat font — served from DesignSync CDN. After install, add @import './font-montserrat.css' to your globals.css.",
+  "files": [
+    {
+      "path": "registry/styles/font-montserrat.css",
+      "type": "registry:file",
+      "target": "app/font-montserrat.css",
+      "content": "@font-face {\n  font-family: 'Montserrat';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url('https://designsync-omega.vercel.app/fonts/Montserrat-400.woff2') format('woff2');\n  unicode-range: U+0000-00FF;\n}\n\n@font-face {\n  font-family: 'Montserrat';\n  font-style: normal;\n  font-weight: 500;\n  font-display: swap;\n  src: url('https://designsync-omega.vercel.app/fonts/Montserrat-500.woff2') format('woff2');\n  unicode-range: U+0000-00FF;\n}\n\n@font-face {\n  font-family: 'Montserrat';\n  font-style: normal;\n  font-weight: 700;\n  font-display: swap;\n  src: url('https://designsync-omega.vercel.app/fonts/Montserrat-700.woff2') format('woff2');\n  unicode-range: U+0000-00FF;\n}"
+    }
+  ]
+}
