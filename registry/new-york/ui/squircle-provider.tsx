@@ -55,6 +55,41 @@ const SQUIRCLE_SLOTS: Record<string, { radiusMult: number; border: boolean }> = 
   "input-otp-slot": { radiusMult: 1, border: true },
 };
 
+/**
+ * Parse computed box-shadow string and convert to filter: drop-shadow().
+ * box-shadow: offsetX offsetY blur spread color  (spread is NOT supported by drop-shadow)
+ * Computed style format is always: "rgba(...) Xpx Ypx Bpx Spx" (color first, then values)
+ */
+function parseBoxShadowToDropShadow(boxShadow: string): string {
+  return boxShadow
+    .split(/,(?![^(]*\))/)
+    .map((shadow) => {
+      const s = shadow.trim();
+      // Skip inset shadows — drop-shadow doesn't support inset
+      if (s.startsWith("inset")) return null;
+      // Computed style format: color offsetX offsetY blur spread
+      // Color is always first in computed style (rgba/oklch/etc.)
+      const m = s.match(
+        /^(rgba?\([^)]+\)|oklch\([^)]+\/[^)]*\)|oklch\([^)]+\)|#[\da-f]+|\w+)\s+([-\d.]+)px\s+([-\d.]+)px\s+([-\d.]+)px(?:\s+[-\d.]+px)?/i
+      );
+      if (m) {
+        const [, color, x, y, blur] = m;
+        return `drop-shadow(${x}px ${y}px ${blur}px ${color})`;
+      }
+      // Fallback: values first, then color
+      const m2 = s.match(
+        /([-\d.]+)px\s+([-\d.]+)px\s+([-\d.]+)px(?:\s+[-\d.]+px)?\s+(rgba?\([^)]+\)|oklch\([^)]+\/[^)]*\)|oklch\([^)]+\)|#[\da-f]+|\w+)/i
+      );
+      if (m2) {
+        const [, x, y, blur, color] = m2;
+        return `drop-shadow(${x}px ${y}px ${blur}px ${color})`;
+      }
+      return null;
+    })
+    .filter(Boolean)
+    .join(" ");
+}
+
 const SELECTOR = Object.keys(SQUIRCLE_SLOTS)
   .map((s) => `[data-slot='${s}']`)
   .join(",");
@@ -109,6 +144,24 @@ export function SquircleProvider({
             ck.apply(`#${htmlEl.id}`, opts);
             htmlEl.setAttribute("data-squircle-applied", "true");
           } catch { /* element not in DOM yet */ }
+        }
+
+        // Fix border doubling: cornerKit renders SVG borders,
+        // remove original CSS border entirely to prevent double borders
+        if (cfg.border && borderWidth > 0) {
+          htmlEl.style.borderColor = "transparent";
+          htmlEl.style.borderWidth = "0";
+        }
+
+        // Fix shadow clipping: clip-path clips box-shadow,
+        // convert to filter: drop-shadow() (drop-shadow has no spread parameter)
+        const boxShadow = styles.boxShadow;
+        if (boxShadow && boxShadow !== "none") {
+          const dropShadows = parseBoxShadowToDropShadow(boxShadow);
+          if (dropShadows) {
+            htmlEl.style.boxShadow = "none";
+            htmlEl.style.filter = dropShadows;
+          }
         }
       });
     });

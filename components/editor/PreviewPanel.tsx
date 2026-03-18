@@ -54,6 +54,37 @@ import { TypographyH1, TypographyH2, TypographyH3, TypographyH4, TypographyP, Ty
 
 import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as CalendarIcon, Smile, Settings, User, LayoutDashboard, FileText, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, ChevronsUpDown, ChevronDown } from "lucide-react";
 
+/**
+ * Parse computed box-shadow string and convert to filter: drop-shadow().
+ * Computed style format: "rgba(...) Xpx Ypx Bpx Spx" (color first, then values)
+ * drop-shadow does NOT support spread, so we skip it.
+ */
+function parseBoxShadowToDropShadow(boxShadow: string): string {
+  return boxShadow
+    .split(/,(?![^(]*\))/)
+    .map((shadow) => {
+      const s = shadow.trim();
+      if (s.startsWith("inset")) return null;
+      const m = s.match(
+        /^(rgba?\([^)]+\)|oklch\([^)]+\/[^)]*\)|oklch\([^)]+\)|#[\da-f]+|\w+)\s+([-\d.]+)px\s+([-\d.]+)px\s+([-\d.]+)px(?:\s+[-\d.]+px)?/i
+      );
+      if (m) {
+        const [, color, x, y, blur] = m;
+        return `drop-shadow(${x}px ${y}px ${blur}px ${color})`;
+      }
+      const m2 = s.match(
+        /([-\d.]+)px\s+([-\d.]+)px\s+([-\d.]+)px(?:\s+[-\d.]+px)?\s+(rgba?\([^)]+\)|oklch\([^)]+\/[^)]*\)|oklch\([^)]+\)|#[\da-f]+|\w+)/i
+      );
+      if (m2) {
+        const [, x, y, blur, color] = m2;
+        return `drop-shadow(${x}px ${y}px ${blur}px ${color})`;
+      }
+      return null;
+    })
+    .filter(Boolean)
+    .join(" ");
+}
+
 type PreviewCategory = "form" | "overlay" | "navigation" | "display" | "feedback";
 
 const PREVIEW_CATEGORIES: { id: PreviewCategory; label: string }[] = [
@@ -1163,8 +1194,23 @@ export function PreviewPanel({
     if (!squircleEnabled || !containerRef.current) {
       if (ckRef.current) {
         containerRef.current?.querySelectorAll("[data-squircle-applied]").forEach((el) => {
-          try { ckRef.current?.remove(`#${el.id}`); } catch { /* ignore */ }
-          el.removeAttribute("data-squircle-applied");
+          const htmlEl = el as HTMLElement;
+          try { ckRef.current?.remove(`#${htmlEl.id}`); } catch { /* ignore */ }
+          htmlEl.removeAttribute("data-squircle-applied");
+          // Restore original border styles
+          if (htmlEl.dataset.origBorder !== undefined) {
+            htmlEl.style.borderColor = htmlEl.dataset.origBorder || "";
+            htmlEl.style.borderWidth = htmlEl.dataset.origBorderWidth || "";
+            delete htmlEl.dataset.origBorder;
+            delete htmlEl.dataset.origBorderWidth;
+          }
+          // Restore original shadow styles
+          if (htmlEl.dataset.origShadow !== undefined) {
+            htmlEl.style.boxShadow = htmlEl.dataset.origShadow || "";
+            htmlEl.style.filter = htmlEl.dataset.origFilter || "";
+            delete htmlEl.dataset.origShadow;
+            delete htmlEl.dataset.origFilter;
+          }
         });
       }
       return;
@@ -1225,6 +1271,7 @@ export function PreviewPanel({
           const styles = getComputedStyle(htmlEl);
           const borderColor = styles.borderColor;
           const borderWidth = parseFloat(styles.borderWidth) || 0;
+          const boxShadow = styles.boxShadow;
 
           const opts: { radius: number; smoothing: number; border?: { width: number; color: string } } = {
             radius: r,
@@ -1246,6 +1293,31 @@ export function PreviewPanel({
               ck.apply(`#${htmlEl.id}`, opts);
               htmlEl.setAttribute("data-squircle-applied", "true");
             } catch { /* ignore */ }
+          }
+
+          // Fix border doubling: cornerKit renders SVG borders via clip-path,
+          // remove original CSS border entirely to prevent double borders
+          if (cfg.border && borderWidth > 0) {
+            if (!htmlEl.dataset.origBorder) {
+              htmlEl.dataset.origBorder = htmlEl.style.borderColor || "";
+              htmlEl.dataset.origBorderWidth = htmlEl.style.borderWidth || "";
+            }
+            htmlEl.style.borderColor = "transparent";
+            htmlEl.style.borderWidth = "0";
+          }
+
+          // Fix shadow clipping: clip-path clips box-shadow,
+          // convert to filter: drop-shadow() which works with clip-path
+          if (boxShadow && boxShadow !== "none") {
+            if (!htmlEl.dataset.origShadow) {
+              htmlEl.dataset.origShadow = htmlEl.style.boxShadow || "";
+              htmlEl.dataset.origFilter = htmlEl.style.filter || "";
+            }
+            const dropShadows = parseBoxShadowToDropShadow(boxShadow);
+            if (dropShadows) {
+              htmlEl.style.boxShadow = "none";
+              htmlEl.style.filter = dropShadows;
+            }
           }
         });
       });
