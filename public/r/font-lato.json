@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "font-lato",
+  "type": "registry:style",
+  "description": "Lato font — self-hosted from DesignSync CDN. Auto-injects @font-face into globals.css.",
+  "css": {
+    "@font-face": {
+      "font-family": "'Lato'",
+      "font-style": "normal",
+      "font-weight": "400",
+      "font-display": "swap",
+      "src": "url('https://designsync-omega.vercel.app/fonts/lato-400.woff2') format('woff2')"
+    }
+  }
+}
