@@ -37,7 +37,7 @@
       "sidebar-accent-foreground": "oklch(0.22 0.12 250)",
       "sidebar-border": "oklch(0.93 0 0)",
       "sidebar-ring": "oklch(0.68 0.17 250)",
-      "font-sans": "'Pretendard', 'Blippo MN', sans-serif",
+      "font-sans": "'BM HANNA Pro OTF', 'Nanum Gothic', sans-serif",
       "font-size-xs": "0.75rem",
       "font-size-sm": "0.875rem",
       "font-size-base": "1rem",
@@ -45,7 +45,7 @@
       "font-size-xl": "1.25rem",
       "font-size-2xl": "1.5rem",
       "font-size-3xl": "1.875rem",
-      "font-size-4xl": "3.0000rem",
+      "font-size-4xl": "3rem",
       "font-weight-normal": "400",
       "font-weight-medium": "500",
       "font-weight-bold": "700",
@@ -80,7 +80,7 @@
       "sidebar-accent-foreground": "oklch(0.93 0.05 250)",
       "sidebar-border": "oklch(0.33 0 0)",
       "sidebar-ring": "oklch(0.58 0.20 250)",
-      "font-sans": "'Pretendard', 'Blippo MN', sans-serif",
+      "font-sans": "'BM HANNA Pro OTF', 'Nanum Gothic', sans-serif",
       "font-size-xs": "0.75rem",
       "font-size-sm": "0.875rem",
       "font-size-base": "1rem",
@@ -88,7 +88,7 @@
       "font-size-xl": "1.25rem",
       "font-size-2xl": "1.5rem",
       "font-size-3xl": "1.875rem",
-      "font-size-4xl": "3.0000rem",
+      "font-size-4xl": "3rem",
       "font-weight-normal": "400",
       "font-weight-medium": "500",
       "font-weight-bold": "700",
@@ -97,5 +97,8 @@
       "line-height-loose": "1.75"
     }
   },
-  "type": "registry:style"
+  "type": "registry:style",
+  "registryDependencies": [
+    "https://designsync-omega.vercel.app/r/font-nanum-gothic.json"
+  ]
 }
