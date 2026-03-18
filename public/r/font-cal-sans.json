@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "font-cal-sans",
+  "type": "registry:file",
+  "description": "Cal Sans font — served from DesignSync CDN. After install, add @import './font-cal-sans.css' to your globals.css.",
+  "files": [
+    {
+      "path": "registry/styles/font-cal-sans.css",
+      "type": "registry:file",
+      "target": "app/font-cal-sans.css",
+      "content": "@font-face {\n  font-family: 'Cal Sans';\n  font-style: normal;\n  font-weight: 400;\n  font-display: swap;\n  src: url('https://designsync-omega.vercel.app/fonts/Cal-Sans-400.woff2') format('woff2');\n  unicode-range: U+0000-00FF;\n}"
+    }
+  ]
+}
