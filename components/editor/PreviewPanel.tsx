@@ -846,7 +846,7 @@ function DisplayPreview() {
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">Typography</h3>
         <div className="space-y-2 max-w-lg">
-          <TypographyH1>Heading 1</TypographyH1>
+          <TypographyH1 style={{ fontSize: 'var(--font-size-4xl)' }}>Heading 1</TypographyH1>
           <TypographyH2>Heading 2</TypographyH2>
           <TypographyH3>Heading 3</TypographyH3>
           <TypographyH4>Heading 4</TypographyH4>

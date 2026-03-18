@@ -49,6 +49,14 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
     setMounted(true);
   }, []);
 
+  // Close color picker popup when clicking outside
+  React.useEffect(() => {
+    if (!activeColor) return;
+    function handleClick() { setActiveColor(null); }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [activeColor]);
+
   // Compute initial scale picker hex after mount
   React.useEffect(() => {
     if (!mounted) return;
@@ -194,10 +202,11 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
                       isActive ? "border-foreground scale-110 shadow-md" : "border-transparent"
                     }`}
                     style={{ backgroundColor: value }}
+                    onMouseDown={(e) => e.stopPropagation()}
                     onClick={() => handleSwatchClick(scale, step)}
                   />
                   {isActive && mounted && (
-                    <div className={`absolute top-full ${popupAlign} mt-1 z-20 bg-card border border-border rounded-md shadow-lg p-2 min-w-[130px]`}>
+                    <div className={`absolute top-full ${popupAlign} mt-1 z-20 bg-card border border-border rounded-md shadow-lg p-2 min-w-[130px]`} onMouseDown={(e) => e.stopPropagation()}>
                       <p className="text-xs text-muted-foreground mb-1 font-mono">{scale}-{step}</p>
                       <input
                         type="color"
