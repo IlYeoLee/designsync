@@ -25,16 +25,6 @@ function linearToSrgb(v: number): number {
   return v <= 0.0031308 ? v * 12.92 : 1.055 * Math.pow(v, 1 / 2.4) - 0.055;
 }
 
-/** Check if linear sRGB values are within [0, 1] gamut */
-function isInGamut(r: number, g: number, b: number): boolean {
-  const eps = 1e-6;
-  return (
-    r >= -eps && r <= 1 + eps &&
-    g >= -eps && g <= 1 + eps &&
-    b >= -eps && b <= 1 + eps
-  );
-}
-
 /** OKLCH → linear sRGB triplet (may be out of gamut) */
 function oklchToLinearRgb(l: number, c: number, h: number): [number, number, number] {
   const hRad = h * Math.PI / 180;
