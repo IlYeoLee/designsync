@@ -169,8 +169,8 @@ export function LayoutTab({ tokens, onTokenChange, squircleEnabled, squircleSmoo
 
         <p className="text-xs text-muted-foreground mb-2 mt-4">Custom values</p>
         <div className="space-y-2">
-          {RADIUS_OPTIONS.filter(({ key }) => key !== "none" && key !== "full").map(({ key, label }) => {
-            const varKey = `${key}-prim`;
+          {RADIUS_OPTIONS.map(({ key, label }) => {
+            const varKey = key === "none" ? "none" : key === "full" ? "full" : `${key}-prim`;
             const currentValue = tokens.primitives.radius[key as keyof typeof tokens.primitives.radius];
             return (
               <div key={key} className="flex items-center gap-3">
@@ -180,7 +180,7 @@ export function LayoutTab({ tokens, onTokenChange, squircleEnabled, squircleSmoo
                   value={currentValue}
                   onChange={(v) => onTokenChange(`--radius-${varKey}`, v)}
                   min={0}
-                  max={64}
+                  max={key === "full" ? 9999 : 64}
                 />
               </div>
             );

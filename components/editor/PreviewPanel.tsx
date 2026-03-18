@@ -1161,7 +1161,6 @@ export function PreviewPanel({
   // Apply cornerKit squircle to preview elements
   React.useEffect(() => {
     if (!squircleEnabled || !containerRef.current) {
-      // Remove all squircle effects
       if (ckRef.current) {
         containerRef.current?.querySelectorAll("[data-squircle-applied]").forEach((el) => {
           try { ckRef.current?.remove(`#${el.id}`); } catch { /* ignore */ }
@@ -1172,45 +1171,87 @@ export function PreviewPanel({
     }
 
     const smoothing = squircleSmoothing / 100;
-    const radius = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--radius-md-prim")) * 16 || 8;
+    const baseR = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--radius-md-prim")) * 16 || 8;
 
-    import("@cornerkit/core").then(({ default: CornerKit }) => {
-      if (!containerRef.current) return;
-      if (!ckRef.current) ckRef.current = new CornerKit();
-      const ck = ckRef.current;
+    // Slots that should get squircle + whether they have a border
+    const SQUIRCLE_SLOTS: Record<string, { radiusMult: number; border: boolean }> = {
+      button: { radiusMult: 1, border: false },
+      card: { radiusMult: 1.5, border: true },
+      input: { radiusMult: 1, border: true },
+      textarea: { radiusMult: 1, border: true },
+      "select-trigger": { radiusMult: 1, border: true },
+      "select-content": { radiusMult: 1, border: true },
+      badge: { radiusMult: 1, border: false },
+      alert: { radiusMult: 1, border: true },
+      avatar: { radiusMult: 100, border: false },
+      checkbox: { radiusMult: 0.5, border: true },
+      switch: { radiusMult: 100, border: true },
+      toggle: { radiusMult: 1, border: true },
+      "tabs-list": { radiusMult: 1, border: true },
+      "tabs-trigger": { radiusMult: 0.8, border: false },
+      "popover-content": { radiusMult: 1, border: true },
+      "dropdown-menu-content": { radiusMult: 1, border: true },
+      "context-menu-content": { radiusMult: 1, border: true },
+      "tooltip-content": { radiusMult: 0.8, border: true },
+      "dialog-content": { radiusMult: 1.5, border: true },
+      "sheet-content": { radiusMult: 1.5, border: true },
+      "alert-dialog-content": { radiusMult: 1.5, border: true },
+      "hover-card-content": { radiusMult: 1, border: true },
+      "navigation-menu-content": { radiusMult: 1, border: true },
+      "command": { radiusMult: 1, border: true },
+      skeleton: { radiusMult: 1, border: false },
+      progress: { radiusMult: 100, border: false },
+      "input-otp-slot": { radiusMult: 1, border: true },
+    };
 
-      const selectors = [
-        "[data-slot='button']",
-        "[data-slot='card']",
-        "[data-slot='input']",
-        "[data-slot='textarea']",
-        "[data-slot='select-trigger']",
-        "[data-slot='badge']",
-        "[data-slot='alert']",
-      ];
+    const selectorStr = Object.keys(SQUIRCLE_SLOTS).map((s) => `[data-slot='${s}']`).join(",");
 
-      const elements = containerRef.current.querySelectorAll(selectors.join(","));
-      elements.forEach((el, i) => {
-        const htmlEl = el as HTMLElement;
-        if (!htmlEl.id) htmlEl.id = `sq-preview-${i}-${Date.now()}`;
-        const slot = htmlEl.getAttribute("data-slot");
-        const r = slot === "card" ? radius * 1.5 : radius;
+    // Small delay to let React render the category content
+    const timer = setTimeout(() => {
+      import("@cornerkit/core").then(({ default: CornerKit }) => {
+        if (!containerRef.current) return;
+        if (!ckRef.current) ckRef.current = new CornerKit();
+        const ck = ckRef.current;
 
-        try {
-          if (htmlEl.hasAttribute("data-squircle-applied")) {
-            ck.update(`#${htmlEl.id}`, { radius: r, smoothing });
-          } else {
-            ck.apply(`#${htmlEl.id}`, { radius: r, smoothing });
-            htmlEl.setAttribute("data-squircle-applied", "true");
+        const elements = containerRef.current!.querySelectorAll(selectorStr);
+        elements.forEach((el, i) => {
+          const htmlEl = el as HTMLElement;
+          if (!htmlEl.id) htmlEl.id = `sq-pv-${i}-${Date.now()}`;
+          const slot = htmlEl.getAttribute("data-slot") || "";
+          const cfg = SQUIRCLE_SLOTS[slot];
+          if (!cfg) return;
+
+          const r = Math.min(cfg.radiusMult * baseR, 9999);
+          const styles = getComputedStyle(htmlEl);
+          const borderColor = styles.borderColor;
+          const borderWidth = parseFloat(styles.borderWidth) || 0;
+
+          const opts: { radius: number; smoothing: number; border?: { width: number; color: string } } = {
+            radius: r,
+            smoothing,
+          };
+          if (cfg.border && borderWidth > 0) {
+            opts.border = { width: borderWidth, color: borderColor };
           }
-        } catch {
+
           try {
-            ck.apply(`#${htmlEl.id}`, { radius: r, smoothing });
-            htmlEl.setAttribute("data-squircle-applied", "true");
-          } catch { /* ignore */ }
-        }
+            if (htmlEl.hasAttribute("data-squircle-applied")) {
+              ck.update(`#${htmlEl.id}`, opts);
+            } else {
+              ck.apply(`#${htmlEl.id}`, opts);
+              htmlEl.setAttribute("data-squircle-applied", "true");
+            }
+          } catch {
+            try {
+              ck.apply(`#${htmlEl.id}`, opts);
+              htmlEl.setAttribute("data-squircle-applied", "true");
+            } catch { /* ignore */ }
+          }
+        });
       });
-    });
+    }, 50);
+
+    return () => clearTimeout(timer);
   }, [squircleEnabled, squircleSmoothing, category]);
 
   return (
