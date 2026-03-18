@@ -16,27 +16,10 @@ export default function Home() {
   const [squircleEnabled, setSquircleEnabled] = React.useState(false);
   const [squircleSmoothing, setSquircleSmoothing] = React.useState(60);
 
-  // ── Mount: apply primitive tokens + init squircle worklet ──────
+  // ── Mount: apply primitive tokens ──────
   React.useEffect(() => {
     applyTokensToDocument(DEFAULT_TOKENS);
-    // Register CSS Houdini paint worklet for squircle preview
-    import("@squircle/core").then(({ init }) => {
-      init();
-      console.log("[DesignSync] squircle paint worklet registered");
-    }).catch((e) => console.warn("[DesignSync] squircle init failed:", e));
   }, []);
-
-  // ── Squircle: apply --squircle-border-smoothing CSS variable ────
-  React.useEffect(() => {
-    if (squircleEnabled) {
-      document.documentElement.style.setProperty(
-        "--squircle-border-smoothing",
-        String(squircleSmoothing / 100)
-      );
-    } else {
-      document.documentElement.style.removeProperty("--squircle-border-smoothing");
-    }
-  }, [squircleEnabled, squircleSmoothing]);
 
   function handleSquircleChange(enabled: boolean, smoothing: number) {
     setSquircleEnabled(enabled);
@@ -295,7 +278,7 @@ export default function Home() {
           squircleSmoothing={squircleSmoothing}
           onSquircleChange={handleSquircleChange}
         />
-        <PreviewPanel squircleEnabled={squircleEnabled} />
+        <PreviewPanel squircleEnabled={squircleEnabled} squircleSmoothing={squircleSmoothing} />
       </div>
     </div>
   );

@@ -200,13 +200,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 4c. Apply squircle settings
+    // 4c. Apply squircle settings (cornerKit uses JS, store smoothing as metadata)
     if (squircle.enabled) {
-      lightVars["squircle-border-smoothing"] = String(squircle.smoothing / 100);
-      darkVars["squircle-border-smoothing"] = String(squircle.smoothing / 100);
+      lightVars["squircle-smoothing"] = String(squircle.smoothing / 100);
+      darkVars["squircle-smoothing"] = String(squircle.smoothing / 100);
     } else {
-      delete lightVars["squircle-border-smoothing"];
-      delete darkVars["squircle-border-smoothing"];
+      delete lightVars["squircle-smoothing"];
+      delete darkVars["squircle-smoothing"];
     }
 
     tokensJson.cssVars = { light: lightVars, dark: darkVars };

@@ -1147,8 +1147,71 @@ function FeedbackPreview() {
 
 // ─── Root ──────────────────────────────────────────────────────────────────────
 
-export function PreviewPanel({ squircleEnabled = false }: { squircleEnabled?: boolean }) {
+export function PreviewPanel({
+  squircleEnabled = false,
+  squircleSmoothing = 60,
+}: {
+  squircleEnabled?: boolean;
+  squircleSmoothing?: number;
+}) {
   const [category, setCategory] = React.useState<PreviewCategory>("form");
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const ckRef = React.useRef<import("@cornerkit/core").default | null>(null);
+
+  // Apply cornerKit squircle to preview elements
+  React.useEffect(() => {
+    if (!squircleEnabled || !containerRef.current) {
+      // Remove all squircle effects
+      if (ckRef.current) {
+        containerRef.current?.querySelectorAll("[data-squircle-applied]").forEach((el) => {
+          try { ckRef.current?.remove(`#${el.id}`); } catch { /* ignore */ }
+          el.removeAttribute("data-squircle-applied");
+        });
+      }
+      return;
+    }
+
+    const smoothing = squircleSmoothing / 100;
+    const radius = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--radius-md-prim")) * 16 || 8;
+
+    import("@cornerkit/core").then(({ default: CornerKit }) => {
+      if (!containerRef.current) return;
+      if (!ckRef.current) ckRef.current = new CornerKit();
+      const ck = ckRef.current;
+
+      const selectors = [
+        "[data-slot='button']",
+        "[data-slot='card']",
+        "[data-slot='input']",
+        "[data-slot='textarea']",
+        "[data-slot='select-trigger']",
+        "[data-slot='badge']",
+        "[data-slot='alert']",
+      ];
+
+      const elements = containerRef.current.querySelectorAll(selectors.join(","));
+      elements.forEach((el, i) => {
+        const htmlEl = el as HTMLElement;
+        if (!htmlEl.id) htmlEl.id = `sq-preview-${i}-${Date.now()}`;
+        const slot = htmlEl.getAttribute("data-slot");
+        const r = slot === "card" ? radius * 1.5 : radius;
+
+        try {
+          if (htmlEl.hasAttribute("data-squircle-applied")) {
+            ck.update(`#${htmlEl.id}`, { radius: r, smoothing });
+          } else {
+            ck.apply(`#${htmlEl.id}`, { radius: r, smoothing });
+            htmlEl.setAttribute("data-squircle-applied", "true");
+          }
+        } catch {
+          try {
+            ck.apply(`#${htmlEl.id}`, { radius: r, smoothing });
+            htmlEl.setAttribute("data-squircle-applied", "true");
+          } catch { /* ignore */ }
+        }
+      });
+    });
+  }, [squircleEnabled, squircleSmoothing, category]);
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-background">
@@ -1168,7 +1231,7 @@ export function PreviewPanel({ squircleEnabled = false }: { squircleEnabled?: bo
         ))}
       </div>
 
-      <div className={`flex-1 overflow-y-auto p-6${squircleEnabled ? " squircle-preview" : ""}`}>
+      <div ref={containerRef} className="flex-1 overflow-y-auto p-6">
         <div className="max-w-2xl mx-auto">
           {category === "form" && <FormPreview />}
           {category === "overlay" && <OverlayPreview />}
