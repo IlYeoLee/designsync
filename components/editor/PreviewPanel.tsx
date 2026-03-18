@@ -100,8 +100,6 @@ const PREVIEW_PORTAL_SLOTS: Record<string, { radiusMult: number; border: boolean
   "select-content": { radiusMult: 1, border: true },
 };
 
-const ALL_PREVIEW_SLOTS = { ...PREVIEW_CONTAINER_SLOTS, ...PREVIEW_PORTAL_SLOTS };
-
 function buildPreviewSelector(slots: Record<string, unknown>): string {
   return Object.keys(slots).map((s) => `[data-slot='${s}']`).join(",");
 }

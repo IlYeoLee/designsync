@@ -69,9 +69,6 @@ const PORTAL_SLOTS: Record<string, { radiusMult: number; border: boolean }> = {
   "select-content": { radiusMult: 1, border: true },
 };
 
-// Merge for full reference
-const ALL_SLOTS = { ...CONTAINER_SLOTS, ...PORTAL_SLOTS };
-
 // Threshold: elements with computed border-radius >= this are already pill/circle shaped
 const PILL_RADIUS_THRESHOLD = 9000;
 
@@ -212,6 +209,7 @@ export function SquircleProvider({
       });
 
       // 2. Apply to portal elements (dialog, sheet, popover, etc.)
+      if (typeof document === "undefined") return;
       const portalEls = document.querySelectorAll(PORTAL_SELECTOR);
       portalEls.forEach((el, i) => {
         const htmlEl = el as HTMLElement;
@@ -245,7 +243,7 @@ export function SquircleProvider({
 
   // Portal observer: watch document.body for portals (dialog, popover, etc.)
   React.useEffect(() => {
-    if (disabled) return;
+    if (disabled || typeof document === "undefined") return;
 
     portalObserverRef.current = new MutationObserver(() => {
       requestAnimationFrame(applySquircle);
