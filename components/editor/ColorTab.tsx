@@ -36,6 +36,7 @@ interface ColorTabProps {
 export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChange }: ColorTabProps) {
   const [mounted, setMounted] = React.useState(false);
   const [activeColor, setActiveColor] = React.useState<{ scale: ColorScaleName; step: string } | null>(null);
+  const colorGridRef = React.useRef<HTMLDivElement>(null);
   const [pickerHex, setPickerHex] = React.useState("#000000");
   // Per-scale one-click picker hex
   const [scalePicker, setScalePicker] = React.useState<Record<ColorScaleName, string>>({
@@ -49,10 +50,14 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
     setMounted(true);
   }, []);
 
-  // Close color picker popup when clicking outside
+  // Close color picker popup when clicking outside the color grid area
   React.useEffect(() => {
     if (!activeColor) return;
-    function handleClick() { setActiveColor(null); }
+    function handleClick(e: MouseEvent) {
+      if (colorGridRef.current && !colorGridRef.current.contains(e.target as Node)) {
+        setActiveColor(null);
+      }
+    }
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, [activeColor]);
@@ -144,6 +149,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
   return (
     <div className="space-y-5 p-4">
       {/* Color Scales */}
+      <div ref={colorGridRef}>
       {COLOR_SCALES.map((scale) => (
         <div key={scale}>
           <div className="flex items-center justify-between mb-2">
@@ -202,11 +208,10 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
                       isActive ? "border-foreground scale-110 shadow-md" : "border-transparent"
                     }`}
                     style={{ backgroundColor: value }}
-                    onMouseDown={(e) => e.stopPropagation()}
                     onClick={() => handleSwatchClick(scale, step)}
                   />
                   {isActive && mounted && (
-                    <div className={`absolute top-full ${popupAlign} mt-1 z-20 bg-card border border-border rounded-md shadow-lg p-2 min-w-[130px]`} onMouseDown={(e) => e.stopPropagation()}>
+                    <div className={`absolute top-full ${popupAlign} mt-1 z-20 bg-card border border-border rounded-md shadow-lg p-2 min-w-[130px]`}>
                       <p className="text-xs text-muted-foreground mb-1 font-mono">{scale}-{step}</p>
                       <input
                         type="color"
@@ -251,6 +256,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
           </div>
         </div>
       ))}
+      </div>
 
       {/* Semantic Mappings – Editable */}
       <div className="mt-4 pt-4 border-t border-border">
