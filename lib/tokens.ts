@@ -248,7 +248,7 @@ export function applyTokensToDocument(tokens: TokenState): void {
   const fontKo = tokens.primitives.fontFamilyKo;
   let fontStack = '';
   if (fontKo && fontEn && fontEn !== 'Geist') {
-    fontStack = `'${fontKo}', '${fontEn}', sans-serif`;
+    fontStack = `'${fontEn}', '${fontKo}', sans-serif`;
   } else if (fontKo) {
     fontStack = `'${fontKo}', sans-serif`;
   } else if (fontEn && fontEn !== 'Geist') {

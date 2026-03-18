@@ -169,7 +169,7 @@ export default function Home() {
     const ko = tokens.primitives.fontFamilyKo;
     let stack = '';
     if (ko && font !== 'Geist') {
-      stack = `'${ko}', '${font}', sans-serif`;
+      stack = `'${font}', '${ko}', sans-serif`;
     } else if (font !== 'Geist') {
       stack = `'${font}', sans-serif`;
     }
@@ -191,7 +191,7 @@ export default function Home() {
     const en = tokens.primitives.fontFamily;
     let stack = '';
     if (font && en && en !== 'Geist') {
-      stack = `'${font}', '${en}', sans-serif`;
+      stack = `'${en}', '${font}', sans-serif`;
     } else if (font) {
       stack = `'${font}', sans-serif`;
     }

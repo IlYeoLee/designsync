@@ -151,10 +151,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
               ? `✗ Upload failed: ${fontUploadStatus.result.error as string}`
               : (
                 <span>
-                  ✓ CDN 업로드 완료. globals.css 상단에 추가:
-                  {" "}<span className="font-mono bg-black/10 dark:bg-white/10 px-1 rounded">
-                    {fontUploadStatus.result?.cssImport as string}
-                  </span>
+                  ✓ {fontUploadStatus.font} 폰트 CDN 업로드 완료. Save 클릭 시 자동으로 적용됩니다.
                 </span>
               )}
           </div>
@@ -171,6 +168,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
               }`}
               onClick={() => {
                 setFontSection(sec);
+                setFontSearch("");
                 if (sec === "local" && localFonts.length === 0) loadLocalFonts();
               }}
             >

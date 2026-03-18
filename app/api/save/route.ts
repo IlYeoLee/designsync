@@ -182,7 +182,7 @@ export async function POST(req: NextRequest) {
     // font-sans 스택 구성: 한글 폰트 우선
     let fontSansValue = '';
     if (fontFamilyKo && fontFamily !== 'Geist') {
-      fontSansValue = `'${fontFamilyKo}', '${fontFamily}', sans-serif`;
+      fontSansValue = `'${fontFamily}', '${fontFamilyKo}', sans-serif`;
     } else if (fontFamilyKo) {
       fontSansValue = `'${fontFamilyKo}', sans-serif`;
     } else if (fontFamily !== 'Geist') {
