@@ -93,38 +93,84 @@ function RemPxInput({
   );
 }
 
+/** Base radius scale (px): even numbers that scale proportionally with the slider */
+const BASE_RADIUS_PX = { sm: 2, md: 4, lg: 6, xl: 8 } as const;
+const SCALE_STEPS = [0, 2, 4, 6, 8, 10, 12, 14, 16] as const;
+
+function RadiusScaleSlider({
+  tokens,
+  onTokenChange,
+}: {
+  tokens: TokenState;
+  onTokenChange: (variable: string, value: string) => void;
+}) {
+  // Derive current scale from md value
+  const mdPx = Math.round(parseFloat(tokens.primitives.radius.md || "0") * 16);
+  const currentStep = SCALE_STEPS.reduce((closest, step) =>
+    Math.abs(step - mdPx) < Math.abs(closest - mdPx) ? step : closest, SCALE_STEPS[0]);
+
+  function applyScale(step: number) {
+    const keys = ["sm", "md", "lg", "xl"] as const;
+    const base = BASE_RADIUS_PX;
+    keys.forEach((k) => {
+      const px = Math.round((step / 4) * base[k]);
+      // Force even
+      const even = px % 2 === 0 ? px : px + 1;
+      const val = even === 0 ? "0px" : `${+(even / 16).toFixed(4)}rem`;
+      onTokenChange(`--radius-${k}-prim`, val);
+    });
+    // Also update --radius (used as default)
+    const mdVal = Math.round((step / 4) * base.md);
+    const mdEven = mdVal % 2 === 0 ? mdVal : mdVal + 1;
+    onTokenChange("--radius", mdEven === 0 ? "0px" : `${+(mdEven / 16).toFixed(4)}rem`);
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-3">
+        <input
+          type="range"
+          min={0}
+          max={16}
+          step={2}
+          value={currentStep}
+          onChange={(e) => applyScale(+e.target.value)}
+          className="flex-1 h-1.5 accent-primary"
+        />
+        <span className="text-xs font-mono text-muted-foreground w-12 text-right">
+          {currentStep}px
+        </span>
+      </div>
+      <div className="flex gap-1.5">
+        {["sm", "md", "lg", "xl"].map((k) => {
+          const v = tokens.primitives.radius[k as keyof typeof tokens.primitives.radius];
+          const px = v === "0px" ? 0 : Math.round(parseFloat(v) * 16);
+          return (
+            <div key={k} className="flex items-center gap-1">
+              <div className="w-5 h-5 bg-primary" style={{ borderRadius: v }} />
+              <span className="text-[10px] text-muted-foreground">{px}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export function LayoutTab({ tokens, onTokenChange, squircleEnabled, squircleSmoothing, onSquircleChange }: LayoutTabProps) {
   return (
     <div className="space-y-6 p-4">
       {/* Border Radius */}
       <div>
         <p className="text-xs font-medium text-foreground mb-3">Border Radius</p>
-        <div className="grid grid-cols-3 gap-2 mb-4">
-          {RADIUS_OPTIONS.map(({ key, label, value }) => {
-            const currentRadius = tokens.primitives.radius[key as keyof typeof tokens.primitives.radius];
-            return (
-              <button
-                key={key}
-                onClick={() => {
-                  onTokenChange(
-                    `--radius-${key === "none" ? "none" : key === "full" ? "full" : `${key}-prim`}`,
-                    value
-                  );
-                  onTokenChange("--radius", value === "9999px" ? "9999px" : value);
-                }}
-                className="flex flex-col items-center gap-2 p-2.5 rounded-md border border-border hover:border-primary/50 hover:bg-accent/30 transition-colors"
-              >
-                <div className="w-8 h-8 bg-primary" style={{ borderRadius: currentRadius }} />
-                <span className="text-[10px] text-muted-foreground">{label}</span>
-              </button>
-            );
-          })}
-        </div>
 
-        <p className="text-xs text-muted-foreground mb-2">Custom values</p>
+        {/* Global scale slider */}
+        <RadiusScaleSlider tokens={tokens} onTokenChange={onTokenChange} />
+
+        <p className="text-xs text-muted-foreground mb-2 mt-4">Custom values</p>
         <div className="space-y-2">
-          {RADIUS_OPTIONS.map(({ key, label }) => {
-            const varKey = key === "none" ? "none" : key === "full" ? "full" : `${key}-prim`;
+          {RADIUS_OPTIONS.filter(({ key }) => key !== "none" && key !== "full").map(({ key, label }) => {
+            const varKey = `${key}-prim`;
             const currentValue = tokens.primitives.radius[key as keyof typeof tokens.primitives.radius];
             return (
               <div key={key} className="flex items-center gap-3">
