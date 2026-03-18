@@ -8,6 +8,7 @@
       "type": "registry:style",
       "title": "DesignSync Design Tokens",
       "description": "CSS custom properties (design tokens) for DesignSync — colors, radius, chart, sidebar.",
+      "dependencies": ["@cornerkit/core", "@cornerkit/react"],
       "cssVars": {
         "light": {
           "radius": "0.625rem",
