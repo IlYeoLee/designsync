@@ -87,16 +87,20 @@ function pvApplyEl(
 
   if (!el.id) el.id = `${prefix}-${idx}-${Date.now()}`;
 
+  // Build CornerKit options — pass border so it uses SVG mode (no clip-path clipping)
+  const bw = parseFloat(styles.borderWidth) || 0;
+  const bc = styles.borderColor || "";
+  const opts: Record<string, unknown> = { radius: cr, smoothing };
+  if (bw > 0 && bc && bc !== "transparent" && bc !== "rgba(0, 0, 0, 0)") {
+    opts.border = { width: bw, color: bc };
+    if (!el.dataset.origBorderWidth) el.dataset.origBorderWidth = el.style.borderWidth || "";
+    el.style.borderWidth = "0";
+  }
+
   try {
-    ck.apply(`#${el.id}`, { radius: cr, smoothing });
+    ck.apply(`#${el.id}`, opts);
     el.setAttribute("data-squircle-applied", "true");
   } catch { /* not ready */ }
-
-  const bs = styles.boxShadow;
-  if (bs && bs !== "none") {
-    if (!el.dataset.origShadow) el.dataset.origShadow = el.style.boxShadow || "";
-    el.style.boxShadow = "none";
-  }
 }
 
 function pvUpdateEl(
@@ -106,7 +110,13 @@ function pvUpdateEl(
   const styles = getComputedStyle(el);
   const cr = parseFloat(styles.borderRadius) || 0;
   if (cr <= 0 || cr >= PILL_THRESHOLD) return;
-  try { ck.update(`#${el.id}`, { radius: cr, smoothing }); } catch { /* ignore */ }
+  const opts: Record<string, unknown> = { radius: cr, smoothing };
+  const bw = parseFloat(styles.borderWidth) || 0;
+  const bc = styles.borderColor || "";
+  if (bw > 0 && bc && bc !== "transparent" && bc !== "rgba(0, 0, 0, 0)") {
+    opts.border = { width: bw, color: bc };
+  }
+  try { ck.update(`#${el.id}`, opts); } catch { /* ignore */ }
 }
 
 type PreviewCategory = "form" | "overlay" | "navigation" | "display" | "feedback";
@@ -1234,6 +1244,10 @@ export function PreviewPanel({
         if (htmlEl.dataset.origShadow !== undefined) {
           htmlEl.style.boxShadow = htmlEl.dataset.origShadow || "";
           delete htmlEl.dataset.origShadow;
+        }
+        if (htmlEl.dataset.origBorderWidth !== undefined) {
+          htmlEl.style.borderWidth = htmlEl.dataset.origBorderWidth || "";
+          delete htmlEl.dataset.origBorderWidth;
         }
       });
     };

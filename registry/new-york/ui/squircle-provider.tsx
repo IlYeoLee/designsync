@@ -9,8 +9,11 @@ import * as React from "react";
  * Automatically targets ALL elements with border-radius > 0,
  * including custom components not in the design library.
  *
+ * When border exists: uses SVG border mode (no clip-path, borders preserved)
+ * When no border: uses clip-path mode
+ *
  * Known limitations:
- *   - box-shadow is clipped → removed when squircle is active
+ *   - box-shadow is removed by CornerKit when border mode is active
  *   - overflow content is clipped → excluded tags listed below
  *   - pill/circle elements (border-radius ≥ 9999px) auto-skipped
  */
@@ -66,18 +69,20 @@ function applyToEl(
 
   if (!el.id) el.id = `${prefix}-${idx}-${Date.now()}`;
 
-  const opts = { radius: cr, smoothing };
+  // Build CornerKit options — pass border so it uses SVG mode (no clip-path clipping)
+  const bw = parseFloat(styles.borderWidth) || 0;
+  const bc = styles.borderColor || "";
+  const opts: Record<string, unknown> = { radius: cr, smoothing };
+  if (bw > 0 && bc && bc !== "transparent" && bc !== "rgba(0, 0, 0, 0)") {
+    opts.border = { width: bw, color: bc };
+    // Remove CSS border — CornerKit SVG replaces it (position:absolute, no layout impact)
+    el.style.borderWidth = "0";
+  }
 
   try {
     ck.apply(`#${el.id}`, opts);
     el.setAttribute("data-squircle-applied", "true");
   } catch { /* not ready */ }
-
-  // Shadow: clip-path clips box-shadow — remove entirely
-  const bs = styles.boxShadow;
-  if (bs && bs !== "none") {
-    el.style.boxShadow = "none";
-  }
 }
 
 function updateEl(
@@ -89,8 +94,16 @@ function updateEl(
   const cr = parseFloat(styles.borderRadius) || 0;
   if (cr <= 0 || cr >= PILL_THRESHOLD) return;
 
+  const opts: Record<string, unknown> = { radius: cr, smoothing };
+  // Re-read border in case it changed (e.g. focus state)
+  const bw = parseFloat(styles.borderWidth) || 0;
+  const bc = styles.borderColor || "";
+  if (bw > 0 && bc && bc !== "transparent" && bc !== "rgba(0, 0, 0, 0)") {
+    opts.border = { width: bw, color: bc };
+  }
+
   try {
-    ck.update(`#${el.id}`, { radius: cr, smoothing });
+    ck.update(`#${el.id}`, opts);
   } catch { /* ignore */ }
 }
 
