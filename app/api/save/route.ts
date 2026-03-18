@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getFontImportUrl } from "@/lib/fonts";
+import { GOOGLE_FONTS } from "@/lib/fonts";
+
+const CDN_BASE = "https://designsync-omega.vercel.app";
 
 function getHeaders() {
   const token = process.env.GITHUB_TOKEN;
@@ -200,33 +202,23 @@ export async function POST(req: NextRequest) {
     }
 
     tokensJson.cssVars = { light: lightVars, dark: darkVars };
+    tokensJson.type = "registry:style";
 
-    // Build files array and dependencies
-    const files: Array<{ path: string; type: string; target?: string; content: string }> = [];
-    const deps: string[] = [];
+    // Clean up stale squircle/cornerkit artifacts from old saves
+    delete tokensJson.files;
+    delete tokensJson.dependencies;
 
-    // Font: add CSS import file for non-Geist fonts
-    if (fontFamily !== 'Geist') {
-      const importUrl = getFontImportUrl(fontFamily);
-      if (importUrl) {
-        files.push({
-          path: "styles/font.css",
-          type: "registry:file",
-          target: "app/font.css",
-          content: `@import url('${importUrl}');`,
-        });
-      }
-    }
-
-    if (files.length > 0) {
-      tokensJson.files = files;
+    // Font: for known Google Fonts that have been self-hosted, add registryDependency
+    // so `shadcn add designsync-tokens.json` also installs the font CSS file.
+    // Local fonts (not in GOOGLE_FONTS) are device-specific — only set --font-sans var.
+    const isGoogleFont = fontFamily !== 'Geist' && GOOGLE_FONTS.includes(fontFamily);
+    if (isGoogleFont) {
+      const fontSlug = fontFamily.replace(/ /g, '-').toLowerCase();
+      tokensJson.registryDependencies = [
+        `${CDN_BASE}/r/font-${fontSlug}.json`,
+      ];
     } else {
-      delete tokensJson.files;
-    }
-    if (deps.length > 0) {
-      tokensJson.dependencies = deps;
-    } else {
-      delete tokensJson.dependencies;
+      delete tokensJson.registryDependencies;
     }
 
     const updatedContent = JSON.stringify(tokensJson, null, 2);

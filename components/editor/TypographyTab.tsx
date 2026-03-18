@@ -139,10 +139,17 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
               : "bg-success-50 border-success-200 text-success-700"
           }`}>
             {fontUploadStatus.loading
-              ? `Uploading ${fontUploadStatus.font} to registry...`
+              ? `Uploading ${fontUploadStatus.font} to CDN...`
               : fontUploadStatus.result?.error
               ? `✗ Upload failed: ${fontUploadStatus.result.error as string}`
-              : `✓ Uploaded! shadcn add ${fontUploadStatus.result?.registryUrl as string}`}
+              : (
+                <span>
+                  ✓ CDN 업로드 완료. globals.css 상단에 추가:
+                  {" "}<span className="font-mono bg-black/10 dark:bg-white/10 px-1 rounded">
+                    {fontUploadStatus.result?.cssImport as string}
+                  </span>
+                </span>
+              )}
           </div>
         )}
 
