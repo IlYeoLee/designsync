@@ -54,11 +54,61 @@ import { TypographyH1, TypographyH2, TypographyH3, TypographyH4, TypographyP, Ty
 
 import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as CalendarIcon, Smile, Settings, User, LayoutDashboard, FileText, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, ChevronsUpDown, ChevronDown } from "lucide-react";
 
-/**
- * Parse computed box-shadow string and convert to filter: drop-shadow().
- * Computed style format: "rgba(...) Xpx Ypx Bpx Spx" (color first, then values)
- * drop-shadow does NOT support spread, so we skip it.
- */
+// Threshold: elements with computed border-radius >= this are pill/circle → skip smoothing
+const PILL_RADIUS_THRESHOLD = 9000;
+
+// Slots inside the preview container
+const PREVIEW_CONTAINER_SLOTS: Record<string, { radiusMult: number; border: boolean }> = {
+  button: { radiusMult: 1, border: false },
+  card: { radiusMult: 1.5, border: true },
+  input: { radiusMult: 1, border: true },
+  textarea: { radiusMult: 1, border: true },
+  "select-trigger": { radiusMult: 1, border: true },
+  badge: { radiusMult: 1, border: false },
+  alert: { radiusMult: 1, border: true },
+  checkbox: { radiusMult: 0.5, border: true },
+  toggle: { radiusMult: 1, border: true },
+  "toggle-group-item": { radiusMult: 1, border: true },
+  "tabs-list": { radiusMult: 1, border: true },
+  "tabs-trigger": { radiusMult: 0.8, border: false },
+  command: { radiusMult: 1, border: true },
+  skeleton: { radiusMult: 1, border: false },
+  "input-otp-slot": { radiusMult: 1, border: true },
+  calendar: { radiusMult: 1, border: false },
+  chart: { radiusMult: 1, border: true },
+  carousel: { radiusMult: 1, border: false },
+  "accordion-item": { radiusMult: 1, border: true },
+  "table-container": { radiusMult: 1, border: true },
+  menubar: { radiusMult: 1, border: true },
+  "resizable-panel-group": { radiusMult: 1, border: true },
+  "navigation-menu-content": { radiusMult: 1, border: true },
+  "navigation-menu-viewport": { radiusMult: 1, border: true },
+};
+
+// Portal-rendered overlay slots
+const PREVIEW_PORTAL_SLOTS: Record<string, { radiusMult: number; border: boolean }> = {
+  "dialog-content": { radiusMult: 1.5, border: true },
+  "sheet-content": { radiusMult: 1.5, border: true },
+  "alert-dialog-content": { radiusMult: 1.5, border: true },
+  "drawer-content": { radiusMult: 1.5, border: true },
+  "popover-content": { radiusMult: 1, border: true },
+  "dropdown-menu-content": { radiusMult: 1, border: true },
+  "context-menu-content": { radiusMult: 1, border: true },
+  "menubar-content": { radiusMult: 1, border: true },
+  "tooltip-content": { radiusMult: 0.8, border: true },
+  "hover-card-content": { radiusMult: 1, border: true },
+  "select-content": { radiusMult: 1, border: true },
+};
+
+const ALL_PREVIEW_SLOTS = { ...PREVIEW_CONTAINER_SLOTS, ...PREVIEW_PORTAL_SLOTS };
+
+function buildPreviewSelector(slots: Record<string, unknown>): string {
+  return Object.keys(slots).map((s) => `[data-slot='${s}']`).join(",");
+}
+
+const PV_CONTAINER_SELECTOR = buildPreviewSelector(PREVIEW_CONTAINER_SLOTS);
+const PV_PORTAL_SELECTOR = buildPreviewSelector(PREVIEW_PORTAL_SLOTS);
+
 function parseBoxShadowToDropShadow(boxShadow: string): string {
   return boxShadow
     .split(/,(?![^(]*\))/)
@@ -68,21 +118,84 @@ function parseBoxShadowToDropShadow(boxShadow: string): string {
       const m = s.match(
         /^(rgba?\([^)]+\)|oklch\([^)]+\/[^)]*\)|oklch\([^)]+\)|#[\da-f]+|\w+)\s+([-\d.]+)px\s+([-\d.]+)px\s+([-\d.]+)px(?:\s+[-\d.]+px)?/i
       );
-      if (m) {
-        const [, color, x, y, blur] = m;
-        return `drop-shadow(${x}px ${y}px ${blur}px ${color})`;
-      }
+      if (m) return `drop-shadow(${m[2]}px ${m[3]}px ${m[4]}px ${m[1]})`;
       const m2 = s.match(
         /([-\d.]+)px\s+([-\d.]+)px\s+([-\d.]+)px(?:\s+[-\d.]+px)?\s+(rgba?\([^)]+\)|oklch\([^)]+\/[^)]*\)|oklch\([^)]+\)|#[\da-f]+|\w+)/i
       );
-      if (m2) {
-        const [, x, y, blur, color] = m2;
-        return `drop-shadow(${x}px ${y}px ${blur}px ${color})`;
-      }
+      if (m2) return `drop-shadow(${m2[1]}px ${m2[2]}px ${m2[3]}px ${m2[4]})`;
       return null;
     })
     .filter(Boolean)
     .join(" ");
+}
+
+function applySquircleToElement(
+  ck: import("@cornerkit/core").default,
+  htmlEl: HTMLElement,
+  cfg: { radiusMult: number; border: boolean },
+  baseR: number,
+  smoothing: number,
+  idPrefix: string,
+  index: number,
+): void {
+  if (!htmlEl.id) htmlEl.id = `${idPrefix}-${index}-${Date.now()}`;
+
+  const styles = getComputedStyle(htmlEl);
+
+  // Skip pill/circle elements
+  const computedRadius = parseFloat(styles.borderRadius) || 0;
+  if (computedRadius >= PILL_RADIUS_THRESHOLD) return;
+
+  const r = Math.min(cfg.radiusMult * baseR, 9999);
+  const borderWidth = parseFloat(styles.borderWidth) || 0;
+  const boxShadow = styles.boxShadow;
+
+  const opts: { radius: number; smoothing: number; border?: { width: number; color: string } } = {
+    radius: r,
+    smoothing,
+  };
+  if (cfg.border && borderWidth > 0) {
+    opts.border = { width: borderWidth, color: styles.borderColor };
+  }
+
+  try {
+    if (htmlEl.hasAttribute("data-squircle-applied")) {
+      ck.update(`#${htmlEl.id}`, opts);
+    } else {
+      ck.apply(`#${htmlEl.id}`, opts);
+      htmlEl.setAttribute("data-squircle-applied", "true");
+    }
+  } catch {
+    try {
+      ck.apply(`#${htmlEl.id}`, opts);
+      htmlEl.setAttribute("data-squircle-applied", "true");
+    } catch { /* ignore */ }
+  }
+
+  // Remove CSS border to prevent doubling
+  if (cfg.border && borderWidth > 0) {
+    if (!htmlEl.dataset.origBorder) {
+      htmlEl.dataset.origBorder = htmlEl.style.borderColor || "";
+      htmlEl.dataset.origBorderWidth = htmlEl.style.borderWidth || "";
+    }
+    htmlEl.style.borderColor = "transparent";
+    htmlEl.style.borderWidth = "0";
+  }
+
+  // Convert box-shadow → drop-shadow
+  if (boxShadow && boxShadow !== "none") {
+    if (!htmlEl.dataset.origShadow) {
+      htmlEl.dataset.origShadow = htmlEl.style.boxShadow || "";
+      htmlEl.dataset.origFilter = htmlEl.style.filter || "";
+    }
+    const dropShadows = parseBoxShadowToDropShadow(boxShadow);
+    if (dropShadows) {
+      htmlEl.style.boxShadow = "none";
+      const existingFilter = styles.filter;
+      const hasExisting = existingFilter && existingFilter !== "none" && !existingFilter.includes("drop-shadow");
+      htmlEl.style.filter = hasExisting ? `${existingFilter} ${dropShadows}` : dropShadows;
+    }
+  }
 }
 
 type PreviewCategory = "form" | "overlay" | "navigation" | "display" | "feedback";
@@ -1191,66 +1304,54 @@ export function PreviewPanel({
 
   // Apply cornerKit squircle to preview elements
   React.useEffect(() => {
+    // Cleanup function for restoring styles when squircle is disabled
+    const restoreAll = () => {
+      // Restore container elements
+      containerRef.current?.querySelectorAll("[data-squircle-applied]").forEach((el) => {
+        const htmlEl = el as HTMLElement;
+        try { ckRef.current?.remove(`#${htmlEl.id}`); } catch { /* ignore */ }
+        htmlEl.removeAttribute("data-squircle-applied");
+        if (htmlEl.dataset.origBorder !== undefined) {
+          htmlEl.style.borderColor = htmlEl.dataset.origBorder || "";
+          htmlEl.style.borderWidth = htmlEl.dataset.origBorderWidth || "";
+          delete htmlEl.dataset.origBorder;
+          delete htmlEl.dataset.origBorderWidth;
+        }
+        if (htmlEl.dataset.origShadow !== undefined) {
+          htmlEl.style.boxShadow = htmlEl.dataset.origShadow || "";
+          htmlEl.style.filter = htmlEl.dataset.origFilter || "";
+          delete htmlEl.dataset.origShadow;
+          delete htmlEl.dataset.origFilter;
+        }
+      });
+      // Restore portal elements
+      document.querySelectorAll("[data-squircle-applied]").forEach((el) => {
+        const htmlEl = el as HTMLElement;
+        if (!htmlEl.id.startsWith("sq-pt-")) return;
+        try { ckRef.current?.remove(`#${htmlEl.id}`); } catch { /* ignore */ }
+        htmlEl.removeAttribute("data-squircle-applied");
+        if (htmlEl.dataset.origBorder !== undefined) {
+          htmlEl.style.borderColor = htmlEl.dataset.origBorder || "";
+          htmlEl.style.borderWidth = htmlEl.dataset.origBorderWidth || "";
+          delete htmlEl.dataset.origBorder;
+          delete htmlEl.dataset.origBorderWidth;
+        }
+        if (htmlEl.dataset.origShadow !== undefined) {
+          htmlEl.style.boxShadow = htmlEl.dataset.origShadow || "";
+          htmlEl.style.filter = htmlEl.dataset.origFilter || "";
+          delete htmlEl.dataset.origShadow;
+          delete htmlEl.dataset.origFilter;
+        }
+      });
+    };
+
     if (!squircleEnabled || !containerRef.current) {
-      if (ckRef.current) {
-        containerRef.current?.querySelectorAll("[data-squircle-applied]").forEach((el) => {
-          const htmlEl = el as HTMLElement;
-          try { ckRef.current?.remove(`#${htmlEl.id}`); } catch { /* ignore */ }
-          htmlEl.removeAttribute("data-squircle-applied");
-          // Restore original border styles
-          if (htmlEl.dataset.origBorder !== undefined) {
-            htmlEl.style.borderColor = htmlEl.dataset.origBorder || "";
-            htmlEl.style.borderWidth = htmlEl.dataset.origBorderWidth || "";
-            delete htmlEl.dataset.origBorder;
-            delete htmlEl.dataset.origBorderWidth;
-          }
-          // Restore original shadow styles
-          if (htmlEl.dataset.origShadow !== undefined) {
-            htmlEl.style.boxShadow = htmlEl.dataset.origShadow || "";
-            htmlEl.style.filter = htmlEl.dataset.origFilter || "";
-            delete htmlEl.dataset.origShadow;
-            delete htmlEl.dataset.origFilter;
-          }
-        });
-      }
+      if (ckRef.current) restoreAll();
       return;
     }
 
     const smoothing = squircleSmoothing / 100;
     const baseR = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--radius-md-prim")) * 16 || 8;
-
-    // Slots that should get squircle + whether they have a border
-    const SQUIRCLE_SLOTS: Record<string, { radiusMult: number; border: boolean }> = {
-      button: { radiusMult: 1, border: false },
-      card: { radiusMult: 1.5, border: true },
-      input: { radiusMult: 1, border: true },
-      textarea: { radiusMult: 1, border: true },
-      "select-trigger": { radiusMult: 1, border: true },
-      "select-content": { radiusMult: 1, border: true },
-      badge: { radiusMult: 1, border: false },
-      alert: { radiusMult: 1, border: true },
-      avatar: { radiusMult: 100, border: false },
-      checkbox: { radiusMult: 0.5, border: true },
-      switch: { radiusMult: 100, border: true },
-      toggle: { radiusMult: 1, border: true },
-      "tabs-list": { radiusMult: 1, border: true },
-      "tabs-trigger": { radiusMult: 0.8, border: false },
-      "popover-content": { radiusMult: 1, border: true },
-      "dropdown-menu-content": { radiusMult: 1, border: true },
-      "context-menu-content": { radiusMult: 1, border: true },
-      "tooltip-content": { radiusMult: 0.8, border: true },
-      "dialog-content": { radiusMult: 1.5, border: true },
-      "sheet-content": { radiusMult: 1.5, border: true },
-      "alert-dialog-content": { radiusMult: 1.5, border: true },
-      "hover-card-content": { radiusMult: 1, border: true },
-      "navigation-menu-content": { radiusMult: 1, border: true },
-      "command": { radiusMult: 1, border: true },
-      skeleton: { radiusMult: 1, border: false },
-      progress: { radiusMult: 100, border: false },
-      "input-otp-slot": { radiusMult: 1, border: true },
-    };
-
-    const selectorStr = Object.keys(SQUIRCLE_SLOTS).map((s) => `[data-slot='${s}']`).join(",");
 
     // Small delay to let React render the category content
     const timer = setTimeout(() => {
@@ -1259,71 +1360,53 @@ export function PreviewPanel({
         if (!ckRef.current) ckRef.current = new CornerKit();
         const ck = ckRef.current;
 
-        const elements = containerRef.current!.querySelectorAll(selectorStr);
-        elements.forEach((el, i) => {
+        // 1. Container elements
+        const containerEls = containerRef.current!.querySelectorAll(PV_CONTAINER_SELECTOR);
+        containerEls.forEach((el, i) => {
           const htmlEl = el as HTMLElement;
-          if (!htmlEl.id) htmlEl.id = `sq-pv-${i}-${Date.now()}`;
           const slot = htmlEl.getAttribute("data-slot") || "";
-          const cfg = SQUIRCLE_SLOTS[slot];
+          const cfg = PREVIEW_CONTAINER_SLOTS[slot];
           if (!cfg) return;
+          applySquircleToElement(ck, htmlEl, cfg, baseR, smoothing, "sq-pv", i);
+        });
 
-          const r = Math.min(cfg.radiusMult * baseR, 9999);
-          const styles = getComputedStyle(htmlEl);
-          const borderColor = styles.borderColor;
-          const borderWidth = parseFloat(styles.borderWidth) || 0;
-          const boxShadow = styles.boxShadow;
-
-          const opts: { radius: number; smoothing: number; border?: { width: number; color: string } } = {
-            radius: r,
-            smoothing,
-          };
-          if (cfg.border && borderWidth > 0) {
-            opts.border = { width: borderWidth, color: borderColor };
-          }
-
-          try {
-            if (htmlEl.hasAttribute("data-squircle-applied")) {
-              ck.update(`#${htmlEl.id}`, opts);
-            } else {
-              ck.apply(`#${htmlEl.id}`, opts);
-              htmlEl.setAttribute("data-squircle-applied", "true");
-            }
-          } catch {
-            try {
-              ck.apply(`#${htmlEl.id}`, opts);
-              htmlEl.setAttribute("data-squircle-applied", "true");
-            } catch { /* ignore */ }
-          }
-
-          // Fix border doubling: cornerKit renders SVG borders via clip-path,
-          // remove original CSS border entirely to prevent double borders
-          if (cfg.border && borderWidth > 0) {
-            if (!htmlEl.dataset.origBorder) {
-              htmlEl.dataset.origBorder = htmlEl.style.borderColor || "";
-              htmlEl.dataset.origBorderWidth = htmlEl.style.borderWidth || "";
-            }
-            htmlEl.style.borderColor = "transparent";
-            htmlEl.style.borderWidth = "0";
-          }
-
-          // Fix shadow clipping: clip-path clips box-shadow,
-          // convert to filter: drop-shadow() which works with clip-path
-          if (boxShadow && boxShadow !== "none") {
-            if (!htmlEl.dataset.origShadow) {
-              htmlEl.dataset.origShadow = htmlEl.style.boxShadow || "";
-              htmlEl.dataset.origFilter = htmlEl.style.filter || "";
-            }
-            const dropShadows = parseBoxShadowToDropShadow(boxShadow);
-            if (dropShadows) {
-              htmlEl.style.boxShadow = "none";
-              htmlEl.style.filter = dropShadows;
-            }
-          }
+        // 2. Portal elements (dialog, popover, dropdown, etc.)
+        const portalEls = document.querySelectorAll(PV_PORTAL_SELECTOR);
+        portalEls.forEach((el, i) => {
+          const htmlEl = el as HTMLElement;
+          const slot = htmlEl.getAttribute("data-slot") || "";
+          const cfg = PREVIEW_PORTAL_SLOTS[slot];
+          if (!cfg) return;
+          applySquircleToElement(ck, htmlEl, cfg, baseR, smoothing, "sq-pt", i);
         });
       });
     }, 50);
 
-    return () => clearTimeout(timer);
+    // Also observe document.body for portal elements
+    const portalObserver = new MutationObserver(() => {
+      if (!squircleEnabled) return;
+      import("@cornerkit/core").then(({ default: CornerKit }) => {
+        if (!ckRef.current) ckRef.current = new CornerKit();
+        const ck = ckRef.current;
+        const smoothVal = squircleSmoothing / 100;
+        const r = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--radius-md-prim")) * 16 || 8;
+        const portalEls = document.querySelectorAll(PV_PORTAL_SELECTOR);
+        portalEls.forEach((el, i) => {
+          const htmlEl = el as HTMLElement;
+          if (htmlEl.hasAttribute("data-squircle-applied")) return;
+          const slot = htmlEl.getAttribute("data-slot") || "";
+          const cfg = PREVIEW_PORTAL_SLOTS[slot];
+          if (!cfg) return;
+          applySquircleToElement(ck, htmlEl, cfg, r, smoothVal, "sq-pt", i);
+        });
+      });
+    });
+    portalObserver.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      clearTimeout(timer);
+      portalObserver.disconnect();
+    };
   }, [squircleEnabled, squircleSmoothing, category]);
 
   return (
