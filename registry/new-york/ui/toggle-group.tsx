@@ -25,7 +25,14 @@ function ToggleGroup({
   return (
     <ToggleGroupPrimitive.Root
       data-slot="toggle-group"
-      className={cn("flex items-center justify-center gap-1", className)}
+      data-variant={variant}
+      className={cn(
+        "flex items-center justify-center",
+        variant === "outline"
+          ? "gap-0 rounded-md border border-input shadow-xs [&>button]:rounded-none [&>button]:border-0 [&>button]:shadow-none [&>button:first-child]:rounded-l-md [&>button:last-child]:rounded-r-md [&>button:not(:first-child)]:border-l [&>button:not(:first-child)]:border-input"
+          : "gap-1",
+        className
+      )}
       {...props}
     >
       <ToggleGroupContext.Provider value={{ variant, size }}>
