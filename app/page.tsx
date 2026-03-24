@@ -5,6 +5,7 @@ import { EditorHeader } from "@/components/editor/Header";
 import { EditorPanel } from "@/components/editor/EditorPanel";
 import { PreviewPanel } from "@/components/editor/PreviewPanel";
 import { DEFAULT_TOKENS, TokenState, HistoryEntry, applyTokensToDocument } from "@/lib/tokens";
+import { applyStylePreset } from "@/lib/style-presets";
 
 /** lang="ko" 시 한글 폰트 우선 적용 — style 태그로 주입 */
 function applyLangKoOverride(stackKo: string) {
@@ -25,9 +26,10 @@ export default function Home() {
   const [saveSuccess, setSaveSuccess] = React.useState(false);
   const [history, setHistory] = React.useState<HistoryEntry[]>([]);
   const [snapshots, setSnapshots] = React.useState<TokenState[]>([]);
-  // ── Mount: apply primitive tokens ──────
+  // ── Mount: apply primitive tokens + style preset ──────
   React.useEffect(() => {
     applyTokensToDocument(DEFAULT_TOKENS);
+    applyStylePreset(DEFAULT_TOKENS.primitives.stylePreset);
   }, []);
 
   // ── Dark mode class ─────────────────────────────────────────────
@@ -320,6 +322,7 @@ export default function Home() {
           onFontFamilyChange={handleFontFamilyChange}
           onFontFamilyKoChange={handleFontFamilyKoChange}
           onIconLibraryChange={(lib: string) => setTokens((prev) => ({ ...prev, primitives: { ...prev.primitives, iconLibrary: lib } }))}
+          onStylePresetChange={(preset: string) => setTokens((prev) => ({ ...prev, primitives: { ...prev.primitives, stylePreset: preset } }))}
           history={history.slice(0, 3)}
         />
         <PreviewPanel iconLibrary={tokens.primitives.iconLibrary} />

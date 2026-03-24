@@ -18,6 +18,7 @@ interface EditorPanelProps {
   onFontFamilyChange: (font: string) => void;
   onFontFamilyKoChange: (font: string) => void;
   onIconLibraryChange: (library: string) => void;
+  onStylePresetChange: (preset: string) => void;
   history: HistoryEntry[];
 }
 
@@ -29,6 +30,7 @@ export function EditorPanel({
   onFontFamilyChange,
   onFontFamilyKoChange,
   onIconLibraryChange,
+  onStylePresetChange,
   history,
 }: EditorPanelProps) {
   const [activeTab, setActiveTab] = React.useState<Tab>("colors");
@@ -82,6 +84,7 @@ export function EditorPanel({
               tokens={tokens}
               onTokenChange={onTokenChange}
               onIconLibraryChange={onIconLibraryChange}
+              onStylePresetChange={onStylePresetChange}
             />
           </TabsContent>
         </div>

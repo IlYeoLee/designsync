@@ -20,6 +20,7 @@ export type TokenState = {
     radius: Record<'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full', string>;
     shadows: Record<'sm' | 'md' | 'lg', string>;
     iconLibrary: string;
+    stylePreset: string;
   };
   semantic: {
     light: Record<string, string>;
@@ -144,6 +145,7 @@ export const DEFAULT_TOKENS: TokenState = {
       lg: '0 10px 15px -3px oklch(0 0 0 / 0.10)',
     },
     iconLibrary: 'lucide',
+    stylePreset: 'vega',
   },
   semantic: {
     light: {

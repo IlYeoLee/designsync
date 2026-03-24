@@ -114,6 +114,12 @@ ${fontSection}- 시맨틱 색상: var(--primary), var(--secondary), var(--accent
 - p-*, m-*, px-*, py-*, mx-*, my-* 등도 동일한 스케일 사용
 - ❌ gap-[13px], p-[20px] 등 임의 간격 금지 — 토큰 스케일 값 사용
 
+### 밀도/스타일 프리셋
+- 이 프로젝트는 스타일 프리셋으로 컴포넌트 밀도를 제어한다.
+- CSS 변수: var(--ds-button-h-default), var(--ds-input-h), var(--ds-card-padding), var(--ds-section-gap), var(--ds-button-radius), var(--ds-card-radius)
+- Button/Input/Card 등 핵심 컴포넌트는 이 변수를 참조하므로, 프리셋 변경 시 자동으로 밀도가 조절된다.
+- ❌ Button이나 Input의 높이를 className으로 직접 오버라이드하지 말 것 (h-12, h-8 등 금지)
+
 ### 둥글기 (border-radius)
 - rounded-none, rounded-sm, rounded-md, rounded-lg, rounded-xl, rounded-full
 

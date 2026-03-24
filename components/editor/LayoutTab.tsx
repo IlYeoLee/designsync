@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { TokenState } from "@/lib/tokens";
+import { STYLE_PRESETS, applyStylePreset } from "@/lib/style-presets";
 import { Home, Settings, Search, Bell, Mail } from "lucide-react";
 import { IconHome, IconSettings, IconSearch, IconBell, IconMail } from "@tabler/icons-react";
 import { House, Gear, MagnifyingGlass, BellSimple, Envelope } from "@phosphor-icons/react";
@@ -26,6 +27,7 @@ interface LayoutTabProps {
   tokens: TokenState;
   onTokenChange: (variable: string, value: string) => void;
   onIconLibraryChange: (library: string) => void;
+  onStylePresetChange: (preset: string) => void;
 }
 
 const RADIUS_OPTIONS = [
@@ -172,9 +174,49 @@ function RadiusScaleSlider({
   );
 }
 
-export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange }: LayoutTabProps) {
+export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStylePresetChange }: LayoutTabProps) {
   return (
     <div className="space-y-6 p-4">
+      {/* Style Presets */}
+      <div>
+        <p className="text-xs font-medium text-foreground mb-2">스타일 프리셋</p>
+        <p className="text-[10px] text-muted-foreground mb-3">컴포넌트 밀도와 둥글기를 한 번에 설정합니다.</p>
+        <div className="grid grid-cols-1 gap-1.5">
+          {STYLE_PRESETS.map((preset) => {
+            const isActive = tokens.primitives.stylePreset === preset.id;
+            const btnH = preset.vars["--ds-button-h-default"];
+            const btnRadius = preset.vars["--ds-button-radius"];
+            const radiusDisplay = btnRadius === "9999px"
+              ? "full"
+              : btnRadius === "0"
+                ? "0"
+                : btnRadius.replace("var(--radius-", "").replace("-prim)", "");
+            return (
+              <button
+                key={preset.id}
+                onClick={() => {
+                  applyStylePreset(preset.id);
+                  onStylePresetChange(preset.id);
+                }}
+                className={`flex flex-col items-start px-3 py-2.5 rounded-md border text-left transition-colors ${
+                  isActive
+                    ? "border-primary bg-accent text-foreground"
+                    : "border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground"
+                }`}
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-xs font-medium">{preset.label}</span>
+                  <span className="text-[10px] font-mono text-muted-foreground">
+                    h:{btnH} r:{radiusDisplay}
+                  </span>
+                </div>
+                <span className="text-[10px] text-muted-foreground mt-1">{preset.desc}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Border Radius */}
       <div>
         <p className="text-xs font-medium text-foreground mb-3">테두리 둥글기</p>
