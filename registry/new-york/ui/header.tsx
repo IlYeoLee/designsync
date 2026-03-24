@@ -109,7 +109,7 @@ function HeaderNavLink({
       data-slot="header-nav-link"
       data-active={active || undefined}
       className={cn(
-        "text-sm font-medium text-muted-foreground transition-colors hover:text-foreground px-3 py-2 rounded-md",
+        "text-sm font-medium text-muted-foreground transition-colors hover:text-foreground px-3 py-2 rounded-[var(--ds-button-radius)]",
         active && "text-foreground bg-accent",
         className
       )}
@@ -175,7 +175,7 @@ function HeaderMobileNavLink({
       data-slot="header-mobile-nav-link"
       data-active={active || undefined}
       className={cn(
-        "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
+        "flex items-center gap-2 rounded-[var(--ds-button-radius)] px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
         active && "bg-accent text-foreground",
         className
       )}

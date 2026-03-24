@@ -85,7 +85,7 @@ function DataTable<T extends Record<string, unknown>>({
 
   return (
     <div data-slot="data-table" className={cn("space-y-4", className)}>
-      <div className="rounded-md border border-border">
+      <div className="rounded-[var(--ds-card-radius)] border border-border">
         <Table>
           <TableHeader>
             <TableRow>
