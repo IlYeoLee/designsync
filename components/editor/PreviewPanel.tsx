@@ -52,7 +52,7 @@ import { Header, HeaderLogo, HeaderNav, HeaderNavLink, HeaderActions, HeaderMobi
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/registry/new-york/ui/navigation-menu";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/registry/new-york/ui/resizable";
 import { Toaster } from "@/registry/new-york/ui/sonner";
-import { TypographyH1, TypographyH2, TypographyH3, TypographyH4, TypographyP, TypographyBlockquote, TypographyCode, TypographyLead, TypographyMuted } from "@/registry/new-york/ui/typography";
+import { TypographyH1, TypographyH2, TypographyH3, TypographyH4, TypographyP, TypographyBlockquote, TypographyCode, TypographyLead, TypographyLarge, TypographySmall, TypographyMuted, TypographyTable, TypographyTr, TypographyTh, TypographyTd, TypographyList } from "@/registry/new-york/ui/typography";
 
 // B-category components
 import { Combobox } from "@/registry/new-york/ui/combobox";
@@ -1028,7 +1028,48 @@ function DisplayPreview() {
             &ldquo;디자인은 어떻게 보이는가가 아니라, 어떻게 작동하는가이다.&rdquo; &mdash; 스티브 잡스
           </TypographyBlockquote>
           <TypographyCode>npm install @designsync/ui</TypographyCode>
+          <TypographyLarge>Large 텍스트</TypographyLarge>
+          <TypographySmall>Small 텍스트 — 작은 보조 정보</TypographySmall>
           <TypographyMuted>보조 정보를 위한 흐린 텍스트입니다.</TypographyMuted>
+
+          <TypographyList>
+            <li>순서 없는 리스트 항목 1</li>
+            <li>순서 없는 리스트 항목 2</li>
+            <li>순서 없는 리스트 항목 3</li>
+          </TypographyList>
+
+          <TypographyList ordered>
+            <li>순서 있는 리스트 항목 1</li>
+            <li>순서 있는 리스트 항목 2</li>
+            <li>순서 있는 리스트 항목 3</li>
+          </TypographyList>
+
+          <TypographyTable>
+            <thead>
+              <TypographyTr>
+                <TypographyTh>항목</TypographyTh>
+                <TypographyTh>설명</TypographyTh>
+                <TypographyTh className="text-right">값</TypographyTh>
+              </TypographyTr>
+            </thead>
+            <tbody>
+              <TypographyTr>
+                <TypographyTd>Primary</TypographyTd>
+                <TypographyTd>메인 브랜드 색상</TypographyTd>
+                <TypographyTd className="text-right">brand-600</TypographyTd>
+              </TypographyTr>
+              <TypographyTr>
+                <TypographyTd>Background</TypographyTd>
+                <TypographyTd>페이지 배경</TypographyTd>
+                <TypographyTd className="text-right">neutral-50</TypographyTd>
+              </TypographyTr>
+              <TypographyTr>
+                <TypographyTd>Destructive</TypographyTd>
+                <TypographyTd>삭제/위험 액션</TypographyTd>
+                <TypographyTd className="text-right">error-600</TypographyTd>
+              </TypographyTr>
+            </tbody>
+          </TypographyTable>
         </div>
       </div>
 
