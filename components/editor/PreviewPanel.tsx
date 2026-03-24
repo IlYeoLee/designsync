@@ -554,10 +554,14 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
               <SheetTitle>프로필 편집</SheetTitle>
               <SheetDescription>프로필을 수정하세요. 완료 후 저장을 눌러주세요.</SheetDescription>
             </SheetHeader>
-            <div className="space-y-3 py-4">
+            <div className="flex-1 space-y-3 px-6">
               <div className="space-y-1.5">
                 <Label>이름</Label>
                 <Input placeholder="이름을 입력하세요" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>사용자 이름</Label>
+                <Input placeholder="@username" />
               </div>
             </div>
             <SheetFooter>
