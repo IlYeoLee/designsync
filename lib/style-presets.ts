@@ -78,10 +78,10 @@ export const STYLE_PRESETS: StylePreset[] = [
       "--ds-section-gap": "1.5rem",
       "--ds-internal-gap": "0.5rem",
       "--ds-button-radius": "9999px",        // pill — buttons, badges, toggles
-      "--ds-element-radius": "0.625rem",     // 10px — menu items, sidebar, skeleton
-      "--ds-input-radius": "0.75rem",        // 12px — inputs, selects
-      "--ds-card-radius": "1rem",            // 16px — cards, popover, dropdown
-      "--ds-dialog-radius": "1.25rem",       // 20px — dialog, sheet
+      "--ds-element-radius": "0.5rem",       // 8px — menu items, sidebar, skeleton
+      "--ds-input-radius": "0.5rem",         // 8px — inputs, selects (soft but not excessive)
+      "--ds-card-radius": "0.75rem",         // 12px — cards, popover, dropdown
+      "--ds-dialog-radius": "1rem",          // 16px — dialog, sheet
       "--ds-base-font-size": "0.875rem",
       "--ds-focus-ring-width": "3px",
     },
