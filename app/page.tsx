@@ -266,7 +266,7 @@ export default function Home() {
   }
 
   // ── Save ────────────────────────────────────────────────────────
-  async function handleSave() {
+  async function handleSave(): Promise<boolean> {
     setIsSaving(true);
     setSaveSuccess(false);
     try {
@@ -281,14 +281,19 @@ export default function Home() {
       if (!response.ok) {
         const err = await response.json();
         alert(`Save failed: ${err.error || "Unknown error"}`);
+        setIsSaving(false);
+        return false;
       } else {
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 3000);
+        setIsSaving(false);
+        return true;
       }
     } catch {
       alert("Save failed: network error");
+      setIsSaving(false);
+      return false;
     }
-    setIsSaving(false);
   }
 
   return (
