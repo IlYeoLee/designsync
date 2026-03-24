@@ -114,11 +114,30 @@ ${fontSection}- 시맨틱 색상: var(--primary), var(--secondary), var(--accent
 - p-*, m-*, px-*, py-*, mx-*, my-* 등도 동일한 스케일 사용
 - ❌ gap-[13px], p-[20px] 등 임의 간격 금지 — 토큰 스케일 값 사용
 
-### 밀도/스타일 프리셋
-- 이 프로젝트는 스타일 프리셋으로 컴포넌트 밀도를 제어한다.
-- CSS 변수: var(--ds-button-h-default), var(--ds-input-h), var(--ds-card-padding), var(--ds-section-gap), var(--ds-button-radius), var(--ds-card-radius)
-- Button/Input/Card 등 핵심 컴포넌트는 이 변수를 참조하므로, 프리셋 변경 시 자동으로 밀도가 조절된다.
-- ❌ Button이나 Input의 높이를 className으로 직접 오버라이드하지 말 것 (h-12, h-8 등 금지)
+### 밀도/스타일 프리셋 (매우 중요)
+이 프로젝트의 모든 크기/둥글기/패딩은 CSS 변수로 제어된다. **새로 만드는 모든 컴포넌트도 반드시 이 변수를 사용해야 한다.**
+
+**둥글기 — rounded-md, rounded-lg, rounded-xl 직접 사용 절대 금지:**
+- 버튼/뱃지/토글: rounded-[var(--ds-button-radius)]
+- 메뉴/사이드바/스켈레톤/탭/툴팁: rounded-[var(--ds-element-radius)]
+- 인풋/셀렉트/텍스트영역: rounded-[var(--ds-input-radius)]
+- 카드/팝오버/드롭다운/알럿: rounded-[var(--ds-card-radius)]
+- 다이얼로그/시트/드로어: rounded-[var(--ds-dialog-radius)]
+
+**높이:**
+- 버튼 기본: h-[var(--ds-button-h-default)], sm: h-[var(--ds-button-h-sm)], lg: h-[var(--ds-button-h-lg)]
+- 인풋: h-[var(--ds-input-h)]
+- ❌ h-8, h-9, h-10, h-12 등 직접 높이 지정 금지
+
+**패딩:**
+- 카드/다이얼로그/시트 패딩: p-[var(--ds-card-padding)]
+- 섹션 간격: gap-[var(--ds-section-gap)]
+- 내부 간격: gap-[var(--ds-internal-gap)]
+- ❌ p-6, p-4, gap-4 등 구조적 패딩 직접 지정 금지 (gap-2 이하의 미세 아이콘 간격은 예외)
+
+**포커스 링:**
+- focus-visible:ring-[var(--ds-focus-ring-width)]
+- ❌ focus-visible:ring-[3px] 등 직접 지정 금지
 
 ### 둥글기 (border-radius)
 - rounded-none, rounded-sm, rounded-md, rounded-lg, rounded-xl, rounded-full
