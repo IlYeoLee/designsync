@@ -1,3 +1,12 @@
+/* Roboto (self-hosted via DesignSync) */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('https://designsync-omega.vercel.app/fonts/roboto-variable.woff2') format('woff2');
+}
+
 /* Barlow (self-hosted via DesignSync) */
 @font-face {
   font-family: 'Barlow';
