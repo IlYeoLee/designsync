@@ -54,7 +54,7 @@ function Header({
       )}
       {...props}
     >
-      <div className="flex h-14 items-center gap-4 px-4 md:px-6">
+      <div className="flex h-14 items-center gap-[var(--ds-section-gap)] px-[var(--ds-card-padding)] md:px-[var(--ds-card-padding)]">
         {children}
       </div>
     </header>
