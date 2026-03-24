@@ -18,8 +18,8 @@ function ButtonGroup({
       className={cn(
         "inline-flex",
         orientation === "horizontal"
-          ? "flex-row -space-x-px [&>button]:rounded-none [&>button:first-child]:rounded-l-md [&>button:last-child]:rounded-r-md"
-          : "flex-col -space-y-px [&>button]:rounded-none [&>button:first-child]:rounded-t-md [&>button:last-child]:rounded-b-md",
+          ? "flex-row -space-x-px [&>button]:rounded-none [&>button:first-child]:rounded-l-[var(--ds-button-radius)] [&>button:last-child]:rounded-r-[var(--ds-button-radius)]"
+          : "flex-col -space-y-px [&>button]:rounded-none [&>button:first-child]:rounded-t-[var(--ds-button-radius)] [&>button:last-child]:rounded-b-[var(--ds-button-radius)]",
         className
       )}
       {...props}

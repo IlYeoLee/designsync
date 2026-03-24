@@ -45,7 +45,7 @@ function RemPxInput({
   }
 
   return (
-    <div className="flex items-center h-7 rounded-md border border-input bg-background overflow-hidden focus-within:ring-1 focus-within:ring-ring">
+    <div className="flex items-center h-7 rounded-[var(--ds-element-radius)] border border-input bg-background overflow-hidden focus-within:ring-1 focus-within:ring-ring">
       <input
         type="number"
         min={min * 16}
@@ -130,7 +130,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
       <div>
         <p className="text-xs font-medium text-foreground mb-2">영문 폰트</p>
         <div
-          className="w-full p-3 rounded-md border border-border bg-muted/30 mb-3"
+          className="w-full p-3 rounded-[var(--ds-element-radius)] border border-border bg-muted/30 mb-3"
           style={{ fontFamily: tokens.primitives.fontFamily }}
         >
           <p className="text-base font-normal">The quick brown fox</p>
@@ -138,7 +138,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
         </div>
 
         {fontUploadStatus && (
-          <div className={`mb-3 px-3 py-2 rounded-md text-xs border ${
+          <div className={`mb-3 px-3 py-2 rounded-[var(--ds-element-radius)] text-xs border ${
             fontUploadStatus.loading
               ? "bg-muted/50 border-border text-muted-foreground"
               : fontUploadStatus.result?.error
@@ -157,7 +157,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
           </div>
         )}
 
-        <div className="flex border border-border rounded-md overflow-hidden mb-2">
+        <div className="flex border border-border rounded-[var(--ds-element-radius)] overflow-hidden mb-2">
           {(["google", "local"] as const).map((sec) => (
             <button
               key={sec}
@@ -182,9 +182,9 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
           placeholder="폰트 검색..."
           value={fontSearch}
           onChange={(e) => setFontSearch(e.target.value)}
-          className="w-full h-8 text-xs px-2.5 rounded-md border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring mb-2"
+          className="w-full h-8 text-xs px-2.5 rounded-[var(--ds-element-radius)] border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring mb-2"
         />
-        <div className="max-h-40 overflow-y-auto border border-border rounded-md">
+        <div className="max-h-40 overflow-y-auto border border-border rounded-[var(--ds-element-radius)]">
           {fontSection === "google" ? (
             filteredGoogleFonts.length > 0 ? filteredGoogleFonts.map((font) => (
               <button
@@ -218,7 +218,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
       {/* Korean Font */}
       <div>
         <p className="text-xs font-medium text-foreground mb-2">한글 폰트</p>
-        <div className="w-full p-3 rounded-md border border-border bg-muted/30 mb-3">
+        <div className="w-full p-3 rounded-[var(--ds-element-radius)] border border-border bg-muted/30 mb-3">
           <p className="text-base" style={{ fontFamily: tokens.primitives.fontFamilyKo || undefined }}>
             안녕하세요 Hello
           </p>
@@ -231,9 +231,9 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
           placeholder="한글 폰트 검색..."
           value={koFontSearch}
           onChange={(e) => setKoFontSearch(e.target.value)}
-          className="w-full h-8 text-xs px-2.5 rounded-md border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring mb-2"
+          className="w-full h-8 text-xs px-2.5 rounded-[var(--ds-element-radius)] border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring mb-2"
         />
-        <div className="max-h-40 overflow-y-auto border border-border rounded-md">
+        <div className="max-h-40 overflow-y-auto border border-border rounded-[var(--ds-element-radius)]">
           <button
             onClick={() => onFontFamilyKoChange('')}
             className="w-full text-left px-3 py-1.5 text-xs text-muted-foreground hover:bg-accent"
@@ -290,7 +290,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
               <select
                 value={tokens.primitives.fontWeight[key]}
                 onChange={(e) => onTokenChange(`--font-weight-${key}`, e.target.value)}
-                className="flex-1 h-7 text-xs px-2 rounded-md border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+                className="flex-1 h-7 text-xs px-2 rounded-[var(--ds-element-radius)] border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring"
               >
                 {[100, 200, 300, 400, 500, 600, 700, 800, 900].map((w) => (
                   <option key={w} value={String(w)}>{w}</option>
@@ -318,7 +318,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
                 className="flex-1 h-1.5 accent-primary"
               />
               {/* Line height is unitless — show as plain number, fixed 2 decimals */}
-              <div className="flex items-center h-7 rounded-md border border-input bg-background overflow-hidden focus-within:ring-1 focus-within:ring-ring">
+              <div className="flex items-center h-7 rounded-[var(--ds-element-radius)] border border-input bg-background overflow-hidden focus-within:ring-1 focus-within:ring-ring">
                 <input
                   type="number"
                   min={1}

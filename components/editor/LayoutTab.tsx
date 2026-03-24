@@ -90,7 +90,7 @@ function RemPxInput({
   }
 
   return (
-    <div className="flex items-center h-7 rounded-md border border-input bg-background overflow-hidden focus-within:ring-1 focus-within:ring-ring">
+    <div className="flex items-center h-7 rounded-[var(--ds-element-radius)] border border-input bg-background overflow-hidden focus-within:ring-1 focus-within:ring-ring">
       <input
         type="number"
         min={min}
@@ -198,7 +198,7 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
                   applyStylePreset(preset.id);
                   onStylePresetChange(preset.id);
                 }}
-                className={`flex flex-col items-start px-3 py-2.5 rounded-md border text-left transition-colors ${
+                className={`flex flex-col items-start px-3 py-2.5 rounded-[var(--ds-element-radius)] border text-left transition-colors ${
                   isActive
                     ? "border-primary bg-accent text-foreground"
                     : "border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -293,7 +293,7 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs text-muted-foreground w-6 font-mono">{label}</span>
                   <div
-                    className="flex-1 h-8 rounded-md bg-background border border-border/50"
+                    className="flex-1 h-8 rounded-[var(--ds-element-radius)] bg-background border border-border/50"
                     style={{ boxShadow: currentShadow }}
                   />
                 </div>
@@ -342,7 +342,7 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
             <button
               key={lib.id}
               onClick={() => onIconLibraryChange(lib.id)}
-              className={`flex flex-col items-start px-3 py-2.5 rounded-md border text-left transition-colors ${
+              className={`flex flex-col items-start px-3 py-2.5 rounded-[var(--ds-element-radius)] border text-left transition-colors ${
                 tokens.primitives.iconLibrary === lib.id
                   ? "border-primary bg-accent text-foreground"
                   : "border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -371,7 +371,7 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
         </div>
       </div>
 
-      <div className="rounded-md bg-muted/50 p-3 border border-border">
+      <div className="rounded-[var(--ds-element-radius)] bg-muted/50 p-3 border border-border">
         <p className="text-xs text-muted-foreground">
           그림자는 CSS 변수를 통해 <code className="font-mono text-xs">shadow-sm/md/lg</code> Tailwind 유틸리티에 연결됩니다.
           간격 변경은 모든 <code className="font-mono text-xs">p-*</code>, <code className="font-mono text-xs">gap-*</code> 유틸리티에 영향을 줍니다.

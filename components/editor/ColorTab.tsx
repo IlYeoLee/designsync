@@ -202,7 +202,7 @@ function SemanticDropdown({
         <span className="truncate">{currentLabel}</span>
       </button>
       {open && (
-        <div className="absolute left-0 top-full mt-1 z-40 bg-card border border-border rounded-md shadow-lg max-h-[240px] overflow-y-auto w-full min-w-[180px]">
+        <div className="absolute left-0 top-full mt-1 z-40 bg-card border border-border rounded-[var(--ds-element-radius)] shadow-lg max-h-[240px] overflow-y-auto w-full min-w-[180px]">
           {COLOR_SCALES.map((scale) => (
             <div key={scale}>
               <div className="px-2 py-1 text-[9px] font-medium text-muted-foreground bg-muted/50 sticky top-0">
@@ -475,7 +475,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
                   Auto
                 </button>
                 {openScalePicker === scale && (
-                  <div className="absolute right-0 top-full mt-1 z-30 bg-card border border-border rounded-md shadow-lg p-3 min-w-[200px]">
+                  <div className="absolute right-0 top-full mt-1 z-30 bg-card border border-border rounded-[var(--ds-element-radius)] shadow-lg p-3 min-w-[200px]">
                     <p className="text-[10px] text-muted-foreground mb-2 font-medium">
                       기준색 → 50~900 자동 생성
                     </p>
@@ -502,7 +502,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
                       />
                     </div>
                     <button
-                      className="w-full h-7 bg-primary text-primary-foreground text-xs rounded-md hover:opacity-90 transition-opacity font-medium"
+                      className="w-full h-7 bg-primary text-primary-foreground text-xs rounded-[var(--ds-element-radius)] hover:opacity-90 transition-opacity font-medium"
                       onClick={() => handleGeneratePalette(scale, scalePicker[scale])}
                     >
                       팔레트 생성
@@ -540,7 +540,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
                     onClick={() => handleSwatchClick(scale, step)}
                   />
                   {isActive && mounted && (
-                    <div className={`absolute top-full ${popupAlign} mt-1 z-20 bg-card border border-border rounded-md shadow-lg p-2 min-w-[130px]`}>
+                    <div className={`absolute top-full ${popupAlign} mt-1 z-20 bg-card border border-border rounded-[var(--ds-element-radius)] shadow-lg p-2 min-w-[130px]`}>
                       <p className="text-xs text-muted-foreground mb-1 font-mono">{scale}-{step}</p>
                       <input
                         type="color"
@@ -600,7 +600,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
         {semanticOpen && (
           <>
             {/* Light / Dark toggle */}
-            <div className="flex border border-border rounded-md overflow-hidden mb-3">
+            <div className="flex border border-border rounded-[var(--ds-element-radius)] overflow-hidden mb-3">
               {(["light", "dark"] as const).map((m) => (
                 <button
                   key={m}

@@ -90,7 +90,7 @@ export function EditorHeader({
   return (
     <HeaderRoot className="flex-shrink-0">
       <HeaderLogo href="/">
-        <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center">
+        <div className="w-7 h-7 rounded-[var(--ds-element-radius)] bg-primary flex items-center justify-center">
           <span className="text-primary-foreground text-xs font-bold">DS</span>
         </div>
         <span>DesignSync</span>

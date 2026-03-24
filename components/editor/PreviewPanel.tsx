@@ -219,7 +219,7 @@ function FormPreview({ icons }: { icons: IconMap }) {
           locale={ko}
           selected={date}
           onSelect={setDate}
-          className="rounded-md border border-border w-fit"
+          className="rounded-[var(--ds-card-radius)] border border-border w-fit"
         />
       </div>
 
@@ -417,7 +417,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
       {/* Command */}
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">Command</h3>
-        <Command className="rounded-lg border border-border shadow-md max-w-sm">
+        <Command className="rounded-[var(--ds-card-radius)] border border-border shadow-md max-w-sm">
           <CommandInput placeholder="명령어 또는 검색..." />
           <CommandList>
             <CommandEmpty>결과가 없습니다.</CommandEmpty>
@@ -459,7 +459,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
         <h3 className="text-sm font-medium text-foreground mb-3">Context Menu</h3>
         <ContextMenu>
           <ContextMenuTrigger>
-            <div className="flex h-20 w-full max-w-sm items-center justify-center rounded-md border border-dashed border-border text-sm text-muted-foreground cursor-default select-none">
+            <div className="flex h-20 w-full max-w-sm items-center justify-center rounded-[var(--ds-element-radius)] border border-dashed border-border text-sm text-muted-foreground cursor-default select-none">
               여기를 우클릭
             </div>
           </ContextMenuTrigger>
@@ -757,7 +757,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
       {/* ScrollArea */}
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">Scroll Area</h3>
-        <ScrollArea className="h-36 w-64 rounded-md border border-border p-3">
+        <ScrollArea className="h-36 w-64 rounded-[var(--ds-card-radius)] border border-border p-3">
           <div className="space-y-2">
             {Array.from({ length: 12 }, (_, i) => (
               <div key={i} className="text-xs text-muted-foreground">
@@ -774,7 +774,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">Aspect Ratio</h3>
         <div className="w-64">
-          <AspectRatio ratio={16 / 9} className="rounded-md overflow-hidden bg-muted border border-border">
+          <AspectRatio ratio={16 / 9} className="rounded-[var(--ds-element-radius)] overflow-hidden bg-muted border border-border">
             <div className="flex items-center justify-center h-full text-xs text-muted-foreground">
               16 / 9
             </div>
@@ -797,10 +797,10 @@ function CollapsibleDemo({ icons }: { icons: IconMap }) {
           </Button>
         </CollapsibleTrigger>
       </div>
-      <div className="rounded-md border border-border px-3 py-2 text-xs font-mono">@radix-ui/primitives</div>
+      <div className="rounded-[var(--ds-card-radius)] border border-border px-3 py-2 text-xs font-mono">@radix-ui/primitives</div>
       <CollapsibleContent className="space-y-2">
-        <div className="rounded-md border border-border px-3 py-2 text-xs font-mono">@radix-ui/colors</div>
-        <div className="rounded-md border border-border px-3 py-2 text-xs font-mono">@stitches/react</div>
+        <div className="rounded-[var(--ds-card-radius)] border border-border px-3 py-2 text-xs font-mono">@radix-ui/colors</div>
+        <div className="rounded-[var(--ds-card-radius)] border border-border px-3 py-2 text-xs font-mono">@stitches/react</div>
       </CollapsibleContent>
     </Collapsible>
   );
@@ -813,17 +813,17 @@ function SidebarPreview({ icons }: { icons: IconMap }) {
   return (
     <div>
       <h3 className="text-sm font-medium text-foreground mb-3">Sidebar</h3>
-      <div className="flex rounded-lg border border-border overflow-hidden h-72">
+      <div className="flex rounded-[var(--ds-card-radius)] border border-border overflow-hidden h-72">
         <div className={`bg-sidebar border-r border-sidebar-border flex flex-col transition-all duration-300 ${open ? "w-52" : "w-0 border-r-0 overflow-hidden"}`}>
           {/* Logo + Close */}
           <div className="flex items-center justify-between px-3 py-3 border-b border-sidebar-border">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center">
+              <div className="w-7 h-7 rounded-[var(--ds-element-radius)] bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground text-xs font-bold">DS</span>
               </div>
               <span className="text-sm font-semibold text-sidebar-foreground whitespace-nowrap">DesignSync</span>
             </div>
-            <button onClick={() => setOpen(false)} className="p-1 rounded-md hover:bg-sidebar-accent text-sidebar-foreground/50 hover:text-sidebar-foreground transition-colors">
+            <button onClick={() => setOpen(false)} className="p-1 rounded-[var(--ds-element-radius)] hover:bg-sidebar-accent text-sidebar-foreground/50 hover:text-sidebar-foreground transition-colors">
               <icons.panelLeftClose className="w-4 h-4" />
             </button>
           </div>
@@ -838,7 +838,7 @@ function SidebarPreview({ icons }: { icons: IconMap }) {
               { icon: icons.fileText, label: "문서", active: false },
               { icon: icons.calendar, label: "캘린더", active: false },
             ].map(({ icon: Icon, label, active }) => (
-              <div key={label} className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-xs cursor-default transition-colors ${active ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50"}`}>
+              <div key={label} className={`flex items-center gap-2 px-2 py-1.5 rounded-[var(--ds-element-radius)] text-xs cursor-default transition-colors ${active ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50"}`}>
                 <Icon className="w-3.5 h-3.5" />
                 <span className="whitespace-nowrap">{label}</span>
               </div>
@@ -853,7 +853,7 @@ function SidebarPreview({ icons }: { icons: IconMap }) {
               { icon: icons.settings, label: "설정", active: false },
               { icon: icons.bell, label: "알림", active: false },
             ].map(({ icon: Icon, label, active }) => (
-              <div key={label} className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-xs cursor-default transition-colors ${active ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50"}`}>
+              <div key={label} className={`flex items-center gap-2 px-2 py-1.5 rounded-[var(--ds-element-radius)] text-xs cursor-default transition-colors ${active ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50"}`}>
                 <Icon className="w-3.5 h-3.5" />
                 <span className="whitespace-nowrap">{label}</span>
               </div>
@@ -874,7 +874,7 @@ function SidebarPreview({ icons }: { icons: IconMap }) {
 
         <div className="flex-1 bg-background p-4">
           {!open && (
-            <button onClick={() => setOpen(true)} className="mb-3 p-1.5 rounded-md border border-border hover:bg-accent transition-colors">
+            <button onClick={() => setOpen(true)} className="mb-3 p-1.5 rounded-[var(--ds-card-radius)] border border-border hover:bg-accent transition-colors">
               <icons.panelLeft className="w-4 h-4" />
             </button>
           )}
@@ -892,10 +892,10 @@ function NavigationPreview({ icons }: { icons: IconMap }) {
       {/* Header */}
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">Header</h3>
-        <div className="rounded-md border border-border overflow-hidden">
+        <div className="rounded-[var(--ds-card-radius)] border border-border overflow-hidden">
           <Header>
             <HeaderLogo href="#">
-              <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center">
+              <div className="w-6 h-6 rounded-[var(--ds-element-radius)] bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground text-[10px] font-bold">A</span>
               </div>
               <span>AppName</span>
@@ -1305,7 +1305,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
       {/* Item */}
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">Item</h3>
-        <div className="rounded-md border border-border divide-y divide-border">
+        <div className="rounded-[var(--ds-card-radius)] border border-border divide-y divide-border">
           <Item>
             <ItemMedia>
               <Avatar><AvatarFallback>김</AvatarFallback></Avatar>
@@ -1544,7 +1544,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
       {/* Resizable */}
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">Resizable</h3>
-        <ResizablePanelGroup direction="horizontal" className="rounded-lg border border-border h-56 max-w-lg">
+        <ResizablePanelGroup direction="horizontal" className="rounded-[var(--ds-card-radius)] border border-border h-56 max-w-lg">
           <ResizablePanel defaultSize={50} minSize={20}>
             <div className="flex h-full items-center justify-center p-4">
               <p className="text-xs text-muted-foreground font-medium">왼쪽 패널</p>
@@ -1757,7 +1757,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
           {ICON_SHOWCASE_KEYS.map((key) => {
             const Icon = icons[key];
             return (
-              <div key={key} className="flex flex-col items-center gap-1.5 p-2 rounded-md hover:bg-muted transition-colors">
+              <div key={key} className="flex flex-col items-center gap-1.5 p-2 rounded-[var(--ds-element-radius)] hover:bg-muted transition-colors">
                 <Icon className="w-5 h-5 text-foreground" />
                 <span className="text-[10px] text-muted-foreground">{key}</span>
               </div>
