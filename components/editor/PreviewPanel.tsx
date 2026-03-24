@@ -65,7 +65,7 @@ import { Kbd } from "@/registry/new-york/ui/kbd";
 import { Empty, EmptyIcon, EmptyTitle, EmptyDescription, EmptyActions } from "@/registry/new-york/ui/empty";
 import { Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions } from "@/registry/new-york/ui/item";
 
-import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as CalendarIcon, Smile, Settings, User, LayoutDashboard, FileText, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, ChevronsUpDown, ChevronDown } from "lucide-react";
+import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as CalendarIcon, Smile, Settings, User, LayoutDashboard, FileText, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, ChevronsUpDown, ChevronDown, Mail, Download, Plus, Heart } from "lucide-react";
 
 type PreviewCategory = "form" | "overlay" | "navigation" | "display" | "feedback";
 
@@ -106,6 +106,13 @@ function FormPreview() {
           <Button size="default">기본</Button>
           <Button size="lg">크게</Button>
           <Button disabled>비활성</Button>
+        </div>
+        <div className="flex flex-wrap gap-2 mt-2">
+          <Button><Mail className="w-4 h-4" /> 메일 보내기</Button>
+          <Button variant="outline"><Download className="w-4 h-4" /> 다운로드</Button>
+          <Button variant="secondary"><Plus className="w-4 h-4" /> 추가</Button>
+          <Button size="icon" variant="outline"><Settings className="w-4 h-4" /><span className="sr-only">설정</span></Button>
+          <Button size="icon" variant="ghost"><Heart className="w-4 h-4" /><span className="sr-only">좋아요</span></Button>
         </div>
       </div>
 
