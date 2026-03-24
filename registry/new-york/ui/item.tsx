@@ -11,7 +11,7 @@ function Item({
     <div
       data-slot="item"
       className={cn(
-        "flex items-start gap-3 rounded-[var(--ds-button-radius)] p-3 transition-colors",
+        "flex items-start gap-[var(--ds-internal-gap)] rounded-[var(--ds-button-radius)] p-[var(--ds-internal-gap)] transition-colors",
         className
       )}
       {...props}

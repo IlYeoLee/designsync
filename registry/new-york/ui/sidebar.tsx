@@ -350,7 +350,7 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-header"
       data-sidebar="header"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={cn("flex flex-col gap-[var(--ds-internal-gap)] p-[var(--ds-internal-gap)]", className)}
       {...props}
     />
   )
@@ -361,7 +361,7 @@ function SidebarFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-footer"
       data-sidebar="footer"
-      className={cn("flex flex-col gap-2 p-2", className)}
+      className={cn("flex flex-col gap-[var(--ds-internal-gap)] p-[var(--ds-internal-gap)]", className)}
       {...props}
     />
   )
@@ -400,7 +400,7 @@ function SidebarGroup({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-group"
       data-sidebar="group"
-      className={cn("relative flex w-full min-w-0 flex-col p-2", className)}
+      className={cn("relative flex w-full min-w-0 flex-col p-[var(--ds-internal-gap)]", className)}
       {...props}
     />
   )
@@ -497,7 +497,7 @@ const sidebarMenuButtonVariants = cva(
       },
       size: {
         default: "h-[var(--ds-button-h-sm)] text-sm",
-        sm: "h-7 text-xs",
+        sm: "h-[var(--ds-button-h-xs)] text-xs",
         lg: "h-12 text-sm group-data-[collapsible=icon]:p-0!",
       },
     },
