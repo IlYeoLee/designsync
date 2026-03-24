@@ -3,7 +3,7 @@
 import * as React from "react";
 import { toast } from "sonner";
 import { ko } from "date-fns/locale";
-import { Bar, BarChart, Line, LineChart, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, Line, LineChart, Pie, PieChart, Cell, XAxis, YAxis } from "recharts";
 
 // Existing components
 import { Button } from "@/registry/new-york/ui/button";
@@ -54,6 +54,10 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/registry
 import { Toaster } from "@/registry/new-york/ui/sonner";
 import { TypographyH1, TypographyH2, TypographyH3, TypographyH4, TypographyP, TypographyBlockquote, TypographyCode, TypographyLead, TypographyLarge, TypographySmall, TypographyMuted, TypographyTable, TypographyTr, TypographyTh, TypographyTd, TypographyList } from "@/registry/new-york/ui/typography";
 
+// C-category components
+import { DataTable } from "@/registry/new-york/ui/data-table";
+import { DatePicker } from "@/registry/new-york/ui/date-picker";
+
 // B-category components
 import { Combobox } from "@/registry/new-york/ui/combobox";
 import { ButtonGroup } from "@/registry/new-york/ui/button-group";
@@ -87,6 +91,7 @@ function FormPreview() {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
   const [comboValue, setComboValue] = React.useState("");
   const [comboMultiValue, setComboMultiValue] = React.useState<string[]>([]);
+  const [datePickerValue, setDatePickerValue] = React.useState<Date>();
 
   return (
     <div className="space-y-6">
@@ -214,6 +219,26 @@ function FormPreview() {
           onSelect={setDate}
           className="rounded-md border border-border w-fit"
         />
+      </div>
+
+      <Separator />
+
+      {/* DatePicker */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Date Picker</h3>
+        <div className="max-w-sm space-y-2">
+          <Label>날짜 선택</Label>
+          <DatePicker
+            value={datePickerValue}
+            onValueChange={setDatePickerValue}
+            placeholder="날짜를 선택하세요"
+          />
+          {datePickerValue && (
+            <p className="text-xs text-muted-foreground">
+              선택된 날짜: {datePickerValue.toLocaleDateString("ko-KR")}
+            </p>
+          )}
+        </div>
       </div>
 
       <Separator />
@@ -1018,6 +1043,38 @@ const lineChartConfig = {
   users: { label: "Users", color: "var(--brand-500)" },
 } satisfies ChartConfig;
 
+const PIE_DATA = [
+  { name: "디자인", value: 35 },
+  { name: "개발", value: 40 },
+  { name: "마케팅", value: 15 },
+  { name: "기획", value: 10 },
+];
+
+const PIE_COLORS = [
+  "var(--brand-500)",
+  "var(--success-500)",
+  "var(--warning-500)",
+  "var(--error-500)",
+];
+
+const pieChartConfig = {
+  design: { label: "디자인", color: "var(--brand-500)" },
+  dev: { label: "개발", color: "var(--success-500)" },
+  marketing: { label: "마케팅", color: "var(--warning-500)" },
+  planning: { label: "기획", color: "var(--error-500)" },
+} satisfies ChartConfig;
+
+const DATA_TABLE_DATA = [
+  { name: "김수현", email: "suhyun@example.com", role: "디자이너", status: "활성" },
+  { name: "이준호", email: "junho@example.com", role: "개발자", status: "활성" },
+  { name: "왕서연", email: "seoyeon@example.com", role: "매니저", status: "자리비움" },
+  { name: "박지민", email: "jimin@example.com", role: "디자이너", status: "활성" },
+  { name: "최도윤", email: "doyun@example.com", role: "개발자", status: "비활성" },
+  { name: "정하늘", email: "haneul@example.com", role: "마케팅", status: "활성" },
+  { name: "강민서", email: "minseo@example.com", role: "기획", status: "자리비움" },
+  { name: "윤채원", email: "chaewon@example.com", role: "개발자", status: "활성" },
+];
+
 function DisplayPreview() {
   return (
     <div className="space-y-6">
@@ -1188,6 +1245,39 @@ function DisplayPreview() {
 
       <Separator />
 
+      {/* Chart — Pie */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Chart — Pie</h3>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">팀 구성 비율</CardTitle>
+            <CardDescription>부서별 인원 분포</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={pieChartConfig} className="h-48 w-full">
+              <PieChart>
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Pie
+                  data={PIE_DATA}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={70}
+                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                >
+                  {PIE_DATA.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index]} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Separator />
+
       {/* Carousel */}
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">Carousel</h3>
@@ -1309,6 +1399,39 @@ function DisplayPreview() {
             ))}
           </TableBody>
         </Table>
+      </div>
+
+      <Separator />
+
+      {/* DataTable */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Data Table</h3>
+        <DataTable
+          columns={[
+            { key: "name", header: "이름", sortable: true },
+            { key: "email", header: "이메일" },
+            { key: "role", header: "역할" },
+            {
+              key: "status",
+              header: "상태",
+              render: (value) => (
+                <Badge
+                  variant={
+                    value === "활성"
+                      ? "default"
+                      : value === "비활성"
+                        ? "destructive"
+                        : "secondary"
+                  }
+                >
+                  {String(value)}
+                </Badge>
+              ),
+            },
+          ]}
+          data={DATA_TABLE_DATA}
+          pageSize={5}
+        />
       </div>
 
       <Separator />

@@ -120,7 +120,9 @@ ${fontSection}- 시맨틱 색상: var(--primary), var(--secondary), var(--accent
 - Empty: <Empty> <EmptyIcon> <EmptyTitle> <EmptyDescription> <EmptyActions> — 빈 상태 UI
 - Item: <Item> <ItemMedia> <ItemContent> <ItemTitle> <ItemDescription> <ItemActions> — 리스트 아이템
 - Kbd: <Kbd>⌘</Kbd><Kbd>K</Kbd> — 키보드 단축키 표시
-- Calendar, Carousel, Chart, Command, Breadcrumb, Pagination, InputOTP
+- DataTable: <DataTable columns={[]} data={[]} pageSize={5} /> — 정렬/페이지네이션 테이블
+- DatePicker: <DatePicker value={date} onValueChange={setDate} /> — 날짜 선택 (Calendar+Popover 조합)
+- Calendar, Carousel, Chart (Bar/Line/Pie/Radar/Radial), Command, Breadcrumb, Pagination, InputOTP
 - Header: <Header> <HeaderLogo> <HeaderNav> <HeaderNavLink> <HeaderActions> <HeaderMobileNav> <HeaderMobileNavLink>
 - Toggle (variant="default|outline"), ToggleGroup (variant="outline"으로 테두리 표시), HoverCard, AspectRatio, RadioGroup, Resizable
 - Direction: <DirectionProvider direction="ltr|rtl"> — RTL/LTR 지원

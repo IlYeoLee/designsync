@@ -10,6 +10,95 @@ const COLOR_SCALES: ColorScaleName[] = ["brand", "neutral", "error", "success", 
 const STEPS = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900"] as const;
 type Step = typeof STEPS[number];
 
+// Neutral color variant presets — each is a full 50-900 oklch scale
+// Lightness values match the default neutral scale; chroma/hue give a subtle tint
+const NEUTRAL_PRESETS: Record<string, Record<Step, string>> = {
+  Neutral: {
+    "50":  "oklch(0.99 0 0)",
+    "100": "oklch(0.97 0 0)",
+    "200": "oklch(0.93 0 0)",
+    "300": "oklch(0.87 0 0)",
+    "400": "oklch(0.72 0 0)",
+    "500": "oklch(0.57 0 0)",
+    "600": "oklch(0.45 0 0)",
+    "700": "oklch(0.33 0 0)",
+    "800": "oklch(0.22 0 0)",
+    "900": "oklch(0.13 0 0)",
+  },
+  Stone: {
+    "50":  "oklch(0.99 0.003 60)",
+    "100": "oklch(0.97 0.004 60)",
+    "200": "oklch(0.93 0.004 60)",
+    "300": "oklch(0.87 0.005 60)",
+    "400": "oklch(0.72 0.006 60)",
+    "500": "oklch(0.57 0.006 60)",
+    "600": "oklch(0.45 0.006 60)",
+    "700": "oklch(0.33 0.007 60)",
+    "800": "oklch(0.22 0.007 60)",
+    "900": "oklch(0.13 0.007 60)",
+  },
+  Zinc: {
+    "50":  "oklch(0.99 0.002 260)",
+    "100": "oklch(0.97 0.003 260)",
+    "200": "oklch(0.93 0.004 260)",
+    "300": "oklch(0.87 0.005 260)",
+    "400": "oklch(0.72 0.005 260)",
+    "500": "oklch(0.57 0.005 260)",
+    "600": "oklch(0.45 0.005 260)",
+    "700": "oklch(0.33 0.006 260)",
+    "800": "oklch(0.22 0.006 260)",
+    "900": "oklch(0.13 0.006 260)",
+  },
+  Slate: {
+    "50":  "oklch(0.99 0.003 250)",
+    "100": "oklch(0.97 0.004 250)",
+    "200": "oklch(0.93 0.005 250)",
+    "300": "oklch(0.87 0.006 250)",
+    "400": "oklch(0.72 0.007 250)",
+    "500": "oklch(0.57 0.008 250)",
+    "600": "oklch(0.45 0.008 250)",
+    "700": "oklch(0.33 0.009 250)",
+    "800": "oklch(0.22 0.009 250)",
+    "900": "oklch(0.13 0.010 250)",
+  },
+  Mauve: {
+    "50":  "oklch(0.99 0.003 310)",
+    "100": "oklch(0.97 0.004 310)",
+    "200": "oklch(0.93 0.005 310)",
+    "300": "oklch(0.87 0.006 310)",
+    "400": "oklch(0.72 0.007 310)",
+    "500": "oklch(0.57 0.007 310)",
+    "600": "oklch(0.45 0.007 310)",
+    "700": "oklch(0.33 0.008 310)",
+    "800": "oklch(0.22 0.008 310)",
+    "900": "oklch(0.13 0.009 310)",
+  },
+  Olive: {
+    "50":  "oklch(0.99 0.003 130)",
+    "100": "oklch(0.97 0.004 130)",
+    "200": "oklch(0.93 0.005 130)",
+    "300": "oklch(0.87 0.005 130)",
+    "400": "oklch(0.72 0.006 130)",
+    "500": "oklch(0.57 0.006 130)",
+    "600": "oklch(0.45 0.006 130)",
+    "700": "oklch(0.33 0.007 130)",
+    "800": "oklch(0.22 0.007 130)",
+    "900": "oklch(0.13 0.008 130)",
+  },
+  Taupe: {
+    "50":  "oklch(0.99 0.003 80)",
+    "100": "oklch(0.97 0.004 80)",
+    "200": "oklch(0.93 0.005 80)",
+    "300": "oklch(0.87 0.006 80)",
+    "400": "oklch(0.72 0.006 80)",
+    "500": "oklch(0.57 0.007 80)",
+    "600": "oklch(0.45 0.007 80)",
+    "700": "oklch(0.33 0.008 80)",
+    "800": "oklch(0.22 0.008 80)",
+    "900": "oklch(0.13 0.009 80)",
+  },
+};
+
 const SCALE_LABELS: Record<ColorScaleName, string> = {
   brand: "브랜드 컬러", neutral: "뉴트럴 컬러", error: "오류 컬러", success: "성공 컬러", warning: "경고 컬러",
 };
@@ -174,6 +263,68 @@ function SemanticDropdown({
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+/** Detect which neutral preset currently matches the token state (if any) */
+function detectActiveNeutralPreset(tokens: TokenState): string | null {
+  for (const [name, preset] of Object.entries(NEUTRAL_PRESETS)) {
+    const allMatch = STEPS.every((step) => {
+      const current = tokens.primitives.neutral[step as keyof ColorScale]
+        .replace(/\s+/g, " ")
+        .trim();
+      const expected = preset[step].replace(/\s+/g, " ").trim();
+      return current === expected;
+    });
+    if (allMatch) return name;
+  }
+  return null;
+}
+
+/** Row of small preset buttons for neutral color variants */
+function NeutralPresetSelector({
+  tokens,
+  onBatchChange,
+}: {
+  tokens: TokenState;
+  onBatchChange: (changes: { variable: string; value: string }[]) => void;
+}) {
+  const activePreset = detectActiveNeutralPreset(tokens);
+
+  function applyPreset(name: string) {
+    const preset = NEUTRAL_PRESETS[name];
+    if (!preset) return;
+    const changes = STEPS.map((step) => ({
+      variable: `--neutral-${step}`,
+      value: preset[step],
+    }));
+    onBatchChange(changes);
+  }
+
+  return (
+    <div className="flex items-center gap-1.5 mb-2 flex-wrap">
+      {Object.entries(NEUTRAL_PRESETS).map(([name, preset]) => {
+        const isActive = activePreset === name;
+        return (
+          <button
+            key={name}
+            className={`flex items-center gap-1 px-1.5 py-0.5 rounded border text-[10px] transition-colors ${
+              isActive
+                ? "border-foreground bg-accent text-foreground font-medium"
+                : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
+            }`}
+            onClick={() => applyPreset(name)}
+            title={`뉴트럴 프리셋: ${name}`}
+          >
+            <span
+              className="w-3 h-3 rounded-sm border border-border flex-shrink-0"
+              style={{ backgroundColor: preset["500"] }}
+            />
+            <span>{name}</span>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -366,6 +517,11 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
                 )}
               </div>
           </div>
+
+          {/* Neutral preset selector — only for the neutral scale */}
+          {scale === "neutral" && (
+            <NeutralPresetSelector tokens={tokens} onBatchChange={onBatchChange} />
+          )}
 
           <div className="grid grid-cols-10 gap-1">
             {STEPS.map((step, stepIdx) => {

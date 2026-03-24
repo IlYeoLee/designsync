@@ -714,6 +714,22 @@
       "files": [{"path": "registry/new-york/ui/header.tsx", "type": "registry:ui"}]
     },
     {
+      "name": "data-table",
+      "type": "registry:ui",
+      "title": "Data Table",
+      "description": "Lightweight sortable, paginated data table. No external deps — composes Table + Button.",
+      "registryDependencies": ["table", "button"],
+      "files": [{"path": "registry/new-york/ui/data-table.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "date-picker",
+      "type": "registry:ui",
+      "title": "Date Picker",
+      "description": "A date selection component with popover calendar and Korean locale formatting.",
+      "registryDependencies": ["button", "calendar", "popover"],
+      "files": [{"path": "registry/new-york/ui/date-picker.tsx", "type": "registry:ui"}]
+    },
+    {
       "name": "designsync-all",
       "type": "registry:ui",
       "title": "DesignSync All Components",
@@ -777,7 +793,9 @@
         "https://designsync-omega.vercel.app/r/item.json",
         "https://designsync-omega.vercel.app/r/native-select.json",
         "https://designsync-omega.vercel.app/r/kbd.json",
-        "https://designsync-omega.vercel.app/r/direction.json"
+        "https://designsync-omega.vercel.app/r/direction.json",
+        "https://designsync-omega.vercel.app/r/date-picker.json",
+        "https://designsync-omega.vercel.app/r/data-table.json"
       ],
       "files": []
     }
