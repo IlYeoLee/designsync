@@ -110,7 +110,7 @@ export function EditorHeader({
             <ClipboardCopy className="w-3.5 h-3.5" />
           )}
           <span className="hidden sm:inline">
-            {copyState === "saving" ? "Saving..." : copyState === "copied" ? "Copied!" : "Copy"}
+            {copyState === "saving" ? "저장 중..." : copyState === "copied" ? "복사됨!" : "복사"}
           </span>
         </Button>
 
@@ -122,7 +122,7 @@ export function EditorHeader({
           title="Reset all tokens to defaults"
         >
           <RotateCcw className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">{confirmReset ? "Confirm?" : "Reset"}</span>
+          <span className="hidden sm:inline">{confirmReset ? "확인?" : "초기화"}</span>
         </Button>
 
         {/* Undo */}
@@ -160,7 +160,7 @@ export function EditorHeader({
           ) : (
             <Save className="w-3.5 h-3.5" />
           )}
-          <span>{isSaving ? "Saving..." : saveSuccess ? "Saved!" : "Save"}</span>
+          <span>{isSaving ? "저장 중..." : saveSuccess ? "저장됨!" : "저장"}</span>
         </Button>
       </HeaderActions>
     </HeaderRoot>
