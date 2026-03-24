@@ -23,8 +23,8 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-[var(--ds-button-h-default)] px-4 py-2 has-[>svg]:px-3",
-        sm: "h-[var(--ds-button-h-sm)] rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
-        lg: "h-[var(--ds-button-h-lg)] rounded-md px-6 has-[>svg]:px-4",
+        sm: "h-[var(--ds-button-h-sm)] gap-1.5 px-3 has-[>svg]:px-2.5",
+        lg: "h-[var(--ds-button-h-lg)] px-6 has-[>svg]:px-4",
         icon: "size-[var(--ds-button-h-default)]",
       },
     },
