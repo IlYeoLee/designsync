@@ -1025,11 +1025,11 @@ function NavigationPreview() {
 
       <Separator />
 
-      {/* Tabs */}
+      {/* Tabs — Pill variant */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-3">Tabs</h3>
+        <h3 className="text-sm font-medium text-foreground mb-3">Tabs (Pill)</h3>
         <Tabs defaultValue="account">
-          <TabsList>
+          <TabsList variant="pill">
             <TabsTrigger value="account">계정</TabsTrigger>
             <TabsTrigger value="password">비밀번호</TabsTrigger>
             <TabsTrigger value="settings">설정</TabsTrigger>
@@ -1042,6 +1042,29 @@ function NavigationPreview() {
           </TabsContent>
           <TabsContent value="settings" className="mt-3">
             <Card><CardHeader><CardTitle>설정</CardTitle><CardDescription>환경설정을 관리하세요.</CardDescription></CardHeader></Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      <Separator />
+
+      {/* Tabs — Underline variant */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Tabs (Underline)</h3>
+        <Tabs defaultValue="overview">
+          <TabsList variant="underline">
+            <TabsTrigger value="overview">개요</TabsTrigger>
+            <TabsTrigger value="analytics">분석</TabsTrigger>
+            <TabsTrigger value="reports">리포트</TabsTrigger>
+          </TabsList>
+          <TabsContent value="overview" className="mt-3">
+            <p className="text-sm text-muted-foreground">프로젝트 개요가 여기에 표시됩니다.</p>
+          </TabsContent>
+          <TabsContent value="analytics" className="mt-3">
+            <p className="text-sm text-muted-foreground">분석 데이터가 여기에 표시됩니다.</p>
+          </TabsContent>
+          <TabsContent value="reports" className="mt-3">
+            <p className="text-sm text-muted-foreground">리포트가 여기에 표시됩니다.</p>
           </TabsContent>
         </Tabs>
       </div>
@@ -1182,6 +1205,37 @@ const DATA_TABLE_DATA = [
   { name: "강민서", email: "minseo@example.com", role: "기획", status: "자리비움" },
   { name: "윤채원", email: "chaewon@example.com", role: "개발자", status: "활성" },
 ];
+
+function ProgressSkeletonPreview() {
+  const [progress, setProgress] = React.useState(0);
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) return 0;
+        return prev + 2;
+      });
+    }, 100);
+    return () => clearInterval(timer);
+  }, []);
+  return (
+    <div>
+      <h3 className="text-sm font-medium text-foreground mb-3">Progress & Skeleton</h3>
+      <div className="space-y-3 max-w-sm">
+        <div className="space-y-1">
+          <div className="flex justify-between text-xs text-muted-foreground mb-1">
+            <span>업로드 진행률</span><span>{progress}%</span>
+          </div>
+          <Progress value={progress} />
+        </div>
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-full animate-pulse" />
+          <Skeleton className="h-4 w-4/5 animate-pulse" />
+          <Skeleton className="h-4 w-3/5 animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function DisplayPreview() {
   return (
@@ -1504,7 +1558,7 @@ function DisplayPreview() {
       {/* Resizable */}
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">Resizable</h3>
-        <ResizablePanelGroup direction="horizontal" className="rounded-lg border border-border h-32 max-w-lg">
+        <ResizablePanelGroup direction="horizontal" className="rounded-lg border border-border h-56 max-w-lg">
           <ResizablePanel defaultSize={50} minSize={20}>
             <div className="flex h-full items-center justify-center p-4">
               <p className="text-xs text-muted-foreground font-medium">왼쪽 패널</p>
@@ -1706,22 +1760,7 @@ function DisplayPreview() {
       <Separator />
 
       {/* Progress & Skeleton */}
-      <div>
-        <h3 className="text-sm font-medium text-foreground mb-3">Progress & Skeleton</h3>
-        <div className="space-y-3 max-w-sm">
-          <div className="space-y-1">
-            <div className="flex justify-between text-xs text-muted-foreground mb-1">
-              <span>업로드 진행률</span><span>68%</span>
-            </div>
-            <Progress value={68} />
-          </div>
-          <div className="space-y-2">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-4/5" />
-            <Skeleton className="h-4 w-3/5" />
-          </div>
-        </div>
-      </div>
+      <ProgressSkeletonPreview />
 
       <Separator />
 
