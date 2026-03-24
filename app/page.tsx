@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Header } from "@/components/editor/Header";
+import { EditorHeader } from "@/components/editor/Header";
 import { EditorPanel } from "@/components/editor/EditorPanel";
 import { PreviewPanel } from "@/components/editor/PreviewPanel";
 import { DEFAULT_TOKENS, TokenState, HistoryEntry, applyTokensToDocument } from "@/lib/tokens";
@@ -298,7 +298,7 @@ export default function Home() {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden">
-      <Header
+      <EditorHeader
         isDark={isDark}
         onToggleDark={() => setIsDark(!isDark)}
         onSave={handleSave}
