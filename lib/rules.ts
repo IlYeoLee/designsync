@@ -104,17 +104,26 @@ ${fontSection}- 시맨틱 색상: var(--primary), var(--secondary), var(--accent
 - shadow-sm, shadow-md, shadow-lg
 
 ## ${n + 1}. 컴포넌트 (import from @/components/ui/)
-- Typography: <TypographyH1> <TypographyH2> <TypographyH3> <TypographyH4> <TypographyP> <TypographyLead> <TypographyMuted> <TypographyBlockquote> <TypographyCode> <TypographyLarge> <TypographySmall>
+- Typography: <TypographyH1> <TypographyH2> <TypographyH3> <TypographyH4> <TypographyP> <TypographyLead> <TypographyMuted> <TypographyBlockquote> <TypographyCode> <TypographyLarge> <TypographySmall> <TypographyTable> <TypographyTr> <TypographyTh> <TypographyTd> <TypographyList>
 - Button: variant="default|secondary|outline|ghost|destructive|link" size="sm|default|lg|icon"
+- ButtonGroup: <ButtonGroup> orientation="horizontal|vertical" — 버튼 그룹 묶기
 - Card: <Card> <CardHeader> <CardTitle> <CardDescription> <CardContent> <CardFooter>
-- Input, Textarea, Select, Checkbox, Switch, Slider, Label, Form
+- Input, Textarea, Select, NativeSelect, Checkbox, Switch, Slider, Label, Form
+- Combobox: <Combobox options={[]} value={} onValueChange={} /> — 단일/멀티 자동완성 셀렉트
+- Field: <Field> <FieldDescription> <FieldError> — 폼 필드 래퍼 (라벨+설명+에러)
+- InputGroup: <InputGroup> <InputGroupAddon> — 인풋에 좌우 addon 추가
 - Dialog, Sheet, Drawer, AlertDialog, Popover, Tooltip, DropdownMenu, ContextMenu
 - Tabs, Accordion, Collapsible, NavigationMenu, Menubar, Sidebar
 - Table, Badge, Avatar, Progress, Skeleton, Separator, ScrollArea
 - Alert (variant="default|destructive"), Sonner (토스트 알림)
+- Spinner: <Spinner size="sm|default|lg|xl" /> — 로딩 인디케이터
+- Empty: <Empty> <EmptyIcon> <EmptyTitle> <EmptyDescription> <EmptyActions> — 빈 상태 UI
+- Item: <Item> <ItemMedia> <ItemContent> <ItemTitle> <ItemDescription> <ItemActions> — 리스트 아이템
+- Kbd: <Kbd>⌘</Kbd><Kbd>K</Kbd> — 키보드 단축키 표시
 - Calendar, Carousel, Chart, Command, Breadcrumb, Pagination, InputOTP
 - Header: <Header> <HeaderLogo> <HeaderNav> <HeaderNavLink> <HeaderActions> <HeaderMobileNav> <HeaderMobileNavLink>
-- Toggle, ToggleGroup, HoverCard, AspectRatio, RadioGroup, Resizable
+- Toggle (variant="default|outline"), ToggleGroup (variant="outline"으로 테두리 표시), HoverCard, AspectRatio, RadioGroup, Resizable
+- Direction: <DirectionProvider direction="ltr|rtl"> — RTL/LTR 지원
 
 ## ${n + 2}. 아이콘 (lucide-react)
 이 프로젝트는 lucide-react 아이콘 라이브러리를 사용한다. 모든 아이콘은 반드시 lucide-react에서 import한다.

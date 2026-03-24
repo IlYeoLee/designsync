@@ -70,11 +70,11 @@ import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as Calendar
 type PreviewCategory = "form" | "overlay" | "navigation" | "display" | "feedback";
 
 const PREVIEW_CATEGORIES: { id: PreviewCategory; label: string }[] = [
-  { id: "form", label: "폼" },
-  { id: "overlay", label: "오버레이" },
-  { id: "navigation", label: "내비게이션" },
-  { id: "display", label: "디스플레이" },
-  { id: "feedback", label: "피드백" },
+  { id: "form", label: "Form" },
+  { id: "overlay", label: "Overlay" },
+  { id: "navigation", label: "Navigation" },
+  { id: "display", label: "Display" },
+  { id: "feedback", label: "Feedback" },
 ];
 
 // ─── Form ──────────────────────────────────────────────────────────────────────
@@ -702,11 +702,11 @@ function OverlayPreview() {
         <h3 className="text-sm font-medium text-foreground mb-3">Toggle & Toggle Group</h3>
         <div className="space-y-3">
           <div className="flex gap-2">
-            <Toggle aria-label="Bold"><Bold className="h-4 w-4" /></Toggle>
-            <Toggle aria-label="Italic"><Italic className="h-4 w-4" /></Toggle>
-            <Toggle aria-label="Underline"><Underline className="h-4 w-4" /></Toggle>
+            <Toggle variant="outline" aria-label="Bold"><Bold className="h-4 w-4" /></Toggle>
+            <Toggle variant="outline" aria-label="Italic"><Italic className="h-4 w-4" /></Toggle>
+            <Toggle variant="outline" aria-label="Underline"><Underline className="h-4 w-4" /></Toggle>
           </div>
-          <ToggleGroup type="single" defaultValue="center">
+          <ToggleGroup type="single" variant="outline" defaultValue="center">
             <ToggleGroupItem value="left" aria-label="Left"><AlignLeft className="h-4 w-4" /></ToggleGroupItem>
             <ToggleGroupItem value="center" aria-label="Center"><AlignCenter className="h-4 w-4" /></ToggleGroupItem>
             <ToggleGroupItem value="right" aria-label="Right"><AlignRight className="h-4 w-4" /></ToggleGroupItem>

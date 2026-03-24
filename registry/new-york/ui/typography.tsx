@@ -149,6 +149,85 @@ function TypographyMuted({
   )
 }
 
+function TypographyTable({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div className={cn("my-6 w-full overflow-y-auto", className)} {...props}>
+      <table className="w-full">
+        {children}
+      </table>
+    </div>
+  )
+}
+
+function TypographyTr({
+  className,
+  ...props
+}: React.ComponentProps<"tr">) {
+  return (
+    <tr
+      className={cn("m-0 border-t p-0 even:bg-muted", className)}
+      {...props}
+    />
+  )
+}
+
+function TypographyTh({
+  className,
+  ...props
+}: React.ComponentProps<"th">) {
+  return (
+    <th
+      className={cn(
+        "border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function TypographyTd({
+  className,
+  ...props
+}: React.ComponentProps<"td">) {
+  return (
+    <td
+      className={cn(
+        "border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function TypographyList({
+  className,
+  ordered = false,
+  children,
+  ...props
+}: Omit<React.ComponentProps<"ul">, "ref"> & { ordered?: boolean }) {
+  return ordered ? (
+    <ol
+      className={cn("my-6 ml-6 list-decimal [&>li]:mt-2", className)}
+      {...(props as React.ComponentProps<"ol">)}
+    >
+      {children}
+    </ol>
+  ) : (
+    <ul
+      className={cn("my-6 ml-6 list-disc [&>li]:mt-2", className)}
+      {...props}
+    >
+      {children}
+    </ul>
+  )
+}
+
 export {
   TypographyH1,
   TypographyH2,
@@ -161,4 +240,9 @@ export {
   TypographyLarge,
   TypographySmall,
   TypographyMuted,
+  TypographyTable,
+  TypographyTr,
+  TypographyTh,
+  TypographyTd,
+  TypographyList,
 }

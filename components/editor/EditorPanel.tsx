@@ -32,9 +32,9 @@ export function EditorPanel({
   const [historyOpen, setHistoryOpen] = React.useState(true);
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
-    { id: "colors", label: "색상", icon: <Palette className="w-3.5 h-3.5" /> },
-    { id: "typography", label: "타이포", icon: <Type className="w-3.5 h-3.5" /> },
-    { id: "layout", label: "레이아웃", icon: <Layout className="w-3.5 h-3.5" /> },
+    { id: "colors", label: "Colors", icon: <Palette className="w-3.5 h-3.5" /> },
+    { id: "typography", label: "Type", icon: <Type className="w-3.5 h-3.5" /> },
+    { id: "layout", label: "Layout", icon: <Layout className="w-3.5 h-3.5" /> },
   ];
 
   function formatTimeAgo(date: Date): string {
