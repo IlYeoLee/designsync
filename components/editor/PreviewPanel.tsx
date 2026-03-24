@@ -69,7 +69,7 @@ import { Kbd } from "@/registry/new-york/ui/kbd";
 import { Empty, EmptyIcon, EmptyTitle, EmptyDescription, EmptyActions } from "@/registry/new-york/ui/empty";
 import { Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions } from "@/registry/new-york/ui/item";
 
-import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as CalendarIcon, Smile, Settings, User, LayoutDashboard, FileText, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, ChevronsUpDown, ChevronDown, Mail, Download, Plus, Heart, Search, X, Check, ArrowRight, Bell, Star, Trash2, Edit, Eye, Upload, Filter, Menu, LogOut, Sun, Moon, Zap, PanelLeft, PanelLeftClose } from "lucide-react";
+import { getIconMap } from "@/lib/icon-map";
 
 type PreviewCategory = "form" | "overlay" | "navigation" | "display" | "feedback";
 
@@ -83,7 +83,9 @@ const PREVIEW_CATEGORIES: { id: PreviewCategory; label: string }[] = [
 
 // ─── Form ──────────────────────────────────────────────────────────────────────
 
-function FormPreview() {
+type IconMap = ReturnType<typeof getIconMap>;
+
+function FormPreview({ icons }: { icons: IconMap }) {
   const [sliderVal, setSliderVal] = React.useState([50]);
   const [checked, setChecked] = React.useState(false);
   const [switched, setSwitched] = React.useState(false);
@@ -113,11 +115,11 @@ function FormPreview() {
           <Button disabled>비활성</Button>
         </div>
         <div className="flex flex-wrap gap-2 mt-2">
-          <Button><Mail className="w-4 h-4" /> 메일 보내기</Button>
-          <Button variant="outline"><Download className="w-4 h-4" /> 다운로드</Button>
-          <Button variant="secondary"><Plus className="w-4 h-4" /> 추가</Button>
-          <Button size="icon" variant="outline"><Settings className="w-4 h-4" /><span className="sr-only">설정</span></Button>
-          <Button size="icon" variant="ghost"><Heart className="w-4 h-4" /><span className="sr-only">좋아요</span></Button>
+          <Button><icons.mail className="w-4 h-4" /> 메일 보내기</Button>
+          <Button variant="outline"><icons.download className="w-4 h-4" /> 다운로드</Button>
+          <Button variant="secondary"><icons.plus className="w-4 h-4" /> 추가</Button>
+          <Button size="icon" variant="outline"><icons.settings className="w-4 h-4" /><span className="sr-only">설정</span></Button>
+          <Button size="icon" variant="ghost"><icons.heart className="w-4 h-4" /><span className="sr-only">좋아요</span></Button>
         </div>
       </div>
 
@@ -371,7 +373,7 @@ function FormPreview() {
 
 // ─── Overlay ───────────────────────────────────────────────────────────────────
 
-function OverlayPreview() {
+function OverlayPreview({ icons }: { icons: IconMap }) {
   return (
     <div className="space-y-6">
       {/* Drawer */}
@@ -421,27 +423,27 @@ function OverlayPreview() {
             <CommandEmpty>결과가 없습니다.</CommandEmpty>
             <CommandGroup heading="추천">
               <CommandItem>
-                <CalendarIcon className="mr-2 h-4 w-4" />
+                <icons.calendar className="mr-2 h-4 w-4" />
                 <span>캘린더</span>
               </CommandItem>
               <CommandItem>
-                <Smile className="mr-2 h-4 w-4" />
+                <icons.smile className="mr-2 h-4 w-4" />
                 <span>이모지 검색</span>
               </CommandItem>
               <CommandItem>
-                <Calculator className="mr-2 h-4 w-4" />
+                <icons.calculator className="mr-2 h-4 w-4" />
                 <span>계산기</span>
               </CommandItem>
             </CommandGroup>
             <CommandSeparator />
             <CommandGroup heading="설정">
               <CommandItem>
-                <User className="mr-2 h-4 w-4" />
+                <icons.user className="mr-2 h-4 w-4" />
                 <span>프로필</span>
                 <CommandShortcut>⌘P</CommandShortcut>
               </CommandItem>
               <CommandItem>
-                <Settings className="mr-2 h-4 w-4" />
+                <icons.settings className="mr-2 h-4 w-4" />
                 <span>설정</span>
                 <CommandShortcut>⌘S</CommandShortcut>
               </CommandItem>
@@ -465,7 +467,7 @@ function OverlayPreview() {
             <ContextMenuLabel>작업</ContextMenuLabel>
             <ContextMenuSeparator />
             <ContextMenuItem>
-              <FileText className="mr-2 h-4 w-4" />
+              <icons.fileText className="mr-2 h-4 w-4" />
               열기
               <ContextMenuShortcut>⌘O</ContextMenuShortcut>
             </ContextMenuItem>
@@ -572,16 +574,16 @@ function OverlayPreview() {
         <h3 className="text-sm font-medium text-foreground mb-3">Dropdown Menu</h3>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline">메뉴 <ChevronDown className="ml-2 h-4 w-4" /></Button>
+            <Button variant="outline">메뉴 <icons.chevronDown className="ml-2 h-4 w-4" /></Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-48">
             <DropdownMenuLabel>내 계정</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" /> 프로필 <DropdownMenuShortcut>⌘P</DropdownMenuShortcut>
+              <icons.user className="mr-2 h-4 w-4" /> 프로필 <DropdownMenuShortcut>⌘P</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" /> 설정 <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+              <icons.settings className="mr-2 h-4 w-4" /> 설정 <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive focus:text-destructive">로그아웃</DropdownMenuItem>
@@ -633,7 +635,7 @@ function OverlayPreview() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="outline" size="icon" className="h-8 w-8">
-                  <Settings className="h-4 w-4" />
+                  <icons.settings className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -673,7 +675,7 @@ function OverlayPreview() {
       {/* Collapsible */}
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">Collapsible</h3>
-        <CollapsibleDemo />
+        <CollapsibleDemo icons={icons} />
       </div>
 
       <Separator />
@@ -734,14 +736,14 @@ function OverlayPreview() {
         <h3 className="text-sm font-medium text-foreground mb-3">Toggle & Toggle Group</h3>
         <div className="space-y-3">
           <div className="flex gap-2">
-            <Toggle variant="outline" aria-label="Bold"><Bold className="h-4 w-4" /></Toggle>
-            <Toggle variant="outline" aria-label="Italic"><Italic className="h-4 w-4" /></Toggle>
-            <Toggle variant="outline" aria-label="Underline"><Underline className="h-4 w-4" /></Toggle>
+            <Toggle variant="outline" aria-label="Bold"><icons.bold className="h-4 w-4" /></Toggle>
+            <Toggle variant="outline" aria-label="Italic"><icons.italic className="h-4 w-4" /></Toggle>
+            <Toggle variant="outline" aria-label="Underline"><icons.underline className="h-4 w-4" /></Toggle>
           </div>
           <ToggleGroup type="single" variant="outline" defaultValue="center">
-            <ToggleGroupItem value="left" aria-label="Left"><AlignLeft className="h-4 w-4" /></ToggleGroupItem>
-            <ToggleGroupItem value="center" aria-label="Center"><AlignCenter className="h-4 w-4" /></ToggleGroupItem>
-            <ToggleGroupItem value="right" aria-label="Right"><AlignRight className="h-4 w-4" /></ToggleGroupItem>
+            <ToggleGroupItem value="left" aria-label="Left"><icons.alignLeft className="h-4 w-4" /></ToggleGroupItem>
+            <ToggleGroupItem value="center" aria-label="Center"><icons.alignCenter className="h-4 w-4" /></ToggleGroupItem>
+            <ToggleGroupItem value="right" aria-label="Right"><icons.alignRight className="h-4 w-4" /></ToggleGroupItem>
           </ToggleGroup>
         </div>
       </div>
@@ -779,7 +781,7 @@ function OverlayPreview() {
   );
 }
 
-function CollapsibleDemo() {
+function CollapsibleDemo({ icons }: { icons: IconMap }) {
   const [isOpen, setIsOpen] = React.useState(false);
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-72 space-y-2">
@@ -787,7 +789,7 @@ function CollapsibleDemo() {
         <h4 className="text-sm font-medium">즐겨찾기</h4>
         <CollapsibleTrigger asChild>
           <Button variant="ghost" size="sm" className="w-8 h-8 p-0">
-            <ChevronsUpDown className="h-4 w-4" />
+            <icons.chevronsUpDown className="h-4 w-4" />
           </Button>
         </CollapsibleTrigger>
       </div>
@@ -802,7 +804,7 @@ function CollapsibleDemo() {
 
 // ─── Navigation ────────────────────────────────────────────────────────────────
 
-function SidebarPreview() {
+function SidebarPreview({ icons }: { icons: IconMap }) {
   const [open, setOpen] = React.useState(true);
   return (
     <div>
@@ -818,7 +820,7 @@ function SidebarPreview() {
               <span className="text-sm font-semibold text-sidebar-foreground whitespace-nowrap">DesignSync</span>
             </div>
             <button onClick={() => setOpen(false)} className="p-1 rounded-md hover:bg-sidebar-accent text-sidebar-foreground/50 hover:text-sidebar-foreground transition-colors">
-              <PanelLeftClose className="w-4 h-4" />
+              <icons.panelLeftClose className="w-4 h-4" />
             </button>
           </div>
 
@@ -828,9 +830,9 @@ function SidebarPreview() {
               <span className="text-[10px] font-semibold text-sidebar-foreground/50 uppercase tracking-wider">메뉴</span>
             </div>
             {[
-              { icon: LayoutDashboard, label: "대시보드", active: true },
-              { icon: FileText, label: "문서", active: false },
-              { icon: CalendarIcon, label: "캘린더", active: false },
+              { icon: icons.dashboard, label: "대시보드", active: true },
+              { icon: icons.fileText, label: "문서", active: false },
+              { icon: icons.calendar, label: "캘린더", active: false },
             ].map(({ icon: Icon, label, active }) => (
               <div key={label} className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-xs cursor-default transition-colors ${active ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50"}`}>
                 <Icon className="w-3.5 h-3.5" />
@@ -844,8 +846,8 @@ function SidebarPreview() {
               <span className="text-[10px] font-semibold text-sidebar-foreground/50 uppercase tracking-wider">시스템</span>
             </div>
             {[
-              { icon: Settings, label: "설정", active: false },
-              { icon: Bell, label: "알림", active: false },
+              { icon: icons.settings, label: "설정", active: false },
+              { icon: icons.bell, label: "알림", active: false },
             ].map(({ icon: Icon, label, active }) => (
               <div key={label} className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-xs cursor-default transition-colors ${active ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50"}`}>
                 <Icon className="w-3.5 h-3.5" />
@@ -869,7 +871,7 @@ function SidebarPreview() {
         <div className="flex-1 bg-background p-4">
           {!open && (
             <button onClick={() => setOpen(true)} className="mb-3 p-1.5 rounded-md border border-border hover:bg-accent transition-colors">
-              <PanelLeft className="w-4 h-4" />
+              <icons.panelLeft className="w-4 h-4" />
             </button>
           )}
           <p className="text-xs font-medium text-foreground mb-1">메인 콘텐츠</p>
@@ -880,7 +882,7 @@ function SidebarPreview() {
   );
 }
 
-function NavigationPreview() {
+function NavigationPreview({ icons }: { icons: IconMap }) {
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -1009,7 +1011,7 @@ function NavigationPreview() {
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink href="#"><Home className="w-3.5 h-3.5" /></BreadcrumbLink>
+              <BreadcrumbLink href="#"><icons.home className="w-3.5 h-3.5" /></BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
@@ -1072,7 +1074,7 @@ function NavigationPreview() {
       <Separator />
 
       {/* Sidebar Preview (with toggle) */}
-      <SidebarPreview />
+      <SidebarPreview icons={icons} />
 
       <Separator />
 
@@ -1168,32 +1170,12 @@ const radialChartConfig = {
   value: { label: "완료율", color: "var(--brand-500)" },
 } satisfies ChartConfig;
 
-const ICON_LIST = [
-  { icon: Home, name: "Home" },
-  { icon: Settings, name: "Settings" },
-  { icon: User, name: "User" },
-  { icon: Search, name: "Search" },
-  { icon: Plus, name: "Plus" },
-  { icon: X, name: "X" },
-  { icon: Check, name: "Check" },
-  { icon: ChevronDown, name: "ChevronDown" },
-  { icon: ArrowRight, name: "ArrowRight" },
-  { icon: Bell, name: "Bell" },
-  { icon: Mail, name: "Mail" },
-  { icon: Heart, name: "Heart" },
-  { icon: Star, name: "Star" },
-  { icon: Trash2, name: "Trash2" },
-  { icon: Edit, name: "Edit" },
-  { icon: Eye, name: "Eye" },
-  { icon: Download, name: "Download" },
-  { icon: Upload, name: "Upload" },
-  { icon: Filter, name: "Filter" },
-  { icon: Menu, name: "Menu" },
-  { icon: LogOut, name: "LogOut" },
-  { icon: Sun, name: "Sun" },
-  { icon: Moon, name: "Moon" },
-  { icon: Zap, name: "Zap" },
-] as const;
+const ICON_SHOWCASE_KEYS: (keyof ReturnType<typeof getIconMap>)[] = [
+  "home", "settings", "user", "search", "plus", "x",
+  "check", "chevronDown", "arrowRight", "bell", "mail", "heart",
+  "star", "trash", "edit", "eye", "download", "upload",
+  "filter", "menu", "logout", "sun", "moon", "zap",
+];
 
 const DATA_TABLE_DATA = [
   { name: "김수현", email: "suhyun@example.com", role: "디자이너", status: "활성" },
@@ -1237,7 +1219,7 @@ function ProgressSkeletonPreview() {
   );
 }
 
-function DisplayPreview() {
+function DisplayPreview({ icons }: { icons: IconMap }) {
   return (
     <div className="space-y-6">
       {/* Typography */}
@@ -1305,7 +1287,7 @@ function DisplayPreview() {
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">Empty</h3>
         <Empty>
-          <EmptyIcon><FileText /></EmptyIcon>
+          <EmptyIcon><icons.fileText /></EmptyIcon>
           <EmptyTitle>데이터가 없습니다</EmptyTitle>
           <EmptyDescription>새 항목을 추가해보세요.</EmptyDescription>
           <EmptyActions>
@@ -1766,14 +1748,17 @@ function DisplayPreview() {
 
       {/* Icons */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-3">Icons (lucide-react)</h3>
+        <h3 className="text-sm font-medium text-foreground mb-3">Icons</h3>
         <div className="grid grid-cols-6 gap-3">
-          {ICON_LIST.map(({ icon: Icon, name }) => (
-            <div key={name} className="flex flex-col items-center gap-1.5 p-2 rounded-md hover:bg-muted transition-colors">
-              <Icon className="w-5 h-5 text-foreground" />
-              <span className="text-[10px] text-muted-foreground">{name}</span>
-            </div>
-          ))}
+          {ICON_SHOWCASE_KEYS.map((key) => {
+            const Icon = icons[key];
+            return (
+              <div key={key} className="flex flex-col items-center gap-1.5 p-2 rounded-md hover:bg-muted transition-colors">
+                <Icon className="w-5 h-5 text-foreground" />
+                <span className="text-[10px] text-muted-foreground">{key}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -1782,7 +1767,7 @@ function DisplayPreview() {
 
 // ─── Feedback ──────────────────────────────────────────────────────────────────
 
-function FeedbackPreview() {
+function FeedbackPreview({ icons }: { icons: IconMap }) {
   return (
     <div className="space-y-6">
       {/* Sonner */}
@@ -1823,21 +1808,21 @@ function FeedbackPreview() {
         <h3 className="text-sm font-medium text-foreground mb-3">Alert</h3>
         <div className="space-y-3">
           <Alert>
-            <Info className="h-4 w-4" />
+            <icons.info className="h-4 w-4" />
             <AlertTitle>안내</AlertTitle>
             <AlertDescription>계정이 성공적으로 업데이트되었습니다.</AlertDescription>
           </Alert>
           <Alert
             className="border-[var(--success-300)] bg-[var(--success-50)] dark:border-[var(--success-700)] dark:bg-[var(--success-900)]"
           >
-            <CheckCircle2 className="h-4 w-4 text-[var(--success-600)] dark:text-[var(--success-400)]" />
+            <icons.checkCircle className="h-4 w-4 text-[var(--success-600)] dark:text-[var(--success-400)]" />
             <AlertTitle className="text-[var(--success-800)] dark:text-[var(--success-100)]">성공</AlertTitle>
             <AlertDescription className="text-[var(--success-700)] dark:text-[var(--success-200)]">
               변경사항이 저장되고 성공적으로 배포되었습니다.
             </AlertDescription>
           </Alert>
           <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
+            <icons.alertCircle className="h-4 w-4" />
             <AlertTitle>오류</AlertTitle>
             <AlertDescription>서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.</AlertDescription>
           </Alert>
@@ -1849,8 +1834,9 @@ function FeedbackPreview() {
 
 // ─── Root ──────────────────────────────────────────────────────────────────────
 
-export function PreviewPanel() {
+export function PreviewPanel({ iconLibrary = "lucide" }: { iconLibrary?: string }) {
   const [category, setCategory] = React.useState<PreviewCategory>("form");
+  const icons = getIconMap(iconLibrary);
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-background">
@@ -1874,11 +1860,11 @@ export function PreviewPanel() {
 
       <div className="flex-1 overflow-y-auto p-6">
         <div className="max-w-2xl mx-auto">
-          {category === "form" && <FormPreview />}
-          {category === "overlay" && <OverlayPreview />}
-          {category === "navigation" && <NavigationPreview />}
-          {category === "display" && <DisplayPreview />}
-          {category === "feedback" && <FeedbackPreview />}
+          {category === "form" && <FormPreview icons={icons} />}
+          {category === "overlay" && <OverlayPreview icons={icons} />}
+          {category === "navigation" && <NavigationPreview icons={icons} />}
+          {category === "display" && <DisplayPreview icons={icons} />}
+          {category === "feedback" && <FeedbackPreview icons={icons} />}
         </div>
       </div>
     </div>

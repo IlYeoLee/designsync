@@ -322,7 +322,7 @@ export default function Home() {
           onIconLibraryChange={(lib: string) => setTokens((prev) => ({ ...prev, primitives: { ...prev.primitives, iconLibrary: lib } }))}
           history={history.slice(0, 3)}
         />
-        <PreviewPanel />
+        <PreviewPanel iconLibrary={tokens.primitives.iconLibrary} />
       </div>
     </div>
   );
