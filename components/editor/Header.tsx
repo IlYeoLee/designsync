@@ -159,7 +159,7 @@ export function EditorHeader({
           {isSaving ? (
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
           ) : saveSuccess ? (
-            <Check className="w-3.5 h-3.5 text-green-500" />
+            <Check className="w-3.5 h-3.5 text-[var(--success-500)]" />
           ) : (
             <Save className="w-3.5 h-3.5" />
           )}

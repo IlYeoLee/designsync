@@ -197,7 +197,7 @@ function fetchText(url) {
   console.log('');
   console.log('  Generated files:');
   console.log('    - ' + globalsPath + '     (design tokens + theme)');
-  console.log('    - components/ui/*    (48 UI components)');
+  console.log('    - components/ui/*    (61 UI components)');
   console.log('    - .cursorrules       (Cursor AI rules)');
   console.log('    - CLAUDE.md          (Claude Code AI rules)');
   console.log('    - .windsurfrules     (Windsurf AI rules)');
