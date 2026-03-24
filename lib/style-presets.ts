@@ -68,10 +68,10 @@ export const STYLE_PRESETS: StylePreset[] = [
       "--ds-card-padding": "1.5rem",        // 24px
       "--ds-section-gap": "1.5rem",          // 24px
       "--ds-internal-gap": "0.5rem",         // 8px
-      "--ds-button-radius": "9999px",
-      "--ds-input-radius": "9999px",
+      "--ds-button-radius": "9999px",        // pill buttons
+      "--ds-input-radius": "0.75rem",        // 12px — soft but not pill
       "--ds-card-radius": "1rem",            // 16px
-      "--ds-dialog-radius": "9999px",
+      "--ds-dialog-radius": "1.25rem",       // 20px — generous but contained
       "--ds-base-font-size": "0.875rem",    // 14px
       "--ds-focus-ring-width": "3px",
     },
