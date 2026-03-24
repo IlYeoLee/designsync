@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "font-roboto",
+  "type": "registry:style",
+  "description": "Roboto font — self-hosted from DesignSync CDN. Auto-injects @font-face into globals.css.",
+  "css": {
+    "@font-face": {
+      "font-family": "'Roboto'",
+      "font-style": "normal",
+      "font-weight": "100 900",
+      "font-display": "swap",
+      "src": "url('https://designsync-omega.vercel.app/fonts/roboto-variable.woff2') format('woff2')"
+    }
+  }
+}
