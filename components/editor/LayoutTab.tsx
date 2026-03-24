@@ -3,9 +3,18 @@
 import * as React from "react";
 import { TokenState } from "@/lib/tokens";
 
+const ICON_LIBRARIES = [
+  { id: "lucide", label: "Lucide", pkg: "lucide-react" },
+  { id: "tabler", label: "Tabler", pkg: "@tabler/icons-react" },
+  { id: "phosphor", label: "Phosphor", pkg: "@phosphor-icons/react" },
+  { id: "remix", label: "Remix", pkg: "remix-icon" },
+  { id: "hugeicons", label: "Hugeicons", pkg: "hugeicons-react" },
+] as const;
+
 interface LayoutTabProps {
   tokens: TokenState;
   onTokenChange: (variable: string, value: string) => void;
+  onIconLibraryChange: (library: string) => void;
 }
 
 const RADIUS_OPTIONS = [
@@ -152,7 +161,7 @@ function RadiusScaleSlider({
   );
 }
 
-export function LayoutTab({ tokens, onTokenChange }: LayoutTabProps) {
+export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange }: LayoutTabProps) {
   return (
     <div className="space-y-6 p-4">
       {/* Border Radius */}
@@ -268,6 +277,27 @@ export function LayoutTab({ tokens, onTokenChange }: LayoutTabProps) {
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* Icon Library */}
+      <div>
+        <p className="text-xs font-medium text-foreground mb-3">아이콘 라이브러리</p>
+        <div className="grid grid-cols-1 gap-1.5">
+          {ICON_LIBRARIES.map((lib) => (
+            <button
+              key={lib.id}
+              onClick={() => onIconLibraryChange(lib.id)}
+              className={`flex items-center justify-between px-3 py-2 rounded-md border text-xs transition-colors ${
+                tokens.primitives.iconLibrary === lib.id
+                  ? "border-primary bg-accent text-foreground font-medium"
+                  : "border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground"
+              }`}
+            >
+              <span>{lib.label}</span>
+              <code className="text-[10px] font-mono text-muted-foreground">{lib.pkg}</code>
+            </button>
+          ))}
         </div>
       </div>
 

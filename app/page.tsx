@@ -309,6 +309,7 @@ export default function Home() {
         onReset={handleReset}
         fontFamily={tokens.primitives.fontFamily}
         fontFamilyKo={tokens.primitives.fontFamilyKo}
+        iconLibrary={tokens.primitives.iconLibrary}
       />
       <div className="flex-1 flex overflow-hidden">
         <EditorPanel
@@ -318,6 +319,7 @@ export default function Home() {
           onSemanticChange={handleSemanticChange}
           onFontFamilyChange={handleFontFamilyChange}
           onFontFamilyKoChange={handleFontFamilyKoChange}
+          onIconLibraryChange={(lib: string) => setTokens((prev) => ({ ...prev, primitives: { ...prev.primitives, iconLibrary: lib } }))}
           history={history.slice(0, 3)}
         />
         <PreviewPanel />

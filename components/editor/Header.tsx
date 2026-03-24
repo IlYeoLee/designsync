@@ -22,6 +22,7 @@ interface EditorHeaderProps {
   onReset: () => void;
   fontFamily: string;
   fontFamilyKo: string;
+  iconLibrary: string;
 }
 
 export function EditorHeader({
@@ -35,6 +36,7 @@ export function EditorHeader({
   onReset,
   fontFamily,
   fontFamilyKo,
+  iconLibrary,
 }: EditorHeaderProps) {
   const [copyState, setCopyState] = React.useState<"idle" | "saving" | "copied">("idle");
   const [confirmReset, setConfirmReset] = React.useState(false);
@@ -62,6 +64,7 @@ export function EditorHeader({
       fontFamily: fontFamily !== "Geist" ? fontFamily : undefined,
       fontFamilyKo: fontFamilyKo || undefined,
       fontSansValue: fontSansValue || undefined,
+      iconLibrary: iconLibrary || "lucide",
       includeInstall: true,
     });
 

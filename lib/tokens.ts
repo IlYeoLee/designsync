@@ -19,6 +19,7 @@ export type TokenState = {
     spacing: Record<'1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16', string>;
     radius: Record<'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full', string>;
     shadows: Record<'sm' | 'md' | 'lg', string>;
+    iconLibrary: string;
   };
   semantic: {
     light: Record<string, string>;
@@ -142,6 +143,7 @@ export const DEFAULT_TOKENS: TokenState = {
       md: '0 4px 6px -1px oklch(0 0 0 / 0.10)',
       lg: '0 10px 15px -3px oklch(0 0 0 / 0.10)',
     },
+    iconLibrary: 'lucide',
   },
   semantic: {
     light: {

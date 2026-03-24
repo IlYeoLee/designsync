@@ -16,6 +16,7 @@ interface EditorPanelProps {
   onSemanticChange: (mode: "light" | "dark", key: string, value: string) => void;
   onFontFamilyChange: (font: string) => void;
   onFontFamilyKoChange: (font: string) => void;
+  onIconLibraryChange: (library: string) => void;
   history: HistoryEntry[];
 }
 
@@ -26,6 +27,7 @@ export function EditorPanel({
   onSemanticChange,
   onFontFamilyChange,
   onFontFamilyKoChange,
+  onIconLibraryChange,
   history,
 }: EditorPanelProps) {
   const [activeTab, setActiveTab] = React.useState<Tab>("colors");
@@ -87,6 +89,7 @@ export function EditorPanel({
           <LayoutTab
             tokens={tokens}
             onTokenChange={onTokenChange}
+            onIconLibraryChange={onIconLibraryChange}
           />
         )}
       </div>

@@ -9,6 +9,14 @@
 
 const CDN = "https://designsync-omega.vercel.app";
 
+const ICON_LIBRARY_INFO: Record<string, { name: string; pkg: string; importExample: string }> = {
+  lucide: { name: "Lucide", pkg: "lucide-react", importExample: 'import { Home, Settings, User, Search, Plus, X, Check } from "lucide-react"' },
+  tabler: { name: "Tabler Icons", pkg: "@tabler/icons-react", importExample: 'import { IconHome, IconSettings, IconUser, IconSearch, IconPlus, IconX, IconCheck } from "@tabler/icons-react"' },
+  phosphor: { name: "Phosphor Icons", pkg: "@phosphor-icons/react", importExample: 'import { House, Gear, User, MagnifyingGlass, Plus, X, Check } from "@phosphor-icons/react"' },
+  remix: { name: "Remix Icon", pkg: "remix-icon", importExample: 'import { RiHomeLine, RiSettings3Line, RiUserLine, RiSearchLine, RiAddLine, RiCloseLine, RiCheckLine } from "remix-icon"' },
+  hugeicons: { name: "Hugeicons", pkg: "hugeicons-react", importExample: 'import { Home01Icon, Settings01Icon, User01Icon, Search01Icon, Add01Icon, Cancel01Icon, Tick01Icon } from "hugeicons-react"' },
+};
+
 export interface RulesParams {
   /** e.g. "Poppins" — omit or "" for default */
   fontFamily?: string;
@@ -16,6 +24,8 @@ export interface RulesParams {
   fontFamilyKo?: string;
   /** Resolved CSS value, e.g. "'Poppins', 'Pretendard', sans-serif" */
   fontSansValue?: string;
+  /** Icon library id — e.g. "lucide", "tabler" */
+  iconLibrary?: string;
   /** Include the install command section (for clipboard prompt) */
   includeInstall?: boolean;
 }
@@ -25,8 +35,15 @@ export function generateRules(params: RulesParams = {}): string {
     fontFamily,
     fontFamilyKo,
     fontSansValue,
+    iconLibrary = "lucide",
     includeInstall = false,
   } = params;
+
+  const iconInfo = ICON_LIBRARY_INFO[iconLibrary] || ICON_LIBRARY_INFO.lucide;
+  const otherIconLibs = Object.values(ICON_LIBRARY_INFO)
+    .filter((lib) => lib.pkg !== iconInfo.pkg)
+    .map((lib) => lib.pkg)
+    .join(", ");
 
   // -- Dynamic font line --
   let fontLine = "";
@@ -127,14 +144,13 @@ ${fontSection}- 시맨틱 색상: var(--primary), var(--secondary), var(--accent
 - Toggle (variant="default|outline"), ToggleGroup (variant="outline"으로 테두리 표시), HoverCard, AspectRatio, RadioGroup, Resizable
 - Direction: <DirectionProvider direction="ltr|rtl"> — RTL/LTR 지원
 
-## ${n + 2}. 아이콘 (lucide-react)
-이 프로젝트는 lucide-react 아이콘 라이브러리를 사용한다. 모든 아이콘은 반드시 lucide-react에서 import한다.
-- \`import { Home, Settings, User, Search, Plus, X, Check, ChevronDown, ArrowRight, Bell, Mail, Heart, Star, Trash2, Edit, Eye, Download, Upload, Filter, Menu, LogOut, Sun, Moon } from "lucide-react"\`
+## ${n + 2}. 아이콘 (${iconInfo.name})
+이 프로젝트는 **${iconInfo.name}** (\`${iconInfo.pkg}\`) 아이콘 라이브러리를 사용한다. 모든 아이콘은 반드시 이 라이브러리에서 import한다.
+- \`${iconInfo.importExample}\`
 - 아이콘이 필요한 모든 곳에 적극적으로 사용 (버튼, 메뉴, 네비게이션, 리스트, 상태 표시 등)
 - 크기: className="w-4 h-4" (기본), "w-3.5 h-3.5" (작게), "w-5 h-5" (크게)
-- ❌ 금지: react-icons, heroicons, SVG 직접 작성, 이모지로 아이콘 대체
+- ❌ 금지: ${otherIconLibs}, react-icons, heroicons, SVG 직접 작성, 이모지로 아이콘 대체
 - ❌ 금지: 아이콘 없이 텍스트만으로 UI 구성 (아이콘을 적극 활용할 것)
-- 전체 아이콘 목록: https://lucide.dev/icons
 
 ## ${n + 3}. 필수 규칙 (위반 시 즉시 수정)
 
