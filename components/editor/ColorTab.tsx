@@ -11,7 +11,7 @@ const STEPS = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "90
 type Step = typeof STEPS[number];
 
 const SCALE_LABELS: Record<ColorScaleName, string> = {
-  brand: "브랜드", neutral: "중성", error: "오류", success: "성공", warning: "경고",
+  brand: "브랜드 컬러", neutral: "뉴트럴 컬러", error: "오류 컬러", success: "성공 컬러", warning: "경고 컬러",
 };
 
 // All primitive color var options for semantic dropdowns
@@ -36,6 +36,8 @@ const SEMANTIC_INFO: Record<string, { label: string; desc: string }> = {
   foreground:           { label: "foreground",            desc: "기본 텍스트" },
   card:                 { label: "card",                  desc: "카드 배경" },
   "card-foreground":    { label: "card-fg",               desc: "카드 텍스트" },
+  popover:              { label: "popover",               desc: "팝오버 배경" },
+  "popover-foreground": { label: "popover-fg",            desc: "팝오버 텍스트" },
   secondary:            { label: "secondary",             desc: "보조 배경" },
   "secondary-foreground": { label: "secondary-fg",        desc: "보조 텍스트" },
   muted:                { label: "muted",                 desc: "흐린 배경" },
@@ -47,6 +49,9 @@ const SEMANTIC_INFO: Record<string, { label: string; desc: string }> = {
   input:                { label: "input",                 desc: "입력 테두리" },
   ring:                 { label: "ring",                  desc: "포커스 링" },
 };
+
+// Non-color semantic tokens to hide from the color editor
+const SEMANTIC_SKIP = new Set(["radius"]);
 
 interface ColorTabProps {
   tokens: TokenState;
@@ -456,7 +461,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
             </div>
 
             <div className="space-y-1.5">
-              {Object.entries(semanticTokens).map(([key, value]) => {
+              {Object.entries(semanticTokens).filter(([key]) => !SEMANTIC_SKIP.has(key)).map(([key, value]) => {
                 const info = SEMANTIC_INFO[key];
                 return (
                   <div key={key} className="flex items-center gap-2">

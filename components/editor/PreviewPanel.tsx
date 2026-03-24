@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { toast } from "sonner";
+import { ko } from "date-fns/locale";
 import { Bar, BarChart, Line, LineChart, XAxis, YAxis } from "recharts";
 
 // Existing components
@@ -141,7 +142,7 @@ function FormPreview() {
 
       {/* Checkbox & Switch */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-3">컨트롤</h3>
+        <h3 className="text-sm font-medium text-foreground mb-3">Controls</h3>
         <div className="space-y-3">
           <div className="flex items-center gap-2">
             <Checkbox
@@ -184,9 +185,10 @@ function FormPreview() {
 
       {/* Calendar */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-3">Calendar</h3>
+        <h3 className="text-sm font-medium text-foreground mb-3">캘린더</h3>
         <Calendar
           mode="single"
+          locale={ko}
           selected={date}
           onSelect={setDate}
           className="rounded-md border border-border w-fit"
