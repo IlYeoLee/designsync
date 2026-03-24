@@ -48,6 +48,7 @@ import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuLabel, Con
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/registry/new-york/ui/drawer";
 import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/registry/new-york/ui/input-otp";
 import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarTrigger } from "@/registry/new-york/ui/menubar";
+import { Header, HeaderLogo, HeaderNav, HeaderNavLink, HeaderActions, HeaderMobileNav, HeaderMobileNavLink } from "@/registry/new-york/ui/header";
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/registry/new-york/ui/navigation-menu";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/registry/new-york/ui/resizable";
 import { Toaster } from "@/registry/new-york/ui/sonner";
@@ -634,6 +635,37 @@ function CollapsibleDemo() {
 function NavigationPreview() {
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Header</h3>
+        <div className="rounded-md border border-border overflow-hidden">
+          <Header>
+            <HeaderLogo href="#">
+              <div className="w-6 h-6 rounded-md bg-primary flex items-center justify-center">
+                <span className="text-primary-foreground text-[10px] font-bold">A</span>
+              </div>
+              <span>AppName</span>
+            </HeaderLogo>
+            <HeaderNav>
+              <HeaderNavLink href="#" active>대시보드</HeaderNavLink>
+              <HeaderNavLink href="#">프로젝트</HeaderNavLink>
+              <HeaderNavLink href="#">설정</HeaderNavLink>
+            </HeaderNav>
+            <HeaderActions>
+              <Button variant="outline" size="sm">로그인</Button>
+              <Button size="sm">시작하기</Button>
+            </HeaderActions>
+            <HeaderMobileNav title="메뉴">
+              <HeaderMobileNavLink href="#" active>대시보드</HeaderMobileNavLink>
+              <HeaderMobileNavLink href="#">프로젝트</HeaderMobileNavLink>
+              <HeaderMobileNavLink href="#">설정</HeaderMobileNavLink>
+            </HeaderMobileNav>
+          </Header>
+        </div>
+      </div>
+
+      <Separator />
+
       {/* Menubar */}
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">Menubar</h3>

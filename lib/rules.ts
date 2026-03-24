@@ -92,6 +92,7 @@ ${fontSection}- 색상: var(--primary), var(--secondary), var(--accent), var(--d
 - Tabs, Accordion, Collapsible, NavigationMenu, Menubar, Sidebar
 - Table, Badge, Avatar, Progress, Skeleton, Separator, ScrollArea
 - Calendar, Carousel, Chart, Command, Breadcrumb, Pagination, InputOTP
+- Header: <Header> <HeaderLogo> <HeaderNav> <HeaderNavLink> <HeaderActions> <HeaderMobileNav> <HeaderMobileNavLink>
 - Toggle, ToggleGroup, HoverCard, AspectRatio, RadioGroup, Resizable
 
 ## ${n + 2}. 필수 규칙 (위반 시 즉시 수정)
@@ -118,7 +119,7 @@ ${fontSection}- 색상: var(--primary), var(--secondary), var(--accent), var(--d
 - <p className="text-muted-foreground"> 대신 → <TypographyMuted> 사용
 - Button 크기는 반드시 size prop ("sm" | "default" | "lg" | "icon") — className으로 h-12, px-8 등 금지
 - Input 높이는 기본값 유지 — className으로 높이 변경 금지
-- 커스텀 aside/nav 만들지 말고 <Sidebar>, <NavigationMenu> 사용
+- 커스텀 header/aside/nav 만들지 말고 <Header>, <Sidebar>, <NavigationMenu> 사용
 - 모달은 <Dialog> 또는 <Sheet> 사용 — 커스텀 모달 금지
 - 토스트/알림은 <Sonner> 사용
 

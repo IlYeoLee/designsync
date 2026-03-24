@@ -632,6 +632,14 @@
       "files": [{"path": "registry/new-york/ui/typography.tsx", "type": "registry:ui"}]
     },
     {
+      "name": "header",
+      "type": "registry:ui",
+      "title": "Header",
+      "description": "Composable top navigation bar with logo, nav links, actions, and mobile menu. Uses Button and Sheet internally.",
+      "registryDependencies": ["button", "sheet"],
+      "files": [{"path": "registry/new-york/ui/header.tsx", "type": "registry:ui"}]
+    },
+    {
       "name": "designsync-all",
       "type": "registry:ui",
       "title": "DesignSync All Components",
@@ -684,7 +692,8 @@
         "https://designsync-omega.vercel.app/r/resizable.json",
         "https://designsync-omega.vercel.app/r/sidebar.json",
         "https://designsync-omega.vercel.app/r/sonner.json",
-        "https://designsync-omega.vercel.app/r/typography.json"
+        "https://designsync-omega.vercel.app/r/typography.json",
+        "https://designsync-omega.vercel.app/r/header.json"
       ],
       "files": []
     }
