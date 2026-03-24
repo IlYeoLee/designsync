@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "button-group",
+  "type": "registry:ui",
+  "title": "Button Group",
+  "description": "Groups related buttons with consistent styling, horizontal or vertical orientation.",
+  "registryDependencies": [
+    "button"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/ui/button-group.tsx",
+      "content": "import * as React from \"react\"\n\nimport { cn } from \"@/lib/utils\"\n\nfunction ButtonGroup({\n  className,\n  orientation = \"horizontal\",\n  children,\n  ...props\n}: React.ComponentProps<\"div\"> & {\n  orientation?: \"horizontal\" | \"vertical\"\n}) {\n  return (\n    <div\n      data-slot=\"button-group\"\n      data-orientation={orientation}\n      role=\"group\"\n      className={cn(\n        \"inline-flex\",\n        orientation === \"horizontal\"\n          ? \"flex-row -space-x-px [&>button]:rounded-none [&>button:first-child]:rounded-l-md [&>button:last-child]:rounded-r-md\"\n          : \"flex-col -space-y-px [&>button]:rounded-none [&>button:first-child]:rounded-t-md [&>button:last-child]:rounded-b-md\",\n        className\n      )}\n      {...props}\n    >\n      {children}\n    </div>\n  )\n}\n\nfunction ButtonGroupSeparator({\n  className,\n  orientation = \"horizontal\",\n  ...props\n}: React.ComponentProps<\"div\"> & {\n  orientation?: \"horizontal\" | \"vertical\"\n}) {\n  return (\n    <div\n      data-slot=\"button-group-separator\"\n      className={cn(\n        \"bg-border\",\n        orientation === \"horizontal\" ? \"w-px self-stretch\" : \"h-px self-stretch\",\n        className\n      )}\n      {...props}\n    />\n  )\n}\n\nexport { ButtonGroup, ButtonGroupSeparator }\n",
+      "type": "registry:ui"
+    }
+  ]
+}

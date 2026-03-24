@@ -54,6 +54,17 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/registry
 import { Toaster } from "@/registry/new-york/ui/sonner";
 import { TypographyH1, TypographyH2, TypographyH3, TypographyH4, TypographyP, TypographyBlockquote, TypographyCode, TypographyLead, TypographyMuted } from "@/registry/new-york/ui/typography";
 
+// B-category components
+import { Combobox } from "@/registry/new-york/ui/combobox";
+import { ButtonGroup } from "@/registry/new-york/ui/button-group";
+import { Field, FieldDescription } from "@/registry/new-york/ui/field";
+import { InputGroup, InputGroupAddon } from "@/registry/new-york/ui/input-group";
+import { Spinner } from "@/registry/new-york/ui/spinner";
+import { NativeSelect } from "@/registry/new-york/ui/native-select";
+import { Kbd } from "@/registry/new-york/ui/kbd";
+import { Empty, EmptyIcon, EmptyTitle, EmptyDescription, EmptyActions } from "@/registry/new-york/ui/empty";
+import { Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions } from "@/registry/new-york/ui/item";
+
 import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as CalendarIcon, Smile, Settings, User, LayoutDashboard, FileText, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, ChevronsUpDown, ChevronDown } from "lucide-react";
 
 type PreviewCategory = "form" | "overlay" | "navigation" | "display" | "feedback";
@@ -74,6 +85,8 @@ function FormPreview() {
   const [switched, setSwitched] = React.useState(false);
   const [otpValue, setOtpValue] = React.useState("");
   const [date, setDate] = React.useState<Date | undefined>(new Date());
+  const [comboValue, setComboValue] = React.useState("");
+  const [comboMultiValue, setComboMultiValue] = React.useState<string[]>([]);
 
   return (
     <div className="space-y-6">
@@ -194,6 +207,131 @@ function FormPreview() {
           onSelect={setDate}
           className="rounded-md border border-border w-fit"
         />
+      </div>
+
+      <Separator />
+
+      {/* Combobox */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Combobox</h3>
+        <div className="space-y-4 max-w-sm">
+          <div className="space-y-1.5">
+            <Label>프레임워크 선택</Label>
+            <Combobox
+              options={[
+                { value: "react", label: "React" },
+                { value: "vue", label: "Vue" },
+                { value: "svelte", label: "Svelte" },
+                { value: "angular", label: "Angular" },
+              ]}
+              value={comboValue}
+              onValueChange={setComboValue}
+              placeholder="프레임워크를 선택하세요"
+              searchPlaceholder="검색..."
+              emptyMessage="결과가 없습니다."
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>태그 선택 (다중)</Label>
+            <Combobox
+              options={[
+                { value: "design", label: "디자인" },
+                { value: "dev", label: "개발" },
+                { value: "marketing", label: "마케팅" },
+                { value: "planning", label: "기획" },
+              ]}
+              value={comboMultiValue}
+              onValueChange={setComboMultiValue}
+              multiple
+              placeholder="태그를 선택하세요"
+              searchPlaceholder="검색..."
+              emptyMessage="결과가 없습니다."
+            />
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* ButtonGroup */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Button Group</h3>
+        <ButtonGroup>
+          <Button variant="outline">왼쪽</Button>
+          <Button variant="outline">가운데</Button>
+          <Button variant="outline">오른쪽</Button>
+        </ButtonGroup>
+      </div>
+
+      <Separator />
+
+      {/* Field */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Field</h3>
+        <div className="max-w-sm">
+          <Field>
+            <Label htmlFor="field-email">이메일</Label>
+            <Input id="field-email" type="email" placeholder="email@example.com" />
+            <FieldDescription>이메일 주소를 입력하세요</FieldDescription>
+          </Field>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* InputGroup */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Input Group</h3>
+        <div className="max-w-sm">
+          <InputGroup>
+            <InputGroupAddon>https://</InputGroupAddon>
+            <Input placeholder="example" />
+            <InputGroupAddon>.com</InputGroupAddon>
+          </InputGroup>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Spinner */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Spinner</h3>
+        <div className="flex items-center gap-4">
+          <Spinner size="sm" />
+          <Spinner />
+          <Spinner size="lg" />
+          <Spinner size="xl" />
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* NativeSelect */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Native Select</h3>
+        <div className="max-w-sm">
+          <NativeSelect defaultValue="">
+            <option value="" disabled>선택하세요</option>
+            <option value="1">옵션 1</option>
+            <option value="2">옵션 2</option>
+            <option value="3">옵션 3</option>
+          </NativeSelect>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Kbd */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Kbd</h3>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1">
+            <Kbd>⌘</Kbd><Kbd>K</Kbd>
+          </div>
+          <div className="flex items-center gap-1">
+            <Kbd>Ctrl</Kbd><Kbd>C</Kbd>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -891,6 +1029,66 @@ function DisplayPreview() {
           </TypographyBlockquote>
           <TypographyCode>npm install @designsync/ui</TypographyCode>
           <TypographyMuted>보조 정보를 위한 흐린 텍스트입니다.</TypographyMuted>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Empty */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Empty</h3>
+        <Empty>
+          <EmptyIcon><FileText /></EmptyIcon>
+          <EmptyTitle>데이터가 없습니다</EmptyTitle>
+          <EmptyDescription>새 항목을 추가해보세요.</EmptyDescription>
+          <EmptyActions>
+            <Button>추가하기</Button>
+          </EmptyActions>
+        </Empty>
+      </div>
+
+      <Separator />
+
+      {/* Item */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Item</h3>
+        <div className="rounded-md border border-border divide-y divide-border">
+          <Item>
+            <ItemMedia>
+              <Avatar><AvatarFallback>김</AvatarFallback></Avatar>
+            </ItemMedia>
+            <ItemContent>
+              <ItemTitle>김수현</ItemTitle>
+              <ItemDescription>프론트엔드 개발자</ItemDescription>
+            </ItemContent>
+            <ItemActions>
+              <Button variant="outline" size="sm">보기</Button>
+            </ItemActions>
+          </Item>
+          <Item>
+            <ItemMedia>
+              <Avatar><AvatarFallback>이</AvatarFallback></Avatar>
+            </ItemMedia>
+            <ItemContent>
+              <ItemTitle>이준호</ItemTitle>
+              <ItemDescription>디자이너</ItemDescription>
+            </ItemContent>
+            <ItemActions>
+              <Button variant="outline" size="sm">보기</Button>
+            </ItemActions>
+          </Item>
+          <Item>
+            <ItemMedia>
+              <Avatar><AvatarFallback>왕</AvatarFallback></Avatar>
+            </ItemMedia>
+            <ItemContent>
+              <ItemTitle>왕서연</ItemTitle>
+              <ItemDescription>프로젝트 매니저</ItemDescription>
+            </ItemContent>
+            <ItemActions>
+              <Button variant="outline" size="sm">보기</Button>
+            </ItemActions>
+          </Item>
         </div>
       </div>
 

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "spinner",
+  "type": "registry:ui",
+  "title": "Spinner",
+  "description": "Loading indicator with size variants.",
+  "dependencies": [
+    "class-variance-authority"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/ui/spinner.tsx",
+      "content": "import * as React from \"react\"\nimport { cva, type VariantProps } from \"class-variance-authority\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst spinnerVariants = cva(\n  \"animate-spin text-muted-foreground\",\n  {\n    variants: {\n      size: {\n        default: \"size-4\",\n        sm: \"size-3\",\n        lg: \"size-6\",\n        xl: \"size-8\",\n      },\n    },\n    defaultVariants: {\n      size: \"default\",\n    },\n  }\n)\n\nfunction Spinner({\n  className,\n  size,\n  ...props\n}: React.ComponentProps<\"svg\"> & VariantProps<typeof spinnerVariants>) {\n  return (\n    <svg\n      data-slot=\"spinner\"\n      xmlns=\"http://www.w3.org/2000/svg\"\n      fill=\"none\"\n      viewBox=\"0 0 24 24\"\n      className={cn(spinnerVariants({ size, className }))}\n      {...props}\n    >\n      <circle\n        className=\"opacity-25\"\n        cx=\"12\"\n        cy=\"12\"\n        r=\"10\"\n        stroke=\"currentColor\"\n        strokeWidth=\"4\"\n      />\n      <path\n        className=\"opacity-75\"\n        fill=\"currentColor\"\n        d=\"M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z\"\n      />\n    </svg>\n  )\n}\n\nexport { Spinner, spinnerVariants }\n",
+      "type": "registry:ui"
+    }
+  ]
+}

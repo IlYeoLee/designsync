@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "kbd",
+  "type": "registry:ui",
+  "title": "Kbd",
+  "description": "Displays keyboard shortcut text.",
+  "files": [
+    {
+      "path": "registry/new-york/ui/kbd.tsx",
+      "content": "import * as React from \"react\"\n\nimport { cn } from \"@/lib/utils\"\n\nfunction Kbd({\n  className,\n  children,\n  ...props\n}: React.ComponentProps<\"kbd\">) {\n  return (\n    <kbd\n      data-slot=\"kbd\"\n      className={cn(\n        \"inline-flex h-5 items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground select-none\",\n        className\n      )}\n      {...props}\n    >\n      {children}\n    </kbd>\n  )\n}\n\nexport { Kbd }\n",
+      "type": "registry:ui"
+    }
+  ]
+}

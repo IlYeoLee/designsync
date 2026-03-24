@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "native-select",
+  "type": "registry:ui",
+  "title": "Native Select",
+  "description": "Styled native HTML select element with consistent design tokens.",
+  "dependencies": [
+    "class-variance-authority"
+  ],
+  "files": [
+    {
+      "path": "registry/new-york/ui/native-select.tsx",
+      "content": "import * as React from \"react\"\nimport { cva, type VariantProps } from \"class-variance-authority\"\nimport { ChevronDownIcon } from \"lucide-react\"\n\nimport { cn } from \"@/lib/utils\"\n\nconst nativeSelectVariants = cva(\n  \"flex w-full appearance-none rounded-md border border-input bg-background text-foreground shadow-xs transition-colors focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50\",\n  {\n    variants: {\n      size: {\n        default: \"h-9 px-3 py-1 text-sm\",\n        sm: \"h-8 px-2 py-1 text-xs\",\n        lg: \"h-10 px-4 py-2 text-sm\",\n      },\n    },\n    defaultVariants: {\n      size: \"default\",\n    },\n  }\n)\n\nfunction NativeSelect({\n  className,\n  size,\n  children,\n  ...props\n}: React.ComponentProps<\"select\"> & VariantProps<typeof nativeSelectVariants>) {\n  return (\n    <div data-slot=\"native-select\" className=\"relative\">\n      <select\n        className={cn(nativeSelectVariants({ size, className }), \"pr-8\")}\n        {...props}\n      >\n        {children}\n      </select>\n      <ChevronDownIcon className=\"pointer-events-none absolute right-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground\" />\n    </div>\n  )\n}\n\nexport { NativeSelect, nativeSelectVariants }\n",
+      "type": "registry:ui"
+    }
+  ]
+}

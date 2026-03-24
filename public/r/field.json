@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "field",
+  "type": "registry:ui",
+  "title": "Field",
+  "description": "Combines label, control, description and error message for accessible form fields.",
+  "files": [
+    {
+      "path": "registry/new-york/ui/field.tsx",
+      "content": "import * as React from \"react\"\n\nimport { cn } from \"@/lib/utils\"\n\nfunction Field({\n  className,\n  children,\n  ...props\n}: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"field\"\n      className={cn(\"space-y-2\", className)}\n      {...props}\n    >\n      {children}\n    </div>\n  )\n}\n\nfunction FieldDescription({\n  className,\n  ...props\n}: React.ComponentProps<\"p\">) {\n  return (\n    <p\n      data-slot=\"field-description\"\n      className={cn(\"text-xs text-muted-foreground\", className)}\n      {...props}\n    />\n  )\n}\n\nfunction FieldError({\n  className,\n  ...props\n}: React.ComponentProps<\"p\">) {\n  return (\n    <p\n      data-slot=\"field-error\"\n      className={cn(\"text-xs text-destructive\", className)}\n      {...props}\n    />\n  )\n}\n\nexport { Field, FieldDescription, FieldError }\n",
+      "type": "registry:ui"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "input-group",
+  "type": "registry:ui",
+  "title": "Input Group",
+  "description": "Adds addons and helper content to inputs.",
+  "files": [
+    {
+      "path": "registry/new-york/ui/input-group.tsx",
+      "content": "import * as React from \"react\"\n\nimport { cn } from \"@/lib/utils\"\n\nfunction InputGroup({\n  className,\n  children,\n  ...props\n}: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"input-group\"\n      className={cn(\n        \"flex items-center rounded-md border border-input bg-background shadow-xs focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50\",\n        \"[&>input]:border-0 [&>input]:shadow-none [&>input]:focus-visible:ring-0 [&>input]:focus-visible:border-transparent\",\n        \"[&>textarea]:border-0 [&>textarea]:shadow-none [&>textarea]:focus-visible:ring-0\",\n        className\n      )}\n      {...props}\n    >\n      {children}\n    </div>\n  )\n}\n\nfunction InputGroupAddon({\n  className,\n  children,\n  ...props\n}: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"input-group-addon\"\n      className={cn(\n        \"flex items-center px-3 text-sm text-muted-foreground select-none shrink-0\",\n        className\n      )}\n      {...props}\n    >\n      {children}\n    </div>\n  )\n}\n\nexport { InputGroup, InputGroupAddon }\n",
+      "type": "registry:ui"
+    }
+  ]
+}

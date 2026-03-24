@@ -1,0 +1,14 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "direction",
+  "type": "registry:ui",
+  "title": "Direction",
+  "description": "Provider component for RTL/LTR text direction.",
+  "files": [
+    {
+      "path": "registry/new-york/ui/direction.tsx",
+      "content": "\"use client\"\n\nimport * as React from \"react\"\n\ntype Direction = \"ltr\" | \"rtl\"\n\nconst DirectionContext = React.createContext<Direction>(\"ltr\")\n\nfunction DirectionProvider({\n  direction = \"ltr\",\n  children,\n}: {\n  direction?: Direction\n  children: React.ReactNode\n}) {\n  return (\n    <DirectionContext.Provider value={direction}>\n      <div data-slot=\"direction\" dir={direction}>\n        {children}\n      </div>\n    </DirectionContext.Provider>\n  )\n}\n\nfunction useDirection(): Direction {\n  return React.useContext(DirectionContext)\n}\n\nexport { DirectionProvider, useDirection, type Direction }\n",
+      "type": "registry:ui"
+    }
+  ]
+}

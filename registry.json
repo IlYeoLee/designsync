@@ -632,6 +632,80 @@
       "files": [{"path": "registry/new-york/ui/typography.tsx", "type": "registry:ui"}]
     },
     {
+      "name": "combobox",
+      "type": "registry:ui",
+      "title": "Combobox",
+      "description": "Autocomplete select with search, supports single and multi-select with chips.",
+      "registryDependencies": ["button", "command", "popover", "badge"],
+      "files": [{"path": "registry/new-york/ui/combobox.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "button-group",
+      "type": "registry:ui",
+      "title": "Button Group",
+      "description": "Groups related buttons with consistent styling, horizontal or vertical orientation.",
+      "registryDependencies": ["button"],
+      "files": [{"path": "registry/new-york/ui/button-group.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "field",
+      "type": "registry:ui",
+      "title": "Field",
+      "description": "Combines label, control, description and error message for accessible form fields.",
+      "files": [{"path": "registry/new-york/ui/field.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "input-group",
+      "type": "registry:ui",
+      "title": "Input Group",
+      "description": "Adds addons and helper content to inputs.",
+      "files": [{"path": "registry/new-york/ui/input-group.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "spinner",
+      "type": "registry:ui",
+      "title": "Spinner",
+      "description": "Loading indicator with size variants.",
+      "dependencies": ["class-variance-authority"],
+      "files": [{"path": "registry/new-york/ui/spinner.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "empty",
+      "type": "registry:ui",
+      "title": "Empty",
+      "description": "Empty state placeholder with icon, title, description and actions.",
+      "files": [{"path": "registry/new-york/ui/empty.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "item",
+      "type": "registry:ui",
+      "title": "Item",
+      "description": "Versatile component for displaying content with media, title, description and actions.",
+      "files": [{"path": "registry/new-york/ui/item.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "native-select",
+      "type": "registry:ui",
+      "title": "Native Select",
+      "description": "Styled native HTML select element with consistent design tokens.",
+      "dependencies": ["class-variance-authority"],
+      "files": [{"path": "registry/new-york/ui/native-select.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "kbd",
+      "type": "registry:ui",
+      "title": "Kbd",
+      "description": "Displays keyboard shortcut text.",
+      "files": [{"path": "registry/new-york/ui/kbd.tsx", "type": "registry:ui"}]
+    },
+    {
+      "name": "direction",
+      "type": "registry:ui",
+      "title": "Direction",
+      "description": "Provider component for RTL/LTR text direction.",
+      "files": [{"path": "registry/new-york/ui/direction.tsx", "type": "registry:ui"}]
+    },
+    {
       "name": "header",
       "type": "registry:ui",
       "title": "Header",
@@ -693,7 +767,17 @@
         "https://designsync-omega.vercel.app/r/sidebar.json",
         "https://designsync-omega.vercel.app/r/sonner.json",
         "https://designsync-omega.vercel.app/r/typography.json",
-        "https://designsync-omega.vercel.app/r/header.json"
+        "https://designsync-omega.vercel.app/r/header.json",
+        "https://designsync-omega.vercel.app/r/combobox.json",
+        "https://designsync-omega.vercel.app/r/button-group.json",
+        "https://designsync-omega.vercel.app/r/field.json",
+        "https://designsync-omega.vercel.app/r/input-group.json",
+        "https://designsync-omega.vercel.app/r/spinner.json",
+        "https://designsync-omega.vercel.app/r/empty.json",
+        "https://designsync-omega.vercel.app/r/item.json",
+        "https://designsync-omega.vercel.app/r/native-select.json",
+        "https://designsync-omega.vercel.app/r/kbd.json",
+        "https://designsync-omega.vercel.app/r/direction.json"
       ],
       "files": []
     }
