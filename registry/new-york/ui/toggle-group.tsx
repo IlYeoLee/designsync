@@ -73,7 +73,7 @@ function ToggleGroupItem({
           size: context.size || size,
         }),
         "w-auto min-w-0 shrink-0 focus:z-10 focus-visible:z-10",
-        isConnected && "rounded-none shadow-none first:rounded-l-md last:rounded-r-md",
+        isConnected && "rounded-none shadow-none first:rounded-l-[var(--ds-element-radius)] last:rounded-r-[var(--ds-element-radius)]",
         isConnected && (context.variant || variant) === "outline" && "border-l-0 first:border-l",
         className
       )}
