@@ -7,7 +7,7 @@
   "files": [
     {
       "path": "registry/new-york/ui/skeleton.tsx",
-      "content": "import * as React from \"react\"\r\n\r\nimport { cn } from \"@/lib/utils\"\r\n\r\nfunction Skeleton({ className, ...props }: React.ComponentProps<\"div\">) {\r\n  return (\r\n    <div\r\n      data-slot=\"skeleton\"\r\n      className={cn(\"bg-accent animate-pulse rounded-[var(--ds-button-radius)]\", className)}\r\n      {...props}\r\n    />\r\n  )\r\n}\r\n\r\nexport { Skeleton }\r\n",
+      "content": "import * as React from \"react\"\n\nimport { cn } from \"@/lib/utils\"\n\nfunction Skeleton({ className, ...props }: React.ComponentProps<\"div\">) {\n  return (\n    <div\n      data-slot=\"skeleton\"\n      className={cn(\"bg-accent animate-pulse rounded-[var(--ds-element-radius)]\", className)}\n      {...props}\n    />\n  )\n}\n\nexport { Skeleton }\n",
       "type": "registry:ui"
     }
   ]

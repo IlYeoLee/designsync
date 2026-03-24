@@ -35,7 +35,7 @@ function ToggleGroup({
       data-size={size}
       data-spacing={spacing}
       className={cn(
-        "group/toggle-group flex w-fit items-center rounded-[var(--ds-button-radius)]",
+        "group/toggle-group flex w-fit items-center rounded-[var(--ds-element-radius)]",
         spacing === 0
           ? "gap-0"
           : `gap-${spacing}`,

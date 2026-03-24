@@ -339,6 +339,7 @@
   --ds-section-gap: 1rem;
   --ds-internal-gap: 0.5rem;
   --ds-button-radius: var(--radius-md-prim);
+  --ds-element-radius: var(--radius-md-prim);
   --ds-input-radius: var(--radius-md-prim);
   --ds-card-radius: var(--radius-xl-prim);
   --ds-dialog-radius: var(--radius-xl-prim);

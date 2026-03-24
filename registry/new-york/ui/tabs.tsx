@@ -64,7 +64,7 @@ function TabsTrigger({
       className={cn(
         "relative inline-flex items-center justify-center gap-1.5 text-sm font-medium whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-[var(--ds-focus-ring-width)] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         variant === "pill" &&
-          "rounded-[var(--ds-button-radius)] px-2 py-1 data-[state=active]:bg-background data-[state=active]:shadow-xs dark:data-[state=active]:text-foreground dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 text-foreground dark:text-muted-foreground focus-visible:border-ring focus-visible:outline-ring focus-visible:outline-1",
+          "rounded-[var(--ds-element-radius)] px-2 py-1 data-[state=active]:bg-background data-[state=active]:shadow-xs dark:data-[state=active]:text-foreground dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 text-foreground dark:text-muted-foreground focus-visible:border-ring focus-visible:outline-ring focus-visible:outline-1",
         variant === "underline" &&
           "px-4 py-2.5 rounded-none text-muted-foreground hover:text-foreground data-[state=active]:text-foreground",
         className
