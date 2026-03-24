@@ -1531,6 +1531,60 @@ function DisplayPreview() {
 
       <Separator />
 
+      {/* Avatar */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Avatar</h3>
+        <div className="flex items-center gap-3">
+          <Avatar className="w-8 h-8">
+            <AvatarFallback className="text-xs">김</AvatarFallback>
+          </Avatar>
+          <Avatar className="w-10 h-10">
+            <AvatarFallback>수현</AvatarFallback>
+          </Avatar>
+          <Avatar className="w-12 h-12">
+            <AvatarFallback className="text-lg">이</AvatarFallback>
+          </Avatar>
+          <Avatar className="w-8 h-8">
+            <AvatarFallback className="text-xs bg-primary text-primary-foreground">DS</AvatarFallback>
+          </Avatar>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Badge */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Badge</h3>
+        <div className="flex flex-wrap gap-2">
+          <Badge>기본</Badge>
+          <Badge variant="secondary">보조</Badge>
+          <Badge variant="outline">외곽선</Badge>
+          <Badge variant="destructive">삭제</Badge>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Separator */}
+      <div>
+        <h3 className="text-sm font-medium text-foreground mb-3">Separator</h3>
+        <div className="space-y-3">
+          <div>
+            <p className="text-xs text-muted-foreground mb-2">가로 구분선</p>
+            <Separator />
+          </div>
+          <div className="flex items-center gap-3 h-8">
+            <span className="text-xs text-foreground">항목 1</span>
+            <Separator orientation="vertical" />
+            <span className="text-xs text-foreground">항목 2</span>
+            <Separator orientation="vertical" />
+            <span className="text-xs text-foreground">항목 3</span>
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
       {/* Cards & Badges */}
       <div>
         <h3 className="text-sm font-medium text-foreground mb-3">Card & Badges</h3>
