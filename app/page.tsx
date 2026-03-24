@@ -307,6 +307,8 @@ export default function Home() {
         onUndo={handleUndo}
         canUndo={snapshots.length > 0}
         onReset={handleReset}
+        fontFamily={tokens.primitives.fontFamily}
+        fontFamilyKo={tokens.primitives.fontFamilyKo}
       />
       <div className="flex-1 flex overflow-hidden">
         <EditorPanel

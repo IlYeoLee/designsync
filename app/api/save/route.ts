@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GOOGLE_FONTS, KOREAN_FONTS } from "@/lib/fonts";
+import { generateRules } from "@/lib/rules";
 
 const CDN_BASE = "https://designsync-omega.vercel.app";
 
@@ -279,34 +280,12 @@ export async function POST(req: NextRequest) {
     // 6. Embed AI coding rules into designsync-all.json "readme" field
     // AI tools (Cursor @URL, Claude Code, Windsurf) reading this JSON will see the rules.
     // shadcn add ignores unknown fields — no breakage.
-    const fontLine = fontSansValue ? `Font stack: ${fontSansValue}` : '';
-    const readme = `# DesignSync — AI Coding Rules
-This project uses the DesignSync design system.
-Install: \`shadcn add ${CDN_BASE}/r/designsync-all.json\`
-Cursor: use \`@${CDN_BASE}/r/designsync-all.json\` to reference this file directly.
-
-## Design Tokens
-${fontLine}
-Colors: var(--primary) var(--primary-foreground) var(--secondary) var(--secondary-foreground) var(--muted) var(--muted-foreground) var(--accent) var(--accent-foreground) var(--destructive) var(--background) var(--foreground) var(--border) var(--input) var(--ring) var(--card) var(--card-foreground)
-Font size: var(--font-size-xs) var(--font-size-sm) var(--font-size-base) var(--font-size-lg) var(--font-size-xl) var(--font-size-2xl) var(--font-size-3xl) var(--font-size-4xl)
-Font weight: var(--font-weight-normal) var(--font-weight-medium) var(--font-weight-bold)
-Line height: var(--line-height-tight) var(--line-height-normal) var(--line-height-loose)
-Radius: var(--radius)
-
-## Components (import from @/components/ui/)
-Typography: <TypographyH1> <TypographyH2> <TypographyH3> <TypographyH4> <TypographyP> <TypographyLead> <TypographyMuted>
-  → NEVER use raw <h1 className="text-4xl font-bold"> — always use TypographyH* components
-Button: variant="default|secondary|outline|ghost|destructive|link" size="sm|default|lg|icon"
-  → NEVER override size with className (e.g. h-12, px-8) — use size prop
-Input: default h-9 — NEVER override height via className
-Card: <Card> <CardHeader> <CardTitle> <CardDescription> <CardContent> <CardFooter>
-Sidebar: use <Sidebar> <SidebarContent> <SidebarMenu> <SidebarMenuItem> <SidebarMenuButton> — NEVER build custom aside
-Others: Badge, Avatar, Dialog, Sheet, Tabs, Accordion, Select, Checkbox, Switch, Separator, Tooltip, Popover, DropdownMenu, Alert, Progress, Skeleton, Slider, Table, Breadcrumb, Calendar, Command, Drawer, Carousel, Chart, NavigationMenu, Menubar, Resizable, ScrollArea, InputOTP, HoverCard, Collapsible, AlertDialog, AspectRatio, RadioGroup, Toggle, ToggleGroup
-
-## Rules
-✅ DO: bg-background, bg-primary, text-foreground, border-border, var(--primary), gap-4, p-4
-❌ DON'T: bg-blue-600, bg-[#1a1a1a], text-white (hardcoded), font-semibold (not in spec), leading-relaxed (not in spec), text-[10px] (use text-xs)
-`;
+    const readme = generateRules({
+      fontFamily,
+      fontFamilyKo,
+      fontSansValue,
+      includeInstall: false,
+    });
 
     const ALL_PATH = 'public/r/designsync-all.json';
     const existingAll = await getGitHubFile(repo, headers, ALL_PATH);
