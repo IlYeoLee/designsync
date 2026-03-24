@@ -69,7 +69,7 @@ import { Kbd } from "@/registry/new-york/ui/kbd";
 import { Empty, EmptyIcon, EmptyTitle, EmptyDescription, EmptyActions } from "@/registry/new-york/ui/empty";
 import { Item, ItemMedia, ItemContent, ItemTitle, ItemDescription, ItemActions } from "@/registry/new-york/ui/item";
 
-import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as CalendarIcon, Smile, Settings, User, LayoutDashboard, FileText, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, ChevronsUpDown, ChevronDown, Mail, Download, Plus, Heart, Search, X, Check, ArrowRight, Bell, Star, Trash2, Edit, Eye, Upload, Filter, Menu, LogOut, Sun, Moon, Zap } from "lucide-react";
+import { AlertCircle, CheckCircle2, Info, Home, Calculator, Calendar as CalendarIcon, Smile, Settings, User, LayoutDashboard, FileText, Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, ChevronsUpDown, ChevronDown, Mail, Download, Plus, Heart, Search, X, Check, ArrowRight, Bell, Star, Trash2, Edit, Eye, Upload, Filter, Menu, LogOut, Sun, Moon, Zap, PanelLeft, PanelLeftClose } from "lucide-react";
 
 type PreviewCategory = "form" | "overlay" | "navigation" | "display" | "feedback";
 
@@ -802,6 +802,84 @@ function CollapsibleDemo() {
 
 // ─── Navigation ────────────────────────────────────────────────────────────────
 
+function SidebarPreview() {
+  const [open, setOpen] = React.useState(true);
+  return (
+    <div>
+      <h3 className="text-sm font-medium text-foreground mb-3">Sidebar</h3>
+      <div className="flex rounded-lg border border-border overflow-hidden h-72">
+        <div className={`bg-sidebar border-r border-sidebar-border flex flex-col transition-all duration-300 ${open ? "w-52" : "w-0 border-r-0 overflow-hidden"}`}>
+          {/* Logo + Close */}
+          <div className="flex items-center justify-between px-3 py-3 border-b border-sidebar-border">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center">
+                <span className="text-primary-foreground text-xs font-bold">DS</span>
+              </div>
+              <span className="text-sm font-semibold text-sidebar-foreground whitespace-nowrap">DesignSync</span>
+            </div>
+            <button onClick={() => setOpen(false)} className="p-1 rounded-md hover:bg-sidebar-accent text-sidebar-foreground/50 hover:text-sidebar-foreground transition-colors">
+              <PanelLeftClose className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Menu */}
+          <div className="flex-1 flex flex-col px-2 py-2 gap-0.5 overflow-y-auto">
+            <div className="px-2 py-1">
+              <span className="text-[10px] font-semibold text-sidebar-foreground/50 uppercase tracking-wider">메뉴</span>
+            </div>
+            {[
+              { icon: LayoutDashboard, label: "대시보드", active: true },
+              { icon: FileText, label: "문서", active: false },
+              { icon: CalendarIcon, label: "캘린더", active: false },
+            ].map(({ icon: Icon, label, active }) => (
+              <div key={label} className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-xs cursor-default transition-colors ${active ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50"}`}>
+                <Icon className="w-3.5 h-3.5" />
+                <span className="whitespace-nowrap">{label}</span>
+              </div>
+            ))}
+
+            <Separator className="my-2 bg-sidebar-border" />
+
+            <div className="px-2 py-1">
+              <span className="text-[10px] font-semibold text-sidebar-foreground/50 uppercase tracking-wider">시스템</span>
+            </div>
+            {[
+              { icon: Settings, label: "설정", active: false },
+              { icon: Bell, label: "알림", active: false },
+            ].map(({ icon: Icon, label, active }) => (
+              <div key={label} className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-xs cursor-default transition-colors ${active ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50"}`}>
+                <Icon className="w-3.5 h-3.5" />
+                <span className="whitespace-nowrap">{label}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* User */}
+          <div className="border-t border-sidebar-border px-3 py-2.5 flex items-center gap-2">
+            <Avatar className="w-7 h-7">
+              <AvatarFallback className="text-[10px]">김</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium text-sidebar-foreground truncate">김도현</p>
+              <p className="text-[10px] text-sidebar-foreground/50 truncate">kim@designsync.io</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex-1 bg-background p-4">
+          {!open && (
+            <button onClick={() => setOpen(true)} className="mb-3 p-1.5 rounded-md border border-border hover:bg-accent transition-colors">
+              <PanelLeft className="w-4 h-4" />
+            </button>
+          )}
+          <p className="text-xs font-medium text-foreground mb-1">메인 콘텐츠</p>
+          <p className="text-xs text-muted-foreground">사이드바를 닫고 열어보세요.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function NavigationPreview() {
   return (
     <div className="space-y-6">
@@ -970,82 +1048,8 @@ function NavigationPreview() {
 
       <Separator />
 
-      {/* Sidebar Preview (static mockup) */}
-      <div>
-        <h3 className="text-sm font-medium text-foreground mb-3">Sidebar</h3>
-        <div className="flex rounded-lg border border-border overflow-hidden h-72">
-          <div className="w-52 bg-sidebar border-r border-sidebar-border flex flex-col">
-            {/* Logo */}
-            <div className="flex items-center gap-2 px-3 py-3 border-b border-sidebar-border">
-              <div className="w-7 h-7 rounded-md bg-primary flex items-center justify-center">
-                <span className="text-primary-foreground text-xs font-bold">DS</span>
-              </div>
-              <span className="text-sm font-semibold text-sidebar-foreground">DesignSync</span>
-            </div>
-
-            {/* Menu sections */}
-            <div className="flex-1 flex flex-col px-2 py-2 gap-0.5 overflow-y-auto">
-              <div className="px-2 py-1">
-                <span className="text-[10px] font-semibold text-sidebar-foreground/50 uppercase tracking-wider">메뉴</span>
-              </div>
-              {[
-                { icon: LayoutDashboard, label: "대시보드", active: true },
-                { icon: FileText, label: "문서", active: false },
-                { icon: CalendarIcon, label: "캘린더", active: false },
-              ].map(({ icon: Icon, label, active }) => (
-                <div
-                  key={label}
-                  className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-xs cursor-default transition-colors ${
-                    active
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                      : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50"
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  {label}
-                </div>
-              ))}
-
-              <Separator className="my-2 bg-sidebar-border" />
-
-              <div className="px-2 py-1">
-                <span className="text-[10px] font-semibold text-sidebar-foreground/50 uppercase tracking-wider">시스템</span>
-              </div>
-              {[
-                { icon: Settings, label: "설정", active: false },
-                { icon: Bell, label: "알림", active: false },
-              ].map(({ icon: Icon, label, active }) => (
-                <div
-                  key={label}
-                  className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-xs cursor-default transition-colors ${
-                    active
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                      : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50"
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  {label}
-                </div>
-              ))}
-            </div>
-
-            {/* User profile */}
-            <div className="border-t border-sidebar-border px-3 py-2.5 flex items-center gap-2">
-              <Avatar className="w-7 h-7">
-                <AvatarFallback className="text-[10px]">김</AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-sidebar-foreground truncate">김도현</p>
-                <p className="text-[10px] text-sidebar-foreground/50 truncate">kim@designsync.io</p>
-              </div>
-            </div>
-          </div>
-          <div className="flex-1 bg-background p-4">
-            <p className="text-xs font-medium text-foreground mb-1">메인 콘텐츠</p>
-            <p className="text-xs text-muted-foreground">사이드바 레이아웃 미리보기</p>
-          </div>
-        </div>
-      </div>
+      {/* Sidebar Preview (with toggle) */}
+      <SidebarPreview />
 
       <Separator />
 

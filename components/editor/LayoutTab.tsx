@@ -4,11 +4,11 @@ import * as React from "react";
 import { TokenState } from "@/lib/tokens";
 
 const ICON_LIBRARIES = [
-  { id: "lucide", label: "Lucide", pkg: "lucide-react" },
-  { id: "tabler", label: "Tabler", pkg: "@tabler/icons-react" },
-  { id: "phosphor", label: "Phosphor", pkg: "@phosphor-icons/react" },
-  { id: "remix", label: "Remix", pkg: "remix-icon" },
-  { id: "hugeicons", label: "Hugeicons", pkg: "hugeicons-react" },
+  { id: "lucide", label: "Lucide", pkg: "lucide-react", desc: "깔끔한 선형 — shadcn 기본", url: "https://lucide.dev/icons" },
+  { id: "tabler", label: "Tabler", pkg: "@tabler/icons-react", desc: "5400+ 굵은 선형 아이콘", url: "https://tabler.io/icons" },
+  { id: "phosphor", label: "Phosphor", pkg: "@phosphor-icons/react", desc: "6종 굵기 변형 지원", url: "https://phosphoricons.com" },
+  { id: "remix", label: "Remix", pkg: "remix-icon", desc: "2800+ 선형/채움 아이콘", url: "https://remixicon.com" },
+  { id: "hugeicons", label: "Hugeicons", pkg: "hugeicons-react", desc: "36000+ 다양한 스타일", url: "https://hugeicons.com" },
 ] as const;
 
 interface LayoutTabProps {
@@ -282,20 +282,32 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange }: Layout
 
       {/* Icon Library */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-3">아이콘 라이브러리</p>
+        <p className="text-xs font-medium text-foreground mb-2">아이콘 라이브러리</p>
+        <p className="text-[10px] text-muted-foreground mb-3">Copy 시 AI가 이 아이콘 라이브러리를 사용합니다.</p>
         <div className="grid grid-cols-1 gap-1.5">
           {ICON_LIBRARIES.map((lib) => (
             <button
               key={lib.id}
               onClick={() => onIconLibraryChange(lib.id)}
-              className={`flex items-center justify-between px-3 py-2 rounded-md border text-xs transition-colors ${
+              className={`flex flex-col items-start px-3 py-2 rounded-md border text-left transition-colors ${
                 tokens.primitives.iconLibrary === lib.id
-                  ? "border-primary bg-accent text-foreground font-medium"
+                  ? "border-primary bg-accent text-foreground"
                   : "border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground"
               }`}
             >
-              <span>{lib.label}</span>
-              <code className="text-[10px] font-mono text-muted-foreground">{lib.pkg}</code>
+              <div className="flex items-center justify-between w-full">
+                <span className="text-xs font-medium">{lib.label}</span>
+                <a
+                  href={lib.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[9px] text-muted-foreground hover:text-primary underline"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  미리보기
+                </a>
+              </div>
+              <span className="text-[10px] text-muted-foreground mt-0.5">{lib.desc}</span>
             </button>
           ))}
         </div>
