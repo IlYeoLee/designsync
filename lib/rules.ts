@@ -13,8 +13,8 @@ const ICON_LIBRARY_INFO: Record<string, { name: string; pkg: string; importExamp
   lucide: { name: "Lucide", pkg: "lucide-react", importExample: 'import { Home, Settings, User, Search, Plus, X, Check } from "lucide-react"' },
   tabler: { name: "Tabler Icons", pkg: "@tabler/icons-react", importExample: 'import { IconHome, IconSettings, IconUser, IconSearch, IconPlus, IconX, IconCheck } from "@tabler/icons-react"' },
   phosphor: { name: "Phosphor Icons", pkg: "@phosphor-icons/react", importExample: 'import { House, Gear, User, MagnifyingGlass, Plus, X, Check } from "@phosphor-icons/react"' },
-  remix: { name: "Remix Icon", pkg: "remix-icon", importExample: 'import { RiHomeLine, RiSettings3Line, RiUserLine, RiSearchLine, RiAddLine, RiCloseLine, RiCheckLine } from "remix-icon"' },
-  hugeicons: { name: "Hugeicons", pkg: "hugeicons-react", importExample: 'import { Home01Icon, Settings01Icon, User01Icon, Search01Icon, Add01Icon, Cancel01Icon, Tick01Icon } from "hugeicons-react"' },
+  remix: { name: "Remix Icon", pkg: "@remixicon/react", importExample: 'import { RiHome2Line, RiSettings3Line, RiUserLine, RiSearchLine, RiAddLine, RiCloseLine, RiCheckLine } from "@remixicon/react"' },
+  hugeicons: { name: "Hugeicons", pkg: "@hugeicons/react", importExample: 'import { HugeiconsIcon } from "@hugeicons/react"; import { Home01Icon, Settings01Icon } from "@hugeicons/core-free-icons"' },
 };
 
 export interface RulesParams {
