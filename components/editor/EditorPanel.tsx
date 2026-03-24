@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Palette, Type, Layout, ChevronDown, ChevronUp } from "lucide-react";
 import { TokenState, HistoryEntry } from "@/lib/tokens";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/registry/new-york/ui/tabs";
 import { ColorTab } from "./ColorTab";
 import { TypographyTab } from "./TypographyTab";
 import { LayoutTab } from "./LayoutTab";
@@ -49,50 +50,42 @@ export function EditorPanel({
 
   return (
     <div className="w-80 flex-shrink-0 border-r border-border bg-card flex flex-col overflow-hidden">
-      {/* Tab bar */}
-      <div className="flex border-b border-border flex-shrink-0">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs transition-colors ${
-              activeTab === tab.id
-                ? "border-b-2 border-primary text-primary font-medium"
-                : "text-muted-foreground hover:text-foreground hover:bg-accent/30"
-            }`}
-          >
-            {tab.icon}
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as Tab)} className="flex flex-col flex-1 overflow-hidden">
+        <TabsList variant="underline" className="flex-shrink-0">
+          {tabs.map((tab) => (
+            <TabsTrigger key={tab.id} value={tab.id} className="flex-1 gap-1.5 text-xs">
+              {tab.icon}
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-      {/* Tab content */}
-      <div className="flex-1 overflow-y-auto min-h-0">
-        {activeTab === "colors" && (
-          <ColorTab
-            tokens={tokens}
-            onTokenChange={onTokenChange}
-            onBatchChange={onBatchChange}
-            onSemanticChange={onSemanticChange}
-          />
-        )}
-        {activeTab === "typography" && (
-          <TypographyTab
-            tokens={tokens}
-            onTokenChange={onTokenChange}
-            onFontFamilyChange={onFontFamilyChange}
-            onFontFamilyKoChange={onFontFamilyKoChange}
-          />
-        )}
-        {activeTab === "layout" && (
-          <LayoutTab
-            tokens={tokens}
-            onTokenChange={onTokenChange}
-            onIconLibraryChange={onIconLibraryChange}
-          />
-        )}
-      </div>
+        <div className="flex-1 overflow-y-auto min-h-0">
+          <TabsContent value="colors">
+            <ColorTab
+              tokens={tokens}
+              onTokenChange={onTokenChange}
+              onBatchChange={onBatchChange}
+              onSemanticChange={onSemanticChange}
+            />
+          </TabsContent>
+          <TabsContent value="typography">
+            <TypographyTab
+              tokens={tokens}
+              onTokenChange={onTokenChange}
+              onFontFamilyChange={onFontFamilyChange}
+              onFontFamilyKoChange={onFontFamilyKoChange}
+            />
+          </TabsContent>
+          <TabsContent value="layout">
+            <LayoutTab
+              tokens={tokens}
+              onTokenChange={onTokenChange}
+              onIconLibraryChange={onIconLibraryChange}
+            />
+          </TabsContent>
+        </div>
+      </Tabs>
 
       {/* History panel */}
       {history.length > 0 && (
