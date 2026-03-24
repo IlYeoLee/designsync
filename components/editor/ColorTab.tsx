@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { ColorScale, TokenState } from "@/lib/tokens";
-import { oklchToHex, generatePaletteFromHex, getPrimaryForeground } from "@/lib/color";
+import { oklchToHex, generatePaletteFromHex, getAutoForegrounds } from "@/lib/color";
 import { Wand2, ChevronDown } from "lucide-react";
 
 type ColorScaleName = "brand" | "neutral" | "error" | "success" | "warning";
@@ -11,26 +11,166 @@ const STEPS = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "90
 type Step = typeof STEPS[number];
 
 const SCALE_LABELS: Record<ColorScaleName, string> = {
-  brand: "Brand", neutral: "Neutral", error: "Error", success: "Success", warning: "Warning",
+  brand: "브랜드", neutral: "중성", error: "오류", success: "성공", warning: "경고",
 };
 
 // All primitive color var options for semantic dropdowns
-const PRIMITIVE_VAR_OPTIONS: { label: string; value: string }[] = [
+const PRIMITIVE_VAR_OPTIONS: { label: string; value: string; scale: ColorScaleName; step: string }[] = [
   ...COLOR_SCALES.flatMap((scale) =>
     STEPS.map((step) => ({
       label: `${scale}-${step}`,
       value: `var(--${scale}-${step})`,
+      scale,
+      step,
     }))
   ),
-  { label: "white", value: "oklch(1 0 0)" },
-  { label: "black", value: "oklch(0 0 0)" },
+  { label: "white", value: "oklch(1 0 0)", scale: "neutral" as ColorScaleName, step: "white" },
+  { label: "black", value: "oklch(0 0 0)", scale: "neutral" as ColorScaleName, step: "black" },
 ];
+
+// Semantic token labels: English name + Korean short description
+const SEMANTIC_INFO: Record<string, { label: string; desc: string }> = {
+  primary:              { label: "primary",              desc: "메인 색상" },
+  "primary-foreground": { label: "primary-fg",           desc: "메인 위 텍스트" },
+  background:           { label: "background",           desc: "페이지 배경" },
+  foreground:           { label: "foreground",            desc: "기본 텍스트" },
+  card:                 { label: "card",                  desc: "카드 배경" },
+  "card-foreground":    { label: "card-fg",               desc: "카드 텍스트" },
+  secondary:            { label: "secondary",             desc: "보조 배경" },
+  "secondary-foreground": { label: "secondary-fg",        desc: "보조 텍스트" },
+  muted:                { label: "muted",                 desc: "흐린 배경" },
+  "muted-foreground":   { label: "muted-fg",              desc: "흐린 텍스트" },
+  accent:               { label: "accent",                desc: "강조 배경" },
+  "accent-foreground":  { label: "accent-fg",             desc: "강조 텍스트" },
+  destructive:          { label: "destructive",           desc: "삭제/위험" },
+  border:               { label: "border",                desc: "테두리" },
+  input:                { label: "input",                 desc: "입력 테두리" },
+  ring:                 { label: "ring",                  desc: "포커스 링" },
+};
 
 interface ColorTabProps {
   tokens: TokenState;
   onTokenChange: (variable: string, value: string) => void;
   onBatchChange: (changes: { variable: string; value: string }[]) => void;
   onSemanticChange: (mode: "light" | "dark", key: string, value: string) => void;
+}
+
+/** Custom dropdown for semantic token with color swatches */
+function SemanticDropdown({
+  value,
+  tokens,
+  onChange,
+}: {
+  value: string;
+  tokens: TokenState;
+  onChange: (value: string) => void;
+}) {
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (!open) return;
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [open]);
+
+  // Get color for a var() reference
+  function getColor(val: string): string {
+    if (val.startsWith("var(--")) {
+      const varName = val.match(/var\(--([^)]+)\)/)?.[1];
+      if (varName) {
+        const [scale, step] = varName.split("-") as [ColorScaleName, string];
+        if (tokens.primitives[scale] && step in (tokens.primitives[scale] as ColorScale)) {
+          return (tokens.primitives[scale] as ColorScale)[step as keyof ColorScale];
+        }
+      }
+    }
+    return val;
+  }
+
+  const currentLabel = PRIMITIVE_VAR_OPTIONS.find((o) => o.value === value)?.label || value;
+
+  return (
+    <div ref={ref} className="relative flex-1">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full h-6 text-[10px] px-1.5 rounded border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring font-mono truncate text-left flex items-center gap-1"
+      >
+        <span
+          className="w-3 h-3 rounded-sm border border-border flex-shrink-0 inline-block"
+          style={{ backgroundColor: getColor(value) }}
+        />
+        <span className="truncate">{currentLabel}</span>
+      </button>
+      {open && (
+        <div className="absolute left-0 top-full mt-1 z-40 bg-card border border-border rounded-md shadow-lg max-h-[240px] overflow-y-auto w-full min-w-[180px]">
+          {COLOR_SCALES.map((scale) => (
+            <div key={scale}>
+              <div className="px-2 py-1 text-[9px] font-medium text-muted-foreground bg-muted/50 sticky top-0">
+                {SCALE_LABELS[scale]}
+              </div>
+              {STEPS.map((step) => {
+                const opt = PRIMITIVE_VAR_OPTIONS.find(
+                  (o) => o.scale === scale && o.step === step
+                );
+                if (!opt) return null;
+                const color = getColor(opt.value);
+                const isSelected = opt.value === value;
+                return (
+                  <button
+                    key={opt.value}
+                    className={`w-full px-2 py-0.5 text-[10px] font-mono flex items-center gap-1.5 hover:bg-accent transition-colors ${
+                      isSelected ? "bg-accent font-medium" : ""
+                    }`}
+                    onClick={() => {
+                      onChange(opt.value);
+                      setOpen(false);
+                    }}
+                  >
+                    <span
+                      className="w-3 h-3 rounded-sm border border-border flex-shrink-0"
+                      style={{ backgroundColor: color }}
+                    />
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+          {/* White / Black */}
+          <div className="px-2 py-1 text-[9px] font-medium text-muted-foreground bg-muted/50 sticky top-0">
+            기타
+          </div>
+          {[
+            { label: "white", value: "oklch(1 0 0)", color: "#ffffff" },
+            { label: "black", value: "oklch(0 0 0)", color: "#000000" },
+          ].map((opt) => (
+            <button
+              key={opt.value}
+              className={`w-full px-2 py-0.5 text-[10px] font-mono flex items-center gap-1.5 hover:bg-accent transition-colors ${
+                opt.value === value ? "bg-accent font-medium" : ""
+              }`}
+              onClick={() => {
+                onChange(opt.value);
+                setOpen(false);
+              }}
+            >
+              <span
+                className="w-3 h-3 rounded-sm border border-border flex-shrink-0"
+                style={{ backgroundColor: opt.color }}
+              />
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChange }: ColorTabProps) {
@@ -100,10 +240,26 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
         }));
         onBatchChange(changes);
         setScalePicker((prev) => ({ ...prev, [scale]: hex }));
+
+        // Auto-contrast for brand palette
+        if (scale === "brand") {
+          applyAutoForegrounds(palette);
+        }
         return;
       }
     }
     onTokenChange(`--${scale}-${step}`, hex);
+  }
+
+  /** Apply auto-contrast foregrounds for all semantic tokens that sit on brand colors */
+  function applyAutoForegrounds(palette: Record<string, string>) {
+    const fgs = getAutoForegrounds(palette);
+    for (const [key, value] of Object.entries(fgs.light)) {
+      onSemanticChange("light", key, value);
+    }
+    for (const [key, value] of Object.entries(fgs.dark)) {
+      onSemanticChange("dark", key, value);
+    }
   }
 
   function handleGeneratePalette(scale: ColorScaleName, hex: string) {
@@ -121,11 +277,9 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
     }
     onBatchChange(changes);
 
-    // Brand 팔레트 변경 시 primary-foreground 자동 반전 (colorizr readableColor 기반)
+    // Brand 팔레트 변경 시 foreground 자동 대비 (WCAG 기반)
     if (scale === "brand") {
-      const { light, dark } = getPrimaryForeground(hex);
-      onSemanticChange("light", "primary-foreground", light);
-      onSemanticChange("dark", "primary-foreground", dark);
+      applyAutoForegrounds(palette);
     }
 
     setOpenScalePicker(null);
@@ -135,16 +289,17 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
     setScalePicker((prev) => ({ ...prev, [scale]: hex }));
   }
 
+  function handleScalePickerHexInput(scale: ColorScaleName, raw: string) {
+    const withHash = raw.startsWith("#") ? raw : `#${raw}`;
+    if (/^#[0-9a-fA-F]{0,6}$/.test(withHash)) {
+      setScalePicker((prev) => ({ ...prev, [scale]: withHash }));
+      if (withHash.length === 7) {
+        // Valid hex — no auto-generate, just update picker display
+      }
+    }
+  }
+
   const semanticTokens = semanticMode === "light" ? tokens.semantic.light : tokens.semantic.dark;
-  const SEMANTIC_LABELS: Record<string, string> = {
-    primary: "Primary", "primary-foreground": "Primary Fg",
-    background: "Background", foreground: "Foreground",
-    card: "Card", "card-foreground": "Card Fg",
-    secondary: "Secondary", "secondary-foreground": "Secondary Fg",
-    muted: "Muted", "muted-foreground": "Muted Fg",
-    accent: "Accent", "accent-foreground": "Accent Fg",
-    destructive: "Destructive", border: "Border", input: "Input", ring: "Ring",
-  };
 
   return (
     <div className="space-y-5 p-4">
@@ -158,15 +313,15 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
                 <button
                   className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors px-1.5 py-0.5 rounded border border-border hover:border-primary/50"
                   onClick={() => setOpenScalePicker(openScalePicker === scale ? null : scale)}
-                  title="Generate full palette from one color"
+                  title="기준색 하나로 팔레트 자동 생성"
                 >
                   <Wand2 className="w-2.5 h-2.5" />
                   Auto
                 </button>
                 {openScalePicker === scale && (
-                  <div className="absolute right-0 top-full mt-1 z-30 bg-card border border-border rounded-md shadow-lg p-3 min-w-[180px]">
+                  <div className="absolute right-0 top-full mt-1 z-30 bg-card border border-border rounded-md shadow-lg p-3 min-w-[200px]">
                     <p className="text-[10px] text-muted-foreground mb-2 font-medium">
-                      Base color → generate 50~900
+                      기준색 → 50~900 자동 생성
                     </p>
                     <div className="flex items-center gap-2 mb-2">
                       <input
@@ -175,19 +330,32 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
                         onChange={(e) => handleScalePickerChange(scale, e.target.value)}
                         className="w-8 h-8 rounded cursor-pointer border border-border"
                       />
-                      <span className="text-xs font-mono text-muted-foreground">{scalePicker[scale]}</span>
+                      <input
+                        type="text"
+                        value={scalePicker[scale]}
+                        onChange={(e) => handleScalePickerHexInput(scale, e.target.value)}
+                        onBlur={(e) => {
+                          const raw = e.target.value;
+                          const withHash = raw.startsWith("#") ? raw : `#${raw}`;
+                          if (/^#[0-9a-fA-F]{6}$/.test(withHash)) {
+                            setScalePicker((prev) => ({ ...prev, [scale]: withHash }));
+                          }
+                        }}
+                        className="flex-1 h-8 text-xs px-2 rounded border border-input bg-background font-mono focus:outline-none focus:ring-1 focus:ring-ring"
+                        placeholder="#000000"
+                      />
                     </div>
                     <button
                       className="w-full h-7 bg-primary text-primary-foreground text-xs rounded-md hover:opacity-90 transition-opacity font-medium"
                       onClick={() => handleGeneratePalette(scale, scalePicker[scale])}
                     >
-                      Generate Palette
+                      팔레트 생성
                     </button>
                     <button
                       className="w-full h-6 text-[10px] text-muted-foreground hover:text-foreground mt-1"
                       onClick={() => setOpenScalePicker(null)}
                     >
-                      Cancel
+                      취소
                     </button>
                   </div>
                 )}
@@ -264,7 +432,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
           className="w-full flex items-center justify-between mb-3"
           onClick={() => setSemanticOpen((v) => !v)}
         >
-          <p className="text-xs text-muted-foreground font-medium">Semantic Mappings</p>
+          <p className="text-xs text-muted-foreground font-medium">시멘틱 토큰</p>
           <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${semanticOpen ? "rotate-180" : ""}`} />
         </button>
 
@@ -282,33 +450,38 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
                   }`}
                   onClick={() => setSemanticMode(m)}
                 >
-                  {m === "light" ? "Light" : "Dark"}
+                  {m === "light" ? "라이트" : "다크"}
                 </button>
               ))}
             </div>
 
             <div className="space-y-1.5">
-              {Object.entries(semanticTokens).map(([key, value]) => (
-                <div key={key} className="flex items-center gap-2">
-                  <div
-                    className="w-4 h-4 rounded-sm border border-border flex-shrink-0"
-                    style={{ backgroundColor: `var(--${key})` }}
-                  />
-                  <span className="text-[10px] text-muted-foreground w-24 flex-shrink-0 truncate">
-                    {SEMANTIC_LABELS[key] ?? key}
-                  </span>
-                  <select
-                    value={value}
-                    onChange={(e) => onSemanticChange(semanticMode, key, e.target.value)}
-                    className="flex-1 h-6 text-[10px] px-1 rounded border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring font-mono truncate"
-                  >
-                    <option value={value}>{value}</option>
-                    {PRIMITIVE_VAR_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                </div>
-              ))}
+              {Object.entries(semanticTokens).map(([key, value]) => {
+                const info = SEMANTIC_INFO[key];
+                return (
+                  <div key={key} className="flex items-center gap-2">
+                    <div
+                      className="w-4 h-4 rounded-sm border border-border flex-shrink-0"
+                      style={{ backgroundColor: `var(--${key})` }}
+                    />
+                    <div className="w-24 flex-shrink-0">
+                      <span className="text-[10px] text-foreground font-mono block leading-tight truncate">
+                        {info?.label ?? key}
+                      </span>
+                      {info?.desc && (
+                        <span className="text-[9px] text-muted-foreground block leading-tight">
+                          {info.desc}
+                        </span>
+                      )}
+                    </div>
+                    <SemanticDropdown
+                      value={value}
+                      tokens={tokens}
+                      onChange={(v) => onSemanticChange(semanticMode, key, v)}
+                    />
+                  </div>
+                );
+              })}
             </div>
           </>
         )}

@@ -9,12 +9,12 @@ interface LayoutTabProps {
 }
 
 const RADIUS_OPTIONS = [
-  { key: "none", label: "None", value: "0px" },
+  { key: "none", label: "없음", value: "0px" },
   { key: "sm", label: "SM", value: "0.25rem" },
   { key: "md", label: "MD", value: "0.375rem" },
   { key: "lg", label: "LG", value: "0.5rem" },
   { key: "xl", label: "XL", value: "0.75rem" },
-  { key: "full", label: "Full", value: "9999px" },
+  { key: "full", label: "최대", value: "9999px" },
 ] as const;
 
 const SPACING_KEYS = ["1", "2", "3", "4", "5", "6", "8", "10", "12", "16"] as const;
@@ -157,12 +157,12 @@ export function LayoutTab({ tokens, onTokenChange }: LayoutTabProps) {
     <div className="space-y-6 p-4">
       {/* Border Radius */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-3">Border Radius</p>
+        <p className="text-xs font-medium text-foreground mb-3">테두리 둥글기</p>
 
         {/* Global scale slider */}
         <RadiusScaleSlider tokens={tokens} onTokenChange={onTokenChange} />
 
-        <p className="text-xs text-muted-foreground mb-2 mt-4">Custom values</p>
+        <p className="text-xs text-muted-foreground mb-2 mt-4">커스텀 값</p>
         <div className="space-y-2">
           {RADIUS_OPTIONS.map(({ key, label }) => {
             const varKey = key === "none" ? "none" : key === "full" ? "full" : `${key}-prim`;
@@ -185,8 +185,8 @@ export function LayoutTab({ tokens, onTokenChange }: LayoutTabProps) {
 
       {/* Spacing Scale */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-1">Spacing Scale</p>
-        <p className="text-[10px] text-muted-foreground mb-3">Values shown in px (stored as rem)</p>
+        <p className="text-xs font-medium text-foreground mb-1">간격</p>
+        <p className="text-[10px] text-muted-foreground mb-3">px 단위로 표시 (rem으로 저장)</p>
         <div className="space-y-2">
           {SPACING_KEYS.map((key) => {
             const value = tokens.primitives.spacing[key as keyof typeof tokens.primitives.spacing];
@@ -214,7 +214,7 @@ export function LayoutTab({ tokens, onTokenChange }: LayoutTabProps) {
 
       {/* Shadows */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-3">Shadows</p>
+        <p className="text-xs font-medium text-foreground mb-3">그림자</p>
         <div className="space-y-5">
           {SHADOW_LEVELS.map(({ key, label, yOffset }) => {
             const currentShadow = tokens.primitives.shadows?.[key] ??
@@ -237,7 +237,7 @@ export function LayoutTab({ tokens, onTokenChange }: LayoutTabProps) {
                 </div>
                 {/* Blur */}
                 <div className="flex items-center gap-2 mb-1 pl-8">
-                  <span className="text-[10px] text-muted-foreground w-10">Blur</span>
+                  <span className="text-[10px] text-muted-foreground w-10">블러</span>
                   <input
                     type="range" min={0} max={30} step={1} value={blur}
                     onChange={(e) => update(+e.target.value, spread, opacity)}
@@ -247,7 +247,7 @@ export function LayoutTab({ tokens, onTokenChange }: LayoutTabProps) {
                 </div>
                 {/* Spread */}
                 <div className="flex items-center gap-2 mb-1 pl-8">
-                  <span className="text-[10px] text-muted-foreground w-10">Spread</span>
+                  <span className="text-[10px] text-muted-foreground w-10">확산</span>
                   <input
                     type="range" min={-10} max={10} step={1} value={spread}
                     onChange={(e) => update(blur, +e.target.value, opacity)}
@@ -257,7 +257,7 @@ export function LayoutTab({ tokens, onTokenChange }: LayoutTabProps) {
                 </div>
                 {/* Opacity */}
                 <div className="flex items-center gap-2 pl-8">
-                  <span className="text-[10px] text-muted-foreground w-10">Opacity</span>
+                  <span className="text-[10px] text-muted-foreground w-10">투명도</span>
                   <input
                     type="range" min={0} max={0.5} step={0.01} value={opacity}
                     onChange={(e) => update(blur, spread, +e.target.value)}
@@ -273,8 +273,8 @@ export function LayoutTab({ tokens, onTokenChange }: LayoutTabProps) {
 
       <div className="rounded-md bg-muted/50 p-3 border border-border">
         <p className="text-xs text-muted-foreground">
-          Shadows use <code className="font-mono text-xs">shadow-sm/md/lg</code> Tailwind utilities via CSS var wiring.
-          Spacing changes affect all <code className="font-mono text-xs">p-*</code>, <code className="font-mono text-xs">gap-*</code> utilities.
+          그림자는 CSS 변수를 통해 <code className="font-mono text-xs">shadow-sm/md/lg</code> Tailwind 유틸리티에 연결됩니다.
+          간격 변경은 모든 <code className="font-mono text-xs">p-*</code>, <code className="font-mono text-xs">gap-*</code> 유틸리티에 영향을 줍니다.
         </p>
       </div>
 

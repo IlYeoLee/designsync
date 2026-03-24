@@ -128,7 +128,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
     <div className="space-y-6 p-4">
       {/* English Font */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-2">English Font</p>
+        <p className="text-xs font-medium text-foreground mb-2">영문 폰트</p>
         <div
           className="w-full p-3 rounded-md border border-border bg-muted/30 mb-3"
           style={{ fontFamily: tokens.primitives.fontFamily }}
@@ -146,9 +146,9 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
               : "bg-success-50 border-success-200 text-success-700"
           }`}>
             {fontUploadStatus.loading
-              ? `Uploading ${fontUploadStatus.font} to CDN...`
+              ? `${fontUploadStatus.font} CDN 업로드 중...`
               : fontUploadStatus.result?.error
-              ? `✗ Upload failed: ${fontUploadStatus.result.error as string}`
+              ? `✗ 업로드 실패: ${fontUploadStatus.result.error as string}`
               : (
                 <span>
                   ✓ {fontUploadStatus.font} 폰트 CDN 업로드 완료. Save 클릭 시 자동으로 적용됩니다.
@@ -172,14 +172,14 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
                 if (sec === "local" && localFonts.length === 0) loadLocalFonts();
               }}
             >
-              {sec === "google" ? "Google Fonts" : "Local Fonts"}
+              {sec === "google" ? "Google 폰트" : "로컬 폰트"}
             </button>
           ))}
         </div>
 
         <input
           type="text"
-          placeholder="Search fonts..."
+          placeholder="폰트 검색..."
           value={fontSearch}
           onChange={(e) => setFontSearch(e.target.value)}
           className="w-full h-8 text-xs px-2.5 rounded-md border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring mb-2"
@@ -194,9 +194,9 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
                   tokens.primitives.fontFamily === font ? "bg-accent text-accent-foreground font-medium" : ""
                 }`}
               >{font}</button>
-            )) : <p className="text-xs text-muted-foreground p-3">No fonts found</p>
+            )) : <p className="text-xs text-muted-foreground p-3">폰트를 찾을 수 없습니다</p>
           ) : localFontsLoading ? (
-            <p className="text-xs text-muted-foreground p-3">Loading local fonts...</p>
+            <p className="text-xs text-muted-foreground p-3">로컬 폰트 로딩 중...</p>
           ) : filteredLocalFonts.length > 0 ? filteredLocalFonts.map((font) => (
             <button
               key={font}
@@ -208,8 +208,8 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
           )) : (
             <p className="text-xs text-muted-foreground p-3">
               {localFonts.length === 0
-                ? "Local Font Access API not available or permission denied"
-                : "No fonts found"}
+                ? "로컬 폰트 접근 API를 사용할 수 없거나 권한이 거부되었습니다"
+                : "폰트를 찾을 수 없습니다"}
             </p>
           )}
         </div>
@@ -217,7 +217,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
 
       {/* Korean Font */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-2">Korean Font</p>
+        <p className="text-xs font-medium text-foreground mb-2">한글 폰트</p>
         <div className="w-full p-3 rounded-md border border-border bg-muted/30 mb-3">
           <p className="text-base" style={{ fontFamily: tokens.primitives.fontFamilyKo || undefined }}>
             안녕하세요 Hello
@@ -254,8 +254,8 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
 
       {/* Font Sizes — px display */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-1">Font Sizes</p>
-        <p className="text-[10px] text-muted-foreground mb-3">Values shown in px (stored as rem)</p>
+        <p className="text-xs font-medium text-foreground mb-1">글자 크기</p>
+        <p className="text-[10px] text-muted-foreground mb-3">px 단위로 표시 (rem으로 저장)</p>
         <div className="space-y-2">
           {fontSizeKeys.map((key) => (
             <div key={key} className="flex items-center gap-3">
@@ -282,7 +282,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
 
       {/* Font Weight */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-3">Font Weights</p>
+        <p className="text-xs font-medium text-foreground mb-3">글자 굵기</p>
         <div className="space-y-2">
           {fontWeightKeys.map((key) => (
             <div key={key} className="flex items-center gap-3">
@@ -303,7 +303,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
 
       {/* Line Height */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-3">Line Heights</p>
+        <p className="text-xs font-medium text-foreground mb-3">줄 간격</p>
         <div className="space-y-2">
           {lineHeightKeys.map((key) => (
             <div key={key} className="flex items-center gap-3">

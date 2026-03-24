@@ -32,17 +32,17 @@ export function EditorPanel({
   const [historyOpen, setHistoryOpen] = React.useState(true);
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
-    { id: "colors", label: "Colors", icon: <Palette className="w-3.5 h-3.5" /> },
-    { id: "typography", label: "Type", icon: <Type className="w-3.5 h-3.5" /> },
-    { id: "layout", label: "Layout", icon: <Layout className="w-3.5 h-3.5" /> },
+    { id: "colors", label: "색상", icon: <Palette className="w-3.5 h-3.5" /> },
+    { id: "typography", label: "타이포", icon: <Type className="w-3.5 h-3.5" /> },
+    { id: "layout", label: "레이아웃", icon: <Layout className="w-3.5 h-3.5" /> },
   ];
 
   function formatTimeAgo(date: Date): string {
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-    if (seconds < 60) return `${seconds}s ago`;
+    if (seconds < 60) return `${seconds}초 전`;
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}m ago`;
-    return `${Math.floor(minutes / 60)}h ago`;
+    if (minutes < 60) return `${minutes}분 전`;
+    return `${Math.floor(minutes / 60)}시간 전`;
   }
 
   return (
@@ -98,7 +98,7 @@ export function EditorPanel({
             className="w-full flex items-center justify-between px-4 py-2 text-xs text-muted-foreground hover:text-foreground hover:bg-accent/30 transition-colors"
             onClick={() => setHistoryOpen(!historyOpen)}
           >
-            <span className="font-medium">Recent Changes ({history.length})</span>
+            <span className="font-medium">최근 변경 ({history.length})</span>
             {historyOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
           </button>
           {historyOpen && (

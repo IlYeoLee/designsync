@@ -185,6 +185,42 @@ export function getPrimaryForeground(hex: string): { light: string; dark: string
   }
 }
 
+/**
+ * Given a generated palette (hex values keyed by step), compute auto-contrast
+ * foreground colors for ALL semantic tokens that sit on colored backgrounds.
+ *
+ * Light mode: primary=brand-600, accent=brand-100
+ * Dark mode:  primary=brand-400, accent=brand-900
+ *
+ * Each foreground is computed independently based on its actual background color.
+ */
+export function getAutoForegrounds(palette: Record<string, string>): {
+  light: Record<string, string>;
+  dark: Record<string, string>;
+} {
+  const toOklch = (hex: string) =>
+    hex === '#ffffff' ? 'oklch(1 0 0)' : 'oklch(0.08 0 0)';
+
+  const safe = (step: string) => {
+    try {
+      return toOklch(readableColor(palette[step] || '#000000'));
+    } catch {
+      return 'oklch(1 0 0)';
+    }
+  };
+
+  return {
+    light: {
+      'primary-foreground': safe('600'),
+      'accent-foreground': safe('100'),
+    },
+    dark: {
+      'primary-foreground': safe('400'),
+      'accent-foreground': safe('900'),
+    },
+  };
+}
+
 // ─── Utility ────────────────────────────────────────────────────────────────────
 
 /** Convert any CSS color value to hex */
