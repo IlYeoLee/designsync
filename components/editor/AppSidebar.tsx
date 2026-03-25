@@ -39,7 +39,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarProvider,
   SidebarRail,
   SidebarSeparator,
   SidebarGroup,
@@ -176,7 +175,6 @@ export function AppSidebar({
 
   return (
     <>
-      <SidebarProvider defaultOpen={false}>
         <Sidebar collapsible="icon" className="border-r border-sidebar-border">
           <SidebarHeader>
             <SidebarMenu>
@@ -291,7 +289,6 @@ export function AppSidebar({
 
           <SidebarRail />
         </Sidebar>
-      </SidebarProvider>
 
       {/* Create Dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>

@@ -6,6 +6,7 @@ import { EditorPanel } from "@/components/editor/EditorPanel";
 import { PreviewPanel } from "@/components/editor/PreviewPanel";
 import { AppSidebar, type DesignSystem } from "@/components/editor/AppSidebar";
 import { DEFAULT_TOKENS, TokenState, HistoryEntry, applyTokensToDocument } from "@/lib/tokens";
+import { SidebarProvider, SidebarInset } from "@/registry/new-york/ui/sidebar";
 import { applyStylePreset } from "@/lib/style-presets";
 import { createClient } from "@/lib/supabase";
 
@@ -414,7 +415,7 @@ export default function Home() {
   }
 
   return (
-    <div className="h-screen flex overflow-hidden">
+    <SidebarProvider defaultOpen={true}>
       <AppSidebar
         designSystems={designSystems}
         activeId={activeDs?.id ?? null}
@@ -425,7 +426,7 @@ export default function Home() {
         userName={userName}
         userEmail={userEmail}
       />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <SidebarInset className="flex flex-col overflow-hidden">
       <EditorHeader
         isDark={isDark}
         onToggleDark={() => setIsDark(!isDark)}
@@ -453,7 +454,7 @@ export default function Home() {
         />
         <PreviewPanel iconLibrary={tokens.primitives.iconLibrary} />
       </div>
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
