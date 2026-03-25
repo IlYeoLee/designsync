@@ -6,13 +6,6 @@ import { Button } from "@/registry/new-york/ui/button";
 export default function LoginPage() {
   const supabase = createClient();
 
-  async function signInWithGoogle() {
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
-    });
-  }
-
   async function signInWithGitHub() {
     await supabase.auth.signInWithOAuth({
       provider: "github",
