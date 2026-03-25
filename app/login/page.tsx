@@ -7,10 +7,22 @@ export default function LoginPage() {
   const supabase = createClient();
 
   async function signInWithGitHub() {
-    await supabase.auth.signInWithOAuth({
-      provider: "github",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
-    });
+    console.log("🔵 GitHub login clicked");
+    console.log("🔵 Supabase URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "github",
+        options: { redirectTo: `${window.location.origin}/auth/callback` },
+      });
+      console.log("🔵 OAuth result:", { data, error });
+      if (error) {
+        console.error("🔴 OAuth error:", error.message);
+        alert(`로그인 에러: ${error.message}`);
+      }
+    } catch (e) {
+      console.error("🔴 Exception:", e);
+      alert(`에러: ${e}`);
+    }
   }
 
   return (
