@@ -426,7 +426,7 @@ export default function Home() {
         userName={userName}
         userEmail={userEmail}
       />
-      <SidebarInset className="flex flex-col overflow-hidden">
+      <SidebarInset className="flex flex-col h-screen overflow-hidden">
       <EditorHeader
         isDark={isDark}
         onToggleDark={() => setIsDark(!isDark)}
