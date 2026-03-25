@@ -415,7 +415,7 @@ export default function Home() {
   }
 
   return (
-    <SidebarProvider defaultOpen={true}>
+    <SidebarProvider defaultOpen={false}>
       <AppSidebar
         designSystems={designSystems}
         activeId={activeDs?.id ?? null}
