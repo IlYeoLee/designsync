@@ -8,6 +8,8 @@ import {
   HeaderLogo,
   HeaderActions,
 } from "@/registry/new-york/ui/header";
+import { SidebarTrigger } from "@/registry/new-york/ui/sidebar";
+import { Separator } from "@/registry/new-york/ui/separator";
 import { Button } from "@/registry/new-york/ui/button";
 import { Badge } from "@/registry/new-york/ui/badge";
 
@@ -89,6 +91,8 @@ export function EditorHeader({
 
   return (
     <HeaderRoot className="flex-shrink-0">
+      <SidebarTrigger className="-ml-1" />
+      <Separator orientation="vertical" className="mr-2 h-4" />
       <HeaderLogo href="/">
         <div className="w-7 h-7 rounded-[var(--ds-element-radius)] bg-primary flex items-center justify-center">
           <span className="text-primary-foreground text-xs font-bold">DS</span>
