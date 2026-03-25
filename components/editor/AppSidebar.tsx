@@ -87,6 +87,9 @@ export function AppSidebar({
     if (!newName.trim()) return;
     setCreating(true);
 
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setCreating(false); return; }
+
     const sourceTokens = cloneFrom
       ? designSystems.find((ds) => ds.id === cloneFrom)?.tokens ?? DEFAULT_TOKENS
       : DEFAULT_TOKENS;
@@ -96,6 +99,7 @@ export function AppSidebar({
     const { data, error } = await supabase
       .from("design_systems")
       .insert({
+        user_id: user.id,
         name: newName.trim(),
         slug,
         tokens: sourceTokens,

@@ -60,9 +60,10 @@ export default function Home() {
         applyStylePreset(first.style_preset || "vega");
       } else {
         // 첫 방문 — 기본 DS 자동 생성
-        const { data: newDs } = await supabase
+        const { data: newDs, error: insertError } = await supabase
           .from("design_systems")
           .insert({
+            user_id: user.id,
             name: "내 디자인 시스템",
             slug: "my-ds-" + Date.now().toString(36),
             tokens: DEFAULT_TOKENS,
@@ -71,6 +72,10 @@ export default function Home() {
           })
           .select()
           .single();
+
+        if (insertError) {
+          console.error("DS 생성 실패:", insertError.message);
+        }
 
         if (newDs) {
           const ds = newDs as DesignSystem;
