@@ -4,8 +4,10 @@ import * as React from "react";
 import { EditorHeader } from "@/components/editor/Header";
 import { EditorPanel } from "@/components/editor/EditorPanel";
 import { PreviewPanel } from "@/components/editor/PreviewPanel";
+import { AppSidebar, type DesignSystem } from "@/components/editor/AppSidebar";
 import { DEFAULT_TOKENS, TokenState, HistoryEntry, applyTokensToDocument } from "@/lib/tokens";
 import { applyStylePreset } from "@/lib/style-presets";
+import { createClient } from "@/lib/supabase";
 
 /** lang="ko" 시 한글 폰트 우선 적용 — style 태그로 주입 */
 function applyLangKoOverride(stackKo: string) {
@@ -20,16 +22,69 @@ function applyLangKoOverride(stackKo: string) {
 }
 
 export default function Home() {
+  const supabase = createClient();
   const [tokens, setTokens] = React.useState<TokenState>(DEFAULT_TOKENS);
   const [isDark, setIsDark] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
   const [saveSuccess, setSaveSuccess] = React.useState(false);
   const [history, setHistory] = React.useState<HistoryEntry[]>([]);
   const [snapshots, setSnapshots] = React.useState<TokenState[]>([]);
-  // ── Mount: apply primitive tokens + style preset ──────
+
+  // ── Sidebar state ──────
+  const [designSystems, setDesignSystems] = React.useState<DesignSystem[]>([]);
+  const [activeDs, setActiveDs] = React.useState<DesignSystem | null>(null);
+  const [userName, setUserName] = React.useState("");
+  const [userEmail, setUserEmail] = React.useState("");
+  const [loaded, setLoaded] = React.useState(false);
+
+  // ── Mount: load user + design systems from Supabase ──────
   React.useEffect(() => {
-    applyTokensToDocument(DEFAULT_TOKENS);
-    applyStylePreset(DEFAULT_TOKENS.primitives.stylePreset);
+    async function init() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      setUserName(user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split("@")[0] || "User");
+      setUserEmail(user.email || "");
+
+      const { data: dsList } = await supabase
+        .from("design_systems")
+        .select("*")
+        .order("created_at", { ascending: true });
+
+      if (dsList && dsList.length > 0) {
+        setDesignSystems(dsList as DesignSystem[]);
+        const first = dsList[0] as DesignSystem;
+        setActiveDs(first);
+        setTokens(first.tokens);
+        applyTokensToDocument(first.tokens);
+        applyStylePreset(first.style_preset || "vega");
+      } else {
+        // 첫 방문 — 기본 DS 자동 생성
+        const { data: newDs } = await supabase
+          .from("design_systems")
+          .insert({
+            name: "내 디자인 시스템",
+            slug: "my-ds-" + Date.now().toString(36),
+            tokens: DEFAULT_TOKENS,
+            icon_library: "lucide",
+            style_preset: "vega",
+          })
+          .select()
+          .single();
+
+        if (newDs) {
+          const ds = newDs as DesignSystem;
+          setDesignSystems([ds]);
+          setActiveDs(ds);
+          setTokens(ds.tokens);
+          applyTokensToDocument(ds.tokens);
+          applyStylePreset("vega");
+        }
+      }
+      setLoaded(true);
+    }
+    init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── Dark mode class ─────────────────────────────────────────────
@@ -267,39 +322,105 @@ export default function Home() {
     ].slice(0, 10));
   }
 
-  // ── Save ────────────────────────────────────────────────────────
+  // ── Save to Supabase ────────────────────────────────────────────
   async function handleSave(): Promise<boolean> {
+    if (!activeDs) return false;
     setIsSaving(true);
     setSaveSuccess(false);
     try {
-      const response = await fetch("/api/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const { error } = await supabase
+        .from("design_systems")
+        .update({
           tokens,
-          commitMessage: "chore: update design tokens via DesignSync editor",
-        }),
-      });
-      if (!response.ok) {
-        const err = await response.json();
-        alert(`Save failed: ${err.error || "Unknown error"}`);
+          icon_library: tokens.primitives.iconLibrary,
+          style_preset: tokens.primitives.stylePreset,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", activeDs.id);
+
+      if (error) {
+        alert(`저장 실패: ${error.message}`);
         setIsSaving(false);
         return false;
-      } else {
-        setSaveSuccess(true);
-        setTimeout(() => setSaveSuccess(false), 3000);
-        setIsSaving(false);
-        return true;
       }
+
+      // 로컬 상태도 업데이트
+      setDesignSystems((prev) =>
+        prev.map((ds) => ds.id === activeDs.id ? { ...ds, tokens, icon_library: tokens.primitives.iconLibrary, style_preset: tokens.primitives.stylePreset } : ds)
+      );
+      setActiveDs((prev) => prev ? { ...prev, tokens } : prev);
+
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+      setIsSaving(false);
+      return true;
     } catch {
-      alert("Save failed: network error");
+      alert("저장 실패: network error");
       setIsSaving(false);
       return false;
     }
   }
 
+  // ── Sidebar handlers ────────────────────────────────────────────
+  function handleSelectDs(ds: DesignSystem) {
+    setActiveDs(ds);
+    setTokens(ds.tokens);
+    applyTokensToDocument(ds.tokens);
+    applyStylePreset(ds.style_preset || "vega");
+    setHistory([]);
+    setSnapshots([]);
+  }
+
+  function handleDsCreated(ds: DesignSystem) {
+    setDesignSystems((prev) => [...prev, ds]);
+    handleSelectDs(ds);
+  }
+
+  function handleDsDeleted(id: string) {
+    setDesignSystems((prev) => {
+      const next = prev.filter((ds) => ds.id !== id);
+      if (activeDs?.id === id && next.length > 0) {
+        handleSelectDs(next[0]);
+      }
+      return next;
+    });
+  }
+
+  function handleDsRenamed(id: string, name: string) {
+    setDesignSystems((prev) =>
+      prev.map((ds) => ds.id === id ? { ...ds, name } : ds)
+    );
+    if (activeDs?.id === id) {
+      setActiveDs((prev) => prev ? { ...prev, name } : prev);
+    }
+  }
+
+  if (!loaded) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-3">
+          <div className="w-12 h-12 rounded-[var(--ds-element-radius)] bg-primary flex items-center justify-center mx-auto">
+            <span className="text-primary-foreground text-lg font-bold">DS</span>
+          </div>
+          <p className="text-sm text-muted-foreground">로딩 중...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="h-screen flex overflow-hidden">
+      <AppSidebar
+        designSystems={designSystems}
+        activeId={activeDs?.id ?? null}
+        onSelect={handleSelectDs}
+        onCreated={handleDsCreated}
+        onDeleted={handleDsDeleted}
+        onRenamed={handleDsRenamed}
+        userName={userName}
+        userEmail={userEmail}
+      />
+      <div className="flex-1 flex flex-col overflow-hidden">
       <EditorHeader
         isDark={isDark}
         onToggleDark={() => setIsDark(!isDark)}
@@ -326,6 +447,7 @@ export default function Home() {
           history={history.slice(0, 3)}
         />
         <PreviewPanel iconLibrary={tokens.primitives.iconLibrary} />
+      </div>
       </div>
     </div>
   );
