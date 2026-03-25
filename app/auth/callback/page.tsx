@@ -6,24 +6,37 @@ import { createClient } from "@/lib/supabase";
 
 export default function AuthCallback() {
   const router = useRouter();
-  const supabase = createClient();
 
   useEffect(() => {
-    // Supabase automatically handles the code exchange
-    // when it detects the auth params in the URL hash/query
-    supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN") {
-        router.push("/");
-      }
-    });
+    const supabase = createClient();
 
-    // Fallback: if already signed in, redirect
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) {
-        router.push("/");
+    async function handleCallback() {
+      // URL에서 code 파라미터 추출
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("code");
+
+      if (code) {
+        // code를 세션으로 교환
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (!error) {
+          router.push("/");
+          return;
+        }
       }
-    });
-  }, [router, supabase.auth]);
+
+      // code가 없거나 에러 → hash fragment 체크 (implicit flow)
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.push("/");
+        return;
+      }
+
+      // 전부 실패 → 로그인으로
+      router.push("/login");
+    }
+
+    handleCallback();
+  }, [router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
