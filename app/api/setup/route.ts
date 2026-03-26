@@ -52,7 +52,7 @@ function fetchText(url) {
 
   // ── Step 2: Ensure shadcn is initialized ────────────────────────
   if (!fs.existsSync('components.json')) {
-    console.log('  [1/5] shadcn not initialized — running init...');
+    console.log('  [1/6] shadcn not initialized — running init...');
     try {
       execSync('npx -y shadcn@latest init -y -d', { stdio: 'inherit' });
     } catch (e) {
@@ -60,7 +60,7 @@ function fetchText(url) {
       process.exit(1);
     }
   } else {
-    console.log('  [1/5] shadcn project detected');
+    console.log('  [1/6] shadcn project detected');
   }
 
   // ── Step 3: Find and clean globals.css ──────────────────────────
@@ -77,7 +77,7 @@ function fetchText(url) {
     process.exit(1);
   }
 
-  console.log('  [2/5] Found ' + globalsPath + ' — cleaning existing theme...');
+  console.log('  [2/6] Found ' + globalsPath + ' — cleaning existing theme...');
 
   // Backup
   const original = fs.readFileSync(globalsPath, 'utf-8');
@@ -124,7 +124,7 @@ function fetchText(url) {
   console.log('         Theme cleaned (backup: ' + globalsPath + '.bak)');
 
   // ── Step 4: Install DesignSync ──────────────────────────────────
-  console.log('  [3/5] Installing DesignSync (tokens + components)...');
+  console.log('  [3/6] Installing DesignSync (tokens + components)...');
   console.log('');
   try {
     execSync(
@@ -149,7 +149,7 @@ function fetchText(url) {
   var isV3 = cssContent.includes('@tailwind base');
 
   if (isV3) {
-    console.log('  [3.5/5] Tailwind v3 detected — patching tailwind.config...');
+    console.log('  [3.5/6] Tailwind v3 detected — patching tailwind.config...');
 
     var configPath = ['tailwind.config.ts', 'tailwind.config.js', 'tailwind.config.mjs']
       .find(function(f) { return fs.existsSync(f); });
@@ -206,7 +206,7 @@ function fetchText(url) {
 
   // ── Step 5: Generate AI rule files ──────────────────────────────
   console.log('');
-  console.log('  [4/5] Generating AI rule files...');
+  console.log('  [4/6] Generating AI rule files...');
 
   let rulesText = '';
   try {
@@ -263,9 +263,103 @@ function fetchText(url) {
   fs.writeFileSync('.windsurfrules', rulesText);
   console.log('         Created .windsurfrules');
 
+  // ── Step 5: Migrate existing code ─────────────────────────────
+  console.log('');
+  console.log('  [5/6] Migrating existing code to DesignSync tokens...');
+
+  var CLASS_MAP = {
+    'bg-white': 'bg-background', 'bg-gray-50': 'bg-background', 'bg-slate-50': 'bg-background',
+    'bg-[#fafafa]': 'bg-background', 'bg-[#fff]': 'bg-background',
+    'bg-gray-100': 'bg-muted', 'bg-slate-100': 'bg-muted', 'bg-gray-200': 'bg-muted',
+    'bg-blue-600': 'bg-primary', 'bg-blue-700': 'bg-primary/90', 'bg-indigo-600': 'bg-primary',
+    'bg-red-600': 'bg-destructive', 'bg-red-500': 'bg-destructive',
+    'bg-blue-50': 'bg-accent', 'bg-indigo-50': 'bg-accent',
+    'bg-gray-900': 'bg-foreground', 'bg-[#111]': 'bg-foreground', 'bg-[#0a0a0a]': 'bg-foreground',
+    'text-gray-900': 'text-foreground', 'text-gray-800': 'text-foreground',
+    'text-[#111]': 'text-foreground', 'text-black': 'text-foreground',
+    'text-gray-700': 'text-foreground', 'text-gray-600': 'text-muted-foreground',
+    'text-gray-500': 'text-muted-foreground', 'text-gray-400': 'text-muted-foreground',
+    'text-white': 'text-primary-foreground',
+    'text-blue-600': 'text-primary', 'text-blue-700': 'text-primary',
+    'text-red-600': 'text-destructive', 'text-red-500': 'text-destructive',
+    'border-gray-200': 'border-border', 'border-gray-100': 'border-border',
+    'border-gray-300': 'border-input',
+    'border-[#e5e5e5]': 'border-border', 'border-[#ddd]': 'border-input', 'border-[#eee]': 'border-border',
+    'hover:bg-gray-50': 'hover:bg-accent', 'hover:bg-gray-100': 'hover:bg-accent',
+    'hover:bg-blue-700': 'hover:bg-primary/90', 'hover:bg-red-600': 'hover:bg-destructive/90',
+    'hover:text-gray-900': 'hover:text-foreground', 'hover:text-gray-700': 'hover:text-foreground',
+    'rounded-xl': 'rounded-[var(--ds-card-radius)]', 'rounded-lg': 'rounded-[var(--ds-card-radius)]',
+    'p-6': 'p-[var(--ds-card-padding)]', 'p-5': 'p-[var(--ds-card-padding)]',
+    'px-6': 'px-[var(--ds-card-padding)]',
+  };
+
+  function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&'); }
+
+  function replaceClasses(classStr) {
+    var result = classStr;
+    for (var from in CLASS_MAP) {
+      var to = CLASS_MAP[from];
+      var regex = new RegExp('(^|\\\\s)' + escapeRegex(from) + '($|\\\\s)', 'g');
+      result = result.replace(regex, '$1' + to + '$2');
+    }
+    return result;
+  }
+
+  function findSourceFiles(dir) {
+    var results = [];
+    try {
+      var entries = fs.readdirSync(dir, { withFileTypes: true });
+      for (var i = 0; i < entries.length; i++) {
+        var entry = entries[i];
+        var full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          if (['node_modules', '.next', '.git', 'dist', 'build'].indexOf(entry.name) >= 0) continue;
+          if (full.includes(path.join('components', 'ui'))) continue;
+          results = results.concat(findSourceFiles(full));
+        } else if (/\\.(tsx|jsx)$/.test(entry.name)) {
+          if (!full.includes(path.join('components', 'ui'))) {
+            results.push(full);
+          }
+        }
+      }
+    } catch (e) { /* permission error, skip */ }
+    return results;
+  }
+
+  var sourceFiles = findSourceFiles('.');
+  var migratedCount = 0;
+
+  // className="..." pattern — matches both className="..." and className={'...'} and className={\\x60...\\x60}
+  var classNameRegex = /className\\s*=\\s*(?:"([^"]+)"|'([^']+)'|\\{\\s*"([^"]+)"\\s*\\}|\\{\\s*'([^']+)'\\s*\\}|\\{\\s*\\x60([^\\x60]+)\\x60\\s*\\})/g;
+
+  for (var fi = 0; fi < sourceFiles.length; fi++) {
+    try {
+      var content = fs.readFileSync(sourceFiles[fi], 'utf-8');
+      var changed = false;
+      var newContent = content.replace(classNameRegex, function(match) {
+        var replaced = match;
+        for (var from in CLASS_MAP) {
+          var to = CLASS_MAP[from];
+          // Replace whole-word class occurrences
+          var regex = new RegExp('(\\\\s|"|\'|\\x60)' + escapeRegex(from) + '(\\\\s|"|\'|\\x60)', 'g');
+          var prev = replaced;
+          replaced = replaced.replace(regex, '$1' + to + '$2');
+          if (replaced !== prev) changed = true;
+        }
+        return replaced;
+      });
+      if (changed) {
+        fs.writeFileSync(sourceFiles[fi], newContent);
+        migratedCount++;
+      }
+    } catch (e) { /* skip unreadable files */ }
+  }
+
+  console.log('         Scanned ' + sourceFiles.length + ' files, migrated ' + migratedCount + ' files');
+
   // ── Done ────────────────────────────────────────────────────────
   console.log('');
-  console.log('  [5/5] Done!');
+  console.log('  [6/6] Done!');
   console.log('');
   console.log('  DesignSync has been applied to your project.');
   console.log('  Restart your dev server to see the changes.');
@@ -277,6 +371,9 @@ function fetchText(url) {
   console.log('    - CLAUDE.md          (Claude Code AI rules)');
   console.log('    - .windsurfrules     (Windsurf AI rules)');
   console.log('');
+  if (migratedCount > 0) {
+    console.log('  Migrated ' + migratedCount + ' files: hardcoded colors → semantic tokens');
+  }
   console.log('  Every new AI conversation will automatically load these rules.');
   console.log('');
 })().catch((e) => {
