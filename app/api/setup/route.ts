@@ -293,7 +293,7 @@ function fetchText(url) {
     'px-6': 'px-[var(--ds-card-padding)]',
   };
 
-  function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&'); }
+  function escapeRegex(s) { return s.replace(/[.*+?^\${}()|[\\]\\\\]/g, '\\\\$&'); }
 
   function replaceClasses(classStr) {
     var result = classStr;
