@@ -212,6 +212,18 @@ ${fontSection}- 시맨틱 색상: var(--primary), var(--secondary), var(--accent
 
 // Empty State
 <Empty><EmptyIcon><Search className="w-10 h-10" /></EmptyIcon><EmptyTitle>결과 없음</EmptyTitle><EmptyDescription>검색어를 변경해보세요</EmptyDescription></Empty>
+
+// Chart (recharts 기반 — SVG 직접 작성 절대 금지)
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area, ResponsiveContainer } from "recharts"
+
+const chartConfig = { revenue: { label: "매출", color: "var(--chart-1)" }, users: { label: "사용자", color: "var(--chart-2)" } }
+<ChartContainer config={chartConfig} className="h-[300px] w-full">
+  <BarChart data={data}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" /><YAxis /><ChartTooltip content={<ChartTooltipContent />} /><Bar dataKey="revenue" fill="var(--color-revenue)" /></BarChart>
+</ChartContainer>
+// LineChart도 동일 패턴: <LineChart data={data}><Line type="monotone" dataKey="users" stroke="var(--color-users)" /></LineChart>
+// PieChart: <PieChart><Pie data={data} dataKey="value" cx="50%" cy="50%" /><ChartTooltip /></PieChart>
+// ❌ 금지: SVG 직접 작성, canvas, d3.js — 반드시 recharts + ChartContainer 사용
 \`\`\`
 
 ## ${n + 3}. 필수 규칙 (위반 시 즉시 수정)
@@ -226,6 +238,8 @@ ${fontSection}- 시맨틱 색상: var(--primary), var(--secondary), var(--accent
 - ❌ \`<h1>~<h6>\` → 반드시 \`<TypographyH1>~<TypographyH4>\` 사용
 - ❌ 커스텀 모달 div → 반드시 \`<Dialog>\` 또는 \`<Sheet>\` 사용
 - ❌ 커스텀 드롭다운 div → 반드시 \`<DropdownMenu>\` 또는 \`<Select>\` 사용
+- ❌ SVG로 차트/그래프 직접 그리기 → 반드시 \`<ChartContainer>\` + recharts 사용
+- ❌ canvas, d3.js, chart.js → 반드시 recharts + \`<ChartContainer>\` 사용
 
 ### 절대 금지 — 하드코딩
 - ❌ bg-blue-600, bg-[#1a1a1a], text-white, text-gray-500, bg-slate-100 등 직접 색상 클래스
