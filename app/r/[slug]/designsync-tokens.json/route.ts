@@ -31,6 +31,66 @@ export async function GET(
   const lightVars: Record<string, string> = {};
   const darkVars: Record<string, string> = {};
 
+  // Primitive color scales (brand, neutral, error, success, warning)
+  const colorScales = ["brand", "neutral", "error", "success", "warning"] as const;
+  for (const scale of colorScales) {
+    if (tokens.primitives?.[scale]) {
+      for (const [step, val] of Object.entries(tokens.primitives[scale] as Record<string, string>)) {
+        lightVars[`${scale}-${step}`] = val;
+        darkVars[`${scale}-${step}`] = val;
+      }
+    }
+  }
+
+  // Primitive spacing
+  if (tokens.primitives?.spacing) {
+    for (const [key, val] of Object.entries(tokens.primitives.spacing as Record<string, string>)) {
+      lightVars[`spacing-${key}`] = val;
+      darkVars[`spacing-${key}`] = val;
+    }
+  }
+
+  // Primitive radius
+  if (tokens.primitives?.radius) {
+    const radiusMap: Record<string, string> = { none: "radius-none", sm: "radius-sm-prim", md: "radius-md-prim", lg: "radius-lg-prim", xl: "radius-xl-prim", full: "radius-full" };
+    for (const [key, val] of Object.entries(tokens.primitives.radius as Record<string, string>)) {
+      const varName = radiusMap[key] || `radius-${key}`;
+      lightVars[varName] = val;
+      darkVars[varName] = val;
+    }
+  }
+
+  // Primitive shadows
+  if (tokens.primitives?.shadows) {
+    for (const [key, val] of Object.entries(tokens.primitives.shadows as Record<string, string>)) {
+      lightVars[`ds-shadow-${key}`] = val;
+      darkVars[`ds-shadow-${key}`] = val;
+    }
+  }
+
+  // Density variables (from style preset defaults)
+  const densityDefaults: Record<string, string> = {
+    "ds-button-h-default": "2.25rem",
+    "ds-button-h-sm": "2rem",
+    "ds-button-h-lg": "2.5rem",
+    "ds-button-h-xs": "1.5rem",
+    "ds-input-h": "2.25rem",
+    "ds-card-padding": "1.5rem",
+    "ds-section-gap": "1rem",
+    "ds-internal-gap": "0.5rem",
+    "ds-button-radius": "var(--radius-md-prim)",
+    "ds-element-radius": "var(--radius-md-prim)",
+    "ds-input-radius": "var(--radius-md-prim)",
+    "ds-card-radius": "var(--radius-xl-prim)",
+    "ds-dialog-radius": "var(--radius-xl-prim)",
+    "ds-base-font-size": "0.875rem",
+    "ds-focus-ring-width": "3px",
+  };
+  for (const [key, val] of Object.entries(densityDefaults)) {
+    lightVars[key] = val;
+    darkVars[key] = val;
+  }
+
   // Resolve semantic tokens
   if (tokens.semantic?.light) {
     for (const [key, val] of Object.entries(tokens.semantic.light)) {

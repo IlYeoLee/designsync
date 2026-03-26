@@ -114,10 +114,8 @@ function fetchText(url) {
   // Remove @custom-variant dark line (shadcn add will re-add it)
   css = css.replace(/@custom-variant\\s+dark\\s+[^;]+;/g, '');
 
-  // Remove Tailwind v3 directives if present (v4 uses @import)
-  css = css.replace(/@tailwind\\s+base\\s*;/g, '');
-  css = css.replace(/@tailwind\\s+components\\s*;/g, '');
-  css = css.replace(/@tailwind\\s+utilities\\s*;/g, '');
+  // Keep Tailwind v3 directives if present — shadcn add needs them
+  // (only remove if @import "tailwindcss" exists — means v4)
 
   // Clean up excessive blank lines
   css = css.replace(/\\n{3,}/g, '\\n\\n').trim();
