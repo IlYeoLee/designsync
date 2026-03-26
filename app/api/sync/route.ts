@@ -9,6 +9,9 @@ export async function GET(request: Request) {
   const tokensUrl = dsSlug
     ? `${CDN}/r/${dsSlug}/designsync-tokens.json`
     : `${CDN}/r/designsync-tokens.json`;
+  const componentsUrl = dsSlug
+    ? `${CDN}/r/${dsSlug}/designsync-all.json`
+    : `${CDN}/r/designsync-all.json`;
   const rulesUrl = dsSlug
     ? `${CDN}/api/rules?ds=${dsSlug}`
     : `${CDN}/api/rules`;
@@ -17,9 +20,11 @@ export async function GET(request: Request) {
 'use strict';
 
 const fs = require('fs');
+const { execSync } = require('child_process');
 const https = require('https');
 
 const TOKENS_URL = '${tokensUrl}';
+const COMPONENTS_URL = '${componentsUrl}';
 const RULES_URL = '${rulesUrl}';
 
 function fetchJSON(url) {
@@ -72,10 +77,10 @@ function fetchText(url) {
     process.exit(1);
   }
 
-  console.log('  [1/4] Found ' + globalsPath);
+  console.log('  [1/5] Found ' + globalsPath);
 
   // 2. Fetch latest tokens
-  console.log('  [2/4] Fetching latest tokens...');
+  console.log('  [2/5] Fetching latest tokens...');
   let tokens;
   try {
     tokens = await fetchJSON(TOKENS_URL);
@@ -90,7 +95,7 @@ function fetchText(url) {
   }
 
   // 3. Update globals.css — replace ALL :root and .dark blocks
-  console.log('  [3/4] Updating design tokens...');
+  console.log('  [3/5] Updating design tokens...');
   let css = fs.readFileSync(globalsPath, 'utf-8');
 
   // Build new :root and .dark blocks (includes primitives + semantic + density + font)
@@ -144,10 +149,10 @@ function fetchText(url) {
     '.dark {\\n' + darkVars + '\\n}\\n';
 
   fs.writeFileSync(globalsPath, css);
-  console.log('  [3/4] Tokens updated in ' + globalsPath);
+  console.log('  [3/5] Tokens updated in ' + globalsPath);
 
   // 4. Create/update AI rules files
-  console.log('  [4/4] Updating AI rules...');
+  console.log('  [4/5] Updating AI rules...');
   try {
     const rulesText = await fetchText(RULES_URL);
     if (rulesText && !rulesText.trim().startsWith('<')) {
@@ -155,14 +160,23 @@ function fetchText(url) {
       fs.writeFileSync('.cursorrules', rulesText);
       fs.writeFileSync('CLAUDE.md', rulesText);
       fs.writeFileSync('.windsurfrules', rulesText);
-      console.log('  [4/4] AI rules written to .cursorrules, CLAUDE.md, .windsurfrules');
+      console.log('  [4/5] AI rules written to .cursorrules, CLAUDE.md, .windsurfrules');
     }
   } catch {
     console.log('  [WARN] AI rules update skipped.');
   }
 
+  // 5. Update components
+  console.log('  [5/5] Updating components...');
+  try {
+    execSync('npx -y shadcn@latest add -o -y ' + COMPONENTS_URL, { stdio: 'inherit' });
+    console.log('         Components updated');
+  } catch (e) {
+    console.log('         [WARN] Component update skipped');
+  }
+
   console.log('');
-  console.log('  Done! Design tokens synced.');
+  console.log('  Done! Design system synced (tokens + rules + components).');
   console.log('  Restart your dev server to see changes.');
   console.log('');
 })().catch((e) => {

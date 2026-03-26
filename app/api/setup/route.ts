@@ -138,16 +138,26 @@ function fetchText(url) {
     process.exit(1);
   }
 
+  // Parse icon library package from rules (pre-fetch)
+  var iconPkg = 'lucide-react';
+  try {
+    var _iconRules = await fetchText('${rulesUrl}');
+    if (_iconRules && !_iconRules.trim().startsWith('<')) {
+      var _pkgMatch = _iconRules.match(/\\(\\s*.([a-z@][a-z0-9\\-/@]*).\\s*\\)\\s*\\u{C544}\\u{C774}\\u{CF58}/u);
+      if (_pkgMatch) iconPkg = _pkgMatch[1];
+    }
+  } catch (_e) { /* fallback to lucide-react */ }
+
   // Install additional peer dependencies
-  console.log('         Installing peer dependencies (framer-motion, lucide-react)...');
+  console.log('         Installing peer dependencies (framer-motion, ' + iconPkg + ')...');
   try {
     // Detect package manager
     var pm = fs.existsSync('pnpm-lock.yaml') ? 'pnpm add' : fs.existsSync('yarn.lock') ? 'yarn add' : 'npm install --save';
-    execSync(pm + ' framer-motion lucide-react', { stdio: 'pipe' });
+    execSync(pm + ' framer-motion ' + iconPkg, { stdio: 'pipe' });
     console.log('         Peer dependencies installed');
   } catch (e) {
-    console.log('         [WARN] Could not auto-install framer-motion/lucide-react. Run manually:');
-    console.log('         npm install framer-motion lucide-react');
+    console.log('         [WARN] Could not auto-install framer-motion/' + iconPkg + '. Run manually:');
+    console.log('         npm install framer-motion ' + iconPkg);
   }
 
   // ── Step 3b: Inject density CSS variables ──────────────────────
@@ -406,8 +416,6 @@ function fetchText(url) {
     'hover:bg-gray-50': 'hover:bg-accent', 'hover:bg-gray-100': 'hover:bg-accent',
     'hover:bg-blue-700': 'hover:bg-primary/90', 'hover:bg-red-600': 'hover:bg-destructive/90',
     'hover:text-gray-900': 'hover:text-foreground', 'hover:text-gray-700': 'hover:text-foreground',
-    'rounded-xl': 'rounded-[var(--ds-card-radius)]', 'rounded-lg': 'rounded-[var(--ds-card-radius)]',
-    'rounded-md': 'rounded-[var(--ds-element-radius)]', 'rounded-sm': 'rounded-[var(--ds-element-radius)]',
     'p-6': 'p-[var(--ds-card-padding)]', 'p-5': 'p-[var(--ds-card-padding)]',
     'p-4': 'p-[var(--ds-card-padding)]',
     'px-6': 'px-[var(--ds-card-padding)]', 'px-5': 'px-[var(--ds-card-padding)]',
@@ -484,6 +492,84 @@ function fetchText(url) {
 
   console.log('         Scanned ' + sourceFiles.length + ' files, migrated ' + migratedCount + ' files');
 
+  // ── Element replacement pass ──────────────────────────────────
+  var ELEMENT_REPLACEMENTS = [
+    { from: 'button', to: 'Button', importPath: '@/components/ui/button' },
+    { from: 'input', to: 'Input', importPath: '@/components/ui/input' },
+    { from: 'textarea', to: 'Textarea', importPath: '@/components/ui/textarea' },
+    { from: 'select', to: 'NativeSelect', importPath: '@/components/ui/native-select' },
+    { from: 'label', to: 'Label', importPath: '@/components/ui/label' },
+  ];
+
+  var elementMigratedCount = 0;
+  for (var fi = 0; fi < sourceFiles.length; fi++) {
+    var content = fs.readFileSync(sourceFiles[fi], 'utf-8');
+    var modified = false;
+    var importsNeeded = [];
+
+    for (var ei = 0; ei < ELEMENT_REPLACEMENTS.length; ei++) {
+      var el = ELEMENT_REPLACEMENTS[ei];
+      var openRegex = new RegExp('<' + el.from + '(\\\\s|>|/)', 'g');
+      var closeRegex = new RegExp('</' + el.from + '>', 'g');
+
+      if (openRegex.test(content)) {
+        content = content.replace(new RegExp('<' + el.from + '(\\\\s|>)', 'g'), '<' + el.to + '$1');
+        content = content.replace(new RegExp('<' + el.from + '/', 'g'), '<' + el.to + '/');
+        content = content.replace(closeRegex, '</' + el.to + '>');
+        importsNeeded.push(el);
+        modified = true;
+      }
+    }
+
+    if (modified) {
+      for (var ii = 0; ii < importsNeeded.length; ii++) {
+        var imp = importsNeeded[ii];
+        if (!content.includes('from \\x27' + imp.importPath + '\\x27') && !content.includes('from "' + imp.importPath + '"')) {
+          content = 'import { ' + imp.to + ' } from "' + imp.importPath + '";\\n' + content;
+        }
+      }
+      fs.writeFileSync(sourceFiles[fi], content);
+      elementMigratedCount++;
+    }
+  }
+  console.log('         Element replacement: ' + elementMigratedCount + ' files updated');
+
+  // ── Context-aware radius replacement ──────────────────────────
+  var radiusMigratedCount = 0;
+  for (var fi = 0; fi < sourceFiles.length; fi++) {
+    var content = fs.readFileSync(sourceFiles[fi], 'utf-8');
+    var changed = false;
+
+    var lines = content.split('\\n');
+    for (var li = 0; li < lines.length; li++) {
+      var line = lines[li];
+      var newLine = line;
+
+      if (line.includes('rounded-md') || line.includes('rounded-lg') || line.includes('rounded-xl') || line.includes('rounded-sm')) {
+        var radius = 'var(--ds-element-radius)';
+        if (/[<.](?:button|Button|btn)/i.test(line) || /bg-primary|variant/.test(line)) {
+          radius = 'var(--ds-button-radius)';
+        } else if (/[<.](?:input|Input|textarea|Textarea|select|Select)/i.test(line) || /border-input|placeholder/.test(line)) {
+          radius = 'var(--ds-input-radius)';
+        } else if (/[<.](?:Card|card|dialog|Dialog|sheet|Sheet|alert|Alert|popover|Popover)/i.test(line) || /shadow-|border-border/i.test(line)) {
+          radius = 'var(--ds-card-radius)';
+        }
+        newLine = newLine.replace(/rounded-(?:sm|md|lg|xl)/g, 'rounded-[' + radius + ']');
+      }
+
+      if (newLine !== line) {
+        lines[li] = newLine;
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      fs.writeFileSync(sourceFiles[fi], lines.join('\\n'));
+      radiusMigratedCount++;
+    }
+  }
+  console.log('         Context-aware radius: ' + radiusMigratedCount + ' files updated');
+
   // ── Done ────────────────────────────────────────────────────────
   console.log('');
   console.log('  [6/6] Done!');
@@ -498,8 +584,8 @@ function fetchText(url) {
   console.log('    - CLAUDE.md          (Claude Code AI rules)');
   console.log('    - .windsurfrules     (Windsurf AI rules)');
   console.log('');
-  if (migratedCount > 0) {
-    console.log('  Migrated ' + migratedCount + ' files: hardcoded colors → semantic tokens');
+  if (migratedCount > 0 || elementMigratedCount > 0 || radiusMigratedCount > 0) {
+    console.log('  Migrated: ' + migratedCount + ' files (class tokens), ' + elementMigratedCount + ' files (element replacement), ' + radiusMigratedCount + ' files (radius tokens)');
   }
   console.log('  Every new AI conversation will automatically load these rules.');
   console.log('');
