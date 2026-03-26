@@ -289,8 +289,17 @@ function fetchText(url) {
     'hover:bg-blue-700': 'hover:bg-primary/90', 'hover:bg-red-600': 'hover:bg-destructive/90',
     'hover:text-gray-900': 'hover:text-foreground', 'hover:text-gray-700': 'hover:text-foreground',
     'rounded-xl': 'rounded-[var(--ds-card-radius)]', 'rounded-lg': 'rounded-[var(--ds-card-radius)]',
+    'rounded-md': 'rounded-[var(--ds-element-radius)]', 'rounded-sm': 'rounded-[var(--ds-element-radius)]',
     'p-6': 'p-[var(--ds-card-padding)]', 'p-5': 'p-[var(--ds-card-padding)]',
-    'px-6': 'px-[var(--ds-card-padding)]',
+    'p-4': 'p-[var(--ds-card-padding)]',
+    'px-6': 'px-[var(--ds-card-padding)]', 'px-5': 'px-[var(--ds-card-padding)]',
+    'py-6': 'py-[var(--ds-card-padding)]', 'py-5': 'py-[var(--ds-card-padding)]',
+    'gap-6': 'gap-[var(--ds-section-gap)]', 'gap-5': 'gap-[var(--ds-section-gap)]',
+    'gap-4': 'gap-[var(--ds-section-gap)]', 'gap-3': 'gap-[var(--ds-internal-gap)]',
+    'space-y-6': 'space-y-[var(--ds-section-gap)]', 'space-y-5': 'space-y-[var(--ds-section-gap)]',
+    'space-y-4': 'space-y-[var(--ds-section-gap)]', 'space-y-3': 'space-y-[var(--ds-internal-gap)]',
+    'h-10': 'h-[var(--ds-input-h)]', 'h-9': 'h-[var(--ds-button-h-default)]',
+    'h-8': 'h-[var(--ds-button-h-sm)]',
   };
 
   function escapeRegex(s) { return s.replace(/[.*+?^\${}()|[\\]\\\\]/g, '\\\\$&'); }
