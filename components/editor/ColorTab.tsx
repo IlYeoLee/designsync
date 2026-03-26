@@ -3,7 +3,7 @@
 import * as React from "react";
 import { ColorScale, TokenState } from "@/lib/tokens";
 import { oklchToHex, generatePaletteFromHex, getAutoForegrounds } from "@/lib/color";
-import { Wand2, ChevronDown } from "lucide-react";
+import { getIconMap } from "@/lib/icon-map";
 import { Button } from "@/registry/new-york/ui/button";
 import { Input } from "@/registry/new-york/ui/input";
 
@@ -149,6 +149,7 @@ interface ColorTabProps {
   onTokenChange: (variable: string, value: string) => void;
   onBatchChange: (changes: { variable: string; value: string }[]) => void;
   onSemanticChange: (mode: "light" | "dark", key: string, value: string) => void;
+  iconLibrary: string;
 }
 
 /** Custom dropdown for semantic token with color swatches */
@@ -339,7 +340,8 @@ function NeutralPresetSelector({
   );
 }
 
-export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChange }: ColorTabProps) {
+export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChange, iconLibrary }: ColorTabProps) {
+  const icons = getIconMap(iconLibrary);
   const [mounted, setMounted] = React.useState(false);
   const [activeColor, setActiveColor] = React.useState<{ scale: ColorScaleName; step: string } | null>(null);
   const colorGridRef = React.useRef<HTMLDivElement>(null);
@@ -483,7 +485,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
                   onClick={() => setOpenScalePicker(openScalePicker === scale ? null : scale)}
                   title="기준색 하나로 팔레트 자동 생성"
                 >
-                  <Wand2 className="w-2.5 h-2.5" />
+                  <icons.wand className="w-2.5 h-2.5" />
                   Auto
                 </Button>
                 {openScalePicker === scale && (
@@ -614,7 +616,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
           onClick={() => setSemanticOpen((v) => !v)}
         >
           <p className="text-xs text-muted-foreground font-medium">시멘틱 토큰</p>
-          <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${semanticOpen ? "rotate-180" : ""}`} />
+          <icons.chevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${semanticOpen ? "rotate-180" : ""}`} />
         </Button>
 
         {semanticOpen && (

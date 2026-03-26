@@ -9,7 +9,8 @@ import {
   Menu, LogOut, Sun, Moon, Zap, Bold, Italic, Underline, AlignLeft,
   AlignCenter, AlignRight, LayoutDashboard, FileText, Calendar,
   AlertCircle, CheckCircle2, Info, Calculator, Smile, ChevronsUpDown,
-  PanelLeft, PanelLeftClose,
+  PanelLeft, PanelLeftClose, ClipboardCopy, Loader2, Undo2, RotateCcw,
+  Palette, Type, Layout, ChevronUp, Wand2, MoreHorizontal, Save,
 } from "lucide-react";
 
 // Tabler
@@ -22,6 +23,9 @@ import {
   IconLayoutDashboard, IconFileText, IconCalendar, IconAlertCircle,
   IconCircleCheck, IconInfoCircle, IconCalculator, IconMoodSmile,
   IconSelector, IconLayoutSidebarLeftCollapse, IconLayoutSidebarLeftExpand,
+  IconCopy, IconLoader2, IconArrowBackUp, IconRotate, IconPalette,
+  IconTypography, IconLayout, IconChevronUp, IconWand, IconDots,
+  IconDeviceFloppy,
 } from "@tabler/icons-react";
 
 // Phosphor
@@ -34,7 +38,10 @@ import {
   TextUnderline, TextAlignLeft, TextAlignCenter, TextAlignRight,
   SquaresFour, FileText as PhFileText, CalendarBlank, WarningCircle,
   CheckCircle, Info as PhInfo, Calculator as PhCalculator, Smiley,
-  CaretUpDown, SidebarSimple, Sidebar as PhSidebar,
+  CaretUpDown, SidebarSimple, Sidebar as PhSidebar, Copy, SpinnerGap,
+  ArrowCounterClockwise, ArrowsClockwise, Palette as PhPalette,
+  TextT, Layout as PhLayout, CaretUp, MagicWand, DotsThree,
+  FloppyDisk,
 } from "@phosphor-icons/react";
 
 // Remix
@@ -47,7 +54,10 @@ import {
   RiBold, RiItalic, RiUnderline, RiAlignLeft, RiAlignCenter, RiAlignRight,
   RiDashboardLine, RiFileTextLine, RiCalendarLine, RiErrorWarningLine,
   RiCheckboxCircleLine, RiInformationLine, RiCalculatorLine, RiEmotionLine,
-  RiExpandUpDownLine, RiSideBarLine, RiMenuFoldLine,
+  RiExpandUpDownLine, RiSideBarLine, RiMenuFoldLine, RiFileCopyLine,
+  RiLoader4Line, RiArrowGoBackLine, RiRefreshLine, RiPaletteLine,
+  RiFontSize, RiLayoutLine, RiArrowUpSLine, RiMagicLine, RiMoreLine,
+  RiSave3Line,
 } from "@remixicon/react";
 
 // Hugeicons
@@ -63,6 +73,9 @@ import {
   DashboardSquare01Icon, File01Icon, Calendar01Icon, Alert01Icon,
   CheckmarkCircle01Icon, InformationCircleIcon, Calculator01Icon,
   SmileIcon as HgSmileIcon, SidebarLeft01Icon, SidebarLeftIcon as HgSidebarIcon,
+  Copy01Icon, Loading01Icon, ArrowTurnBackwardIcon, RotateLeft01Icon,
+  PaintBoardIcon, TextFontIcon, Layout01Icon, ArrowUp01Icon,
+  MagicWand01Icon, MoreHorizontalIcon, FloppyDiskIcon,
 } from "@hugeicons/core-free-icons";
 
 // Icon name keys used throughout the app
@@ -74,7 +87,9 @@ type IconName =
   | "underline" | "alignLeft" | "alignCenter" | "alignRight"
   | "dashboard" | "fileText" | "calendar" | "alertCircle" | "checkCircle"
   | "info" | "calculator" | "smile" | "chevronsUpDown"
-  | "panelLeft" | "panelLeftClose";
+  | "panelLeft" | "panelLeftClose"
+  | "copy" | "loader" | "undo" | "reset" | "palette" | "type"
+  | "layout" | "chevronUp" | "wand" | "moreHorizontal" | "save";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type IconComponent = React.ComponentType<any>;
@@ -97,6 +112,9 @@ const ICON_MAPS: Record<string, Record<IconName, IconComponent>> = {
     fileText: FileText, calendar: Calendar, alertCircle: AlertCircle,
     checkCircle: CheckCircle2, info: Info, calculator: Calculator, smile: Smile,
     chevronsUpDown: ChevronsUpDown, panelLeft: PanelLeft, panelLeftClose: PanelLeftClose,
+    copy: ClipboardCopy, loader: Loader2, undo: Undo2, reset: RotateCcw,
+    palette: Palette, type: Type, layout: Layout, chevronUp: ChevronUp,
+    wand: Wand2, moreHorizontal: MoreHorizontal, save: Save,
   },
   tabler: {
     home: IconHome, settings: IconSettings, user: IconUser, search: IconSearch,
@@ -111,6 +129,10 @@ const ICON_MAPS: Record<string, Record<IconName, IconComponent>> = {
     alertCircle: IconAlertCircle, checkCircle: IconCircleCheck, info: IconInfoCircle,
     calculator: IconCalculator, smile: IconMoodSmile, chevronsUpDown: IconSelector,
     panelLeft: IconLayoutSidebarLeftExpand, panelLeftClose: IconLayoutSidebarLeftCollapse,
+    copy: IconCopy, loader: IconLoader2, undo: IconArrowBackUp, reset: IconRotate,
+    palette: IconPalette, type: IconTypography, layout: IconLayout,
+    chevronUp: IconChevronUp, wand: IconWand, moreHorizontal: IconDots,
+    save: IconDeviceFloppy,
   },
   phosphor: {
     home: House, settings: Gear, user: UserCircle, search: MagnifyingGlass,
@@ -125,6 +147,10 @@ const ICON_MAPS: Record<string, Record<IconName, IconComponent>> = {
     alertCircle: WarningCircle, checkCircle: CheckCircle, info: PhInfo,
     calculator: PhCalculator, smile: Smiley, chevronsUpDown: CaretUpDown,
     panelLeft: PhSidebar, panelLeftClose: SidebarSimple,
+    copy: Copy, loader: SpinnerGap, undo: ArrowCounterClockwise,
+    reset: ArrowsClockwise, palette: PhPalette, type: TextT,
+    layout: PhLayout, chevronUp: CaretUp, wand: MagicWand,
+    moreHorizontal: DotsThree, save: FloppyDisk,
   },
   remix: {
     home: RiHome2Line, settings: RiSettings3Line, user: RiUserLine,
@@ -141,6 +167,10 @@ const ICON_MAPS: Record<string, Record<IconName, IconComponent>> = {
     info: RiInformationLine, calculator: RiCalculatorLine, smile: RiEmotionLine,
     chevronsUpDown: RiExpandUpDownLine, panelLeft: RiSideBarLine,
     panelLeftClose: RiMenuFoldLine,
+    copy: RiFileCopyLine, loader: RiLoader4Line, undo: RiArrowGoBackLine,
+    reset: RiRefreshLine, palette: RiPaletteLine, type: RiFontSize,
+    layout: RiLayoutLine, chevronUp: RiArrowUpSLine, wand: RiMagicLine,
+    moreHorizontal: RiMoreLine, save: RiSave3Line,
   },
   hugeicons: {
     home: makeHuge(Home01Icon), settings: makeHuge(Settings01Icon),
@@ -166,6 +196,12 @@ const ICON_MAPS: Record<string, Record<IconName, IconComponent>> = {
     calculator: makeHuge(Calculator01Icon), smile: makeHuge(HgSmileIcon),
     chevronsUpDown: makeHuge(ArrowDown01Icon),
     panelLeft: makeHuge(HgSidebarIcon), panelLeftClose: makeHuge(SidebarLeft01Icon),
+    copy: makeHuge(Copy01Icon), loader: makeHuge(Loading01Icon),
+    undo: makeHuge(ArrowTurnBackwardIcon), reset: makeHuge(RotateLeft01Icon),
+    palette: makeHuge(PaintBoardIcon), type: makeHuge(TextFontIcon),
+    layout: makeHuge(Layout01Icon), chevronUp: makeHuge(ArrowUp01Icon),
+    wand: makeHuge(MagicWand01Icon), moreHorizontal: makeHuge(MoreHorizontalIcon),
+    save: makeHuge(FloppyDiskIcon),
   },
 };
 

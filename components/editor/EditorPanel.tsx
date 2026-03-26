@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Palette, Type, Layout, ChevronDown, ChevronUp } from "lucide-react";
+import { getIconMap } from "@/lib/icon-map";
 import { TokenState, HistoryEntry } from "@/lib/tokens";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/registry/new-york/ui/tabs";
 import { Button } from "@/registry/new-york/ui/button";
@@ -20,6 +20,7 @@ interface EditorPanelProps {
   onFontFamilyKoChange: (font: string) => void;
   onIconLibraryChange: (library: string) => void;
   onStylePresetChange: (preset: string) => void;
+  iconLibrary: string;
   history: HistoryEntry[];
 }
 
@@ -32,15 +33,17 @@ export function EditorPanel({
   onFontFamilyKoChange,
   onIconLibraryChange,
   onStylePresetChange,
+  iconLibrary,
   history,
 }: EditorPanelProps) {
+  const icons = getIconMap(iconLibrary);
   const [activeTab, setActiveTab] = React.useState<Tab>("colors");
   const [historyOpen, setHistoryOpen] = React.useState(true);
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
-    { id: "colors", label: "Colors", icon: <Palette className="w-3.5 h-3.5" /> },
-    { id: "typography", label: "Type", icon: <Type className="w-3.5 h-3.5" /> },
-    { id: "layout", label: "Layout", icon: <Layout className="w-3.5 h-3.5" /> },
+    { id: "colors", label: "Colors", icon: <icons.palette className="w-3.5 h-3.5" /> },
+    { id: "typography", label: "Type", icon: <icons.type className="w-3.5 h-3.5" /> },
+    { id: "layout", label: "Layout", icon: <icons.layout className="w-3.5 h-3.5" /> },
   ];
 
   function formatTimeAgo(date: Date): string {
@@ -70,6 +73,7 @@ export function EditorPanel({
               onTokenChange={onTokenChange}
               onBatchChange={onBatchChange}
               onSemanticChange={onSemanticChange}
+              iconLibrary={iconLibrary}
             />
           </TabsContent>
           <TabsContent value="typography">
@@ -100,7 +104,7 @@ export function EditorPanel({
             onClick={() => setHistoryOpen(!historyOpen)}
           >
             <span className="font-medium">최근 변경 ({history.length})</span>
-            {historyOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
+            {historyOpen ? <icons.chevronDown className="w-3.5 h-3.5" /> : <icons.chevronUp className="w-3.5 h-3.5" />}
           </Button>
           {historyOpen && (
             <div className="px-[var(--ds-card-padding)] pb-[var(--ds-internal-gap)] flex flex-col gap-[var(--ds-internal-gap)] max-h-32 overflow-y-auto">

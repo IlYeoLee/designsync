@@ -6,24 +6,16 @@ import { STYLE_PRESETS, applyStylePreset } from "@/lib/style-presets";
 import { Button } from "@/registry/new-york/ui/button";
 import { Input } from "@/registry/new-york/ui/input";
 import { Slider } from "@/registry/new-york/ui/slider";
-import { Home, Settings, Search, Bell, Mail } from "lucide-react";
-import { IconHome, IconSettings, IconSearch, IconBell, IconMail } from "@tabler/icons-react";
-import { House, Gear, MagnifyingGlass, BellSimple, Envelope } from "@phosphor-icons/react";
-import { RiHome2Line, RiSettings3Line, RiSearchLine, RiNotification3Line, RiMailLine } from "@remixicon/react";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Home01Icon as HgHome, Settings01Icon as HgSettings, Search01Icon as HgSearch, Notification01Icon as HgNotification, Mail01Icon as HgMail } from "@hugeicons/core-free-icons";
+import { getIconMap, type IconName } from "@/lib/icon-map";
+
+const PREVIEW_ICON_KEYS: IconName[] = ["home", "settings", "search", "bell", "mail"];
 
 const ICON_LIBRARIES = [
-  { id: "lucide", label: "Lucide", pkg: "lucide-react", desc: "깔끔한 선형 — shadcn 기본", url: "https://lucide.dev/icons", icons: [Home, Settings, Search, Bell, Mail] },
-  { id: "tabler", label: "Tabler", pkg: "@tabler/icons-react", desc: "5400+ 굵은 선형 아이콘", url: "https://tabler.io/icons", icons: [IconHome, IconSettings, IconSearch, IconBell, IconMail] },
-  { id: "phosphor", label: "Phosphor", pkg: "@phosphor-icons/react", desc: "6종 굵기 변형 지원", url: "https://phosphoricons.com", icons: [House, Gear, MagnifyingGlass, BellSimple, Envelope] },
-  { id: "remix", label: "Remix", pkg: "remixicon", desc: "2800+ 선형/채움 아이콘", url: "https://remixicon.com", icons: [RiHome2Line, RiSettings3Line, RiSearchLine, RiNotification3Line, RiMailLine] },
-  { id: "hugeicons", label: "Hugeicons", pkg: "@hugeicons/react", desc: "36000+ 다양한 스타일", url: "https://hugeicons.com", icons: [HgHome, HgSettings, HgSearch, HgNotification, HgMail].map((icon) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const Comp = (props: any) => <HugeiconsIcon icon={icon} {...props} />;
-    Comp.displayName = "HugeIcon";
-    return Comp;
-  }) },
+  { id: "lucide", label: "Lucide", pkg: "lucide-react", desc: "깔끔한 선형 — shadcn 기본", url: "https://lucide.dev/icons" },
+  { id: "tabler", label: "Tabler", pkg: "@tabler/icons-react", desc: "5400+ 굵은 선형 아이콘", url: "https://tabler.io/icons" },
+  { id: "phosphor", label: "Phosphor", pkg: "@phosphor-icons/react", desc: "6종 굵기 변형 지원", url: "https://phosphoricons.com" },
+  { id: "remix", label: "Remix", pkg: "remixicon", desc: "2800+ 선형/채움 아이콘", url: "https://remixicon.com" },
+  { id: "hugeicons", label: "Hugeicons", pkg: "@hugeicons/react", desc: "36000+ 다양한 스타일", url: "https://hugeicons.com" },
 ] as const;
 
 interface LayoutTabProps {
@@ -365,9 +357,11 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
                 </a>
               </div>
               <div className="flex items-center gap-2 mt-1.5">
-                {lib.icons.map((Icon, i) => (
-                  <Icon key={i} className="w-4 h-4" />
-                ))}
+                {PREVIEW_ICON_KEYS.map((key) => {
+                  const libIcons = getIconMap(lib.id);
+                  const Icon = libIcons[key];
+                  return <Icon key={key} className="w-4 h-4" />;
+                })}
               </div>
               <span className="text-[10px] text-muted-foreground mt-1">{lib.desc}</span>
             </Button>

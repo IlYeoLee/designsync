@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Moon, Sun, Save, ClipboardCopy, Check, Loader2, Undo2, RotateCcw } from "lucide-react";
+import { getIconMap } from "@/lib/icon-map";
 import { generateRules } from "@/lib/rules";
 import {
   Header as HeaderRoot,
@@ -39,6 +39,7 @@ export function EditorHeader({
   iconLibrary,
   dsSlug,
 }: EditorHeaderProps) {
+  const icons = getIconMap(iconLibrary);
   const [copyState, setCopyState] = React.useState<"idle" | "saving" | "copied">("idle");
   const [confirmReset, setConfirmReset] = React.useState(false);
 
@@ -102,11 +103,11 @@ export function EditorHeader({
           title="Save &amp; copy setup prompt for AI tools"
         >
           {copyState === "saving" ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            <icons.loader className="w-3.5 h-3.5 animate-spin" />
           ) : copyState === "copied" ? (
-            <Check className="w-3.5 h-3.5" />
+            <icons.check className="w-3.5 h-3.5" />
           ) : (
-            <ClipboardCopy className="w-3.5 h-3.5" />
+            <icons.copy className="w-3.5 h-3.5" />
           )}
           <span className="hidden sm:inline">
             {copyState === "saving" ? "저장 중..." : copyState === "copied" ? "복사됨!" : "복사"}
@@ -120,7 +121,7 @@ export function EditorHeader({
           onClick={handleResetClick}
           title="Reset all tokens to defaults"
         >
-          <RotateCcw className="w-3.5 h-3.5" />
+          <icons.reset className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">{confirmReset ? "확인?" : "초기화"}</span>
         </Button>
 
@@ -132,7 +133,7 @@ export function EditorHeader({
           disabled={!canUndo}
           title="Undo (Ctrl+Z)"
         >
-          <Undo2 className="w-4 h-4" />
+          <icons.undo className="w-4 h-4" />
         </Button>
 
         {/* Dark mode toggle */}
@@ -142,7 +143,7 @@ export function EditorHeader({
           onClick={onToggleDark}
           title={isDark ? "라이트 모드" : "다크 모드"}
         >
-          {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          {isDark ? <icons.sun className="w-4 h-4" /> : <icons.moon className="w-4 h-4" />}
         </Button>
 
         {/* Save */}
@@ -153,11 +154,11 @@ export function EditorHeader({
           disabled={isSaving}
         >
           {isSaving ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            <icons.loader className="w-3.5 h-3.5 animate-spin" />
           ) : saveSuccess ? (
-            <Check className="w-3.5 h-3.5 text-[var(--success-500)]" />
+            <icons.check className="w-3.5 h-3.5 text-[var(--success-500)]" />
           ) : (
-            <Save className="w-3.5 h-3.5" />
+            <icons.save className="w-3.5 h-3.5" />
           )}
           <span>{isSaving ? "저장 중..." : saveSuccess ? "저장됨!" : "저장"}</span>
         </Button>

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Plus, LogOut, MoreHorizontal, Copy, Trash2, Edit } from "lucide-react";
+import { getIconMap } from "@/lib/icon-map";
 import { createClient } from "@/lib/supabase";
 import { DEFAULT_TOKENS, type TokenState } from "@/lib/tokens";
 import { Button } from "@/registry/new-york/ui/button";
@@ -66,6 +66,7 @@ interface AppSidebarProps {
   onRenamed: (id: string, name: string) => void;
   userName: string;
   userEmail: string;
+  iconLibrary: string;
 }
 
 export function AppSidebar({
@@ -77,7 +78,9 @@ export function AppSidebar({
   onRenamed,
   userName,
   userEmail,
+  iconLibrary,
 }: AppSidebarProps) {
+  const icons = getIconMap(iconLibrary);
   const supabase = createClient();
   const [createOpen, setCreateOpen] = React.useState(false);
   const [newName, setNewName] = React.useState("");
@@ -224,23 +227,23 @@ export function AppSidebar({
                             size="icon"
                             className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 opacity-0 group-hover/menu-item:opacity-100"
                           >
-                            <MoreHorizontal className="w-3.5 h-3.5" />
+                            <icons.moreHorizontal className="w-3.5 h-3.5" />
                             <span className="sr-only">메뉴</span>
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent side="right" align="start">
                           <DropdownMenuItem onClick={() => { setRenameTarget(ds); setRenameName(ds.name); }}>
-                            <Edit className="w-3.5 h-3.5 mr-2" /> 이름 변경
+                            <icons.edit className="w-3.5 h-3.5 mr-2" /> 이름 변경
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => { setCloneFrom(ds.id); setNewName(`${ds.name} (사본)`); setCreateOpen(true); }}>
-                            <Copy className="w-3.5 h-3.5 mr-2" /> 복제
+                            <icons.copy className="w-3.5 h-3.5 mr-2" /> 복제
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-destructive"
                             onClick={() => setDeleteTarget(ds)}
                             disabled={designSystems.length <= 1}
                           >
-                            <Trash2 className="w-3.5 h-3.5 mr-2" /> 삭제
+                            <icons.trash className="w-3.5 h-3.5 mr-2" /> 삭제
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -253,7 +256,7 @@ export function AppSidebar({
                       onClick={() => { setCloneFrom(null); setNewName(""); setCreateOpen(true); }}
                       tooltip="새 디자인 시스템"
                     >
-                      <Plus className="w-4 h-4" />
+                      <icons.plus className="w-4 h-4" />
                       <span>새로 만들기</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -283,7 +286,7 @@ export function AppSidebar({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent side="right" align="end" className="w-48">
                     <DropdownMenuItem onClick={handleLogout}>
-                      <LogOut className="w-3.5 h-3.5 mr-2" /> 로그아웃
+                      <icons.logout className="w-3.5 h-3.5 mr-2" /> 로그아웃
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>

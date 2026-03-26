@@ -425,6 +425,7 @@ export default function Home() {
         onRenamed={handleDsRenamed}
         userName={userName}
         userEmail={userEmail}
+        iconLibrary={tokens.primitives.iconLibrary}
       />
       <SidebarInset className="flex flex-col h-screen overflow-hidden">
       <EditorHeader
@@ -451,6 +452,7 @@ export default function Home() {
           onFontFamilyKoChange={handleFontFamilyKoChange}
           onIconLibraryChange={(lib: string) => setTokens((prev) => ({ ...prev, primitives: { ...prev.primitives, iconLibrary: lib } }))}
           onStylePresetChange={(preset: string) => setTokens((prev) => ({ ...prev, primitives: { ...prev.primitives, stylePreset: preset } }))}
+          iconLibrary={tokens.primitives.iconLibrary}
           history={history.slice(0, 3)}
         />
         <PreviewPanel iconLibrary={tokens.primitives.iconLibrary} />
