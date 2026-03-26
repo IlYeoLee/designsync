@@ -98,7 +98,9 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
   function handleSelectFont(font: string, isGoogle: boolean) {
     if (isGoogle) injectGoogleFont(font);
     onFontFamilyChange(font);
+
     if (isGoogle) {
+      // Google Font → /api/font (download from Google + upload to Storage)
       setFontUploadStatus({ loading: true, font, result: null });
       fetch('/api/font', {
         method: 'POST',
@@ -112,6 +114,40 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
           setTimeout(() => setFontUploadStatus(null), 5000);
         })
         .catch(() => setFontUploadStatus({ loading: false, font, result: { error: 'Network error' } }));
+    } else {
+      // Local Font → try to get font data and upload to Storage
+      uploadLocalFont(font);
+    }
+  }
+
+  async function uploadLocalFont(fontName: string) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const win = window as any;
+      if (!("queryLocalFonts" in win)) return;
+
+      const fonts = await win.queryLocalFonts();
+      const match = fonts.find((f: { family: string }) => f.family === fontName);
+      if (!match) return;
+
+      // Get font blob
+      const blob: Blob = await match.blob();
+
+      setFontUploadStatus({ loading: true, font: fontName, result: null });
+
+      const formData = new FormData();
+      formData.append("file", blob, `${fontName}.ttf`);
+      formData.append("fontName", fontName);
+
+      const res = await fetch("/api/font-upload", { method: "POST", body: formData });
+      const data = await res.json();
+
+      setFontUploadStatus({ loading: false, font: fontName, result: data });
+      if (!data.error && onFontUpload) onFontUpload(fontName);
+      setTimeout(() => setFontUploadStatus(null), 5000);
+    } catch {
+      setFontUploadStatus({ loading: false, font: fontName, result: { error: "로컬 폰트 업로드 실패" } });
+      setTimeout(() => setFontUploadStatus(null), 5000);
     }
   }
 
