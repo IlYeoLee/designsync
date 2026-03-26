@@ -140,7 +140,7 @@ function fetchText(url) {
 
   // Install additional peer dependencies
   try {
-    execSync('npm install framer-motion --save 2>/dev/null || npx pnpm add framer-motion 2>/dev/null || true', { stdio: 'pipe' });
+    execSync('npm install framer-motion lucide-react --save 2>/dev/null || npx pnpm add framer-motion lucide-react 2>/dev/null || true', { stdio: 'pipe' });
   } catch { /* ignore */ }
 
   // ── Step 4b: Tailwind v3 compatibility ──────────────────────────

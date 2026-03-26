@@ -182,7 +182,50 @@ ${fontSection}- 시맨틱 색상: var(--primary), var(--secondary), var(--accent
 - ❌ 금지: ${otherIconLibs}, react-icons, heroicons, SVG 직접 작성, 이모지로 아이콘 대체
 - ❌ 금지: 아이콘 없이 텍스트만으로 UI 구성 (아이콘을 적극 활용할 것)
 
+### JSX 사용 예제 (핵심 컴포넌트)
+\`\`\`tsx
+// Button
+<Button>확인</Button>
+<Button variant="outline" size="sm">취소</Button>
+<Button variant="destructive"><Trash className="w-4 h-4" />삭제</Button>
+
+// Card
+<Card><CardHeader><CardTitle>제목</CardTitle><CardDescription>설명</CardDescription></CardHeader><CardContent>내용</CardContent><CardFooter><Button>저장</Button></CardFooter></Card>
+
+// Dialog
+<Dialog><DialogTrigger asChild><Button variant="outline">열기</Button></DialogTrigger><DialogContent><DialogHeader><DialogTitle>제목</DialogTitle></DialogHeader>내용<DialogFooter><Button>확인</Button></DialogFooter></DialogContent></Dialog>
+
+// Form Input
+<Field><Label>이름</Label><Input placeholder="입력하세요" /><FieldDescription>설명 텍스트</FieldDescription></Field>
+
+// Select
+<Select><SelectTrigger><SelectValue placeholder="선택" /></SelectTrigger><SelectContent><SelectItem value="a">옵션 A</SelectItem></SelectContent></Select>
+
+// DatePicker
+<DatePicker value={date} onValueChange={setDate} placeholder="날짜 선택" />
+
+// Table
+<Table><TableHeader><TableRow><TableHead>이름</TableHead></TableRow></TableHeader><TableBody><TableRow><TableCell>값</TableCell></TableRow></TableBody></Table>
+
+// Tabs
+<Tabs defaultValue="tab1"><TabsList><TabsTrigger value="tab1">탭1</TabsTrigger></TabsList><TabsContent value="tab1">내용</TabsContent></Tabs>
+
+// Empty State
+<Empty><EmptyIcon><Search className="w-10 h-10" /></EmptyIcon><EmptyTitle>결과 없음</EmptyTitle><EmptyDescription>검색어를 변경해보세요</EmptyDescription></Empty>
+\`\`\`
+
 ## ${n + 3}. 필수 규칙 (위반 시 즉시 수정)
+
+### 절대 금지 — raw HTML 요소
+- ❌ \`<button>\` → 반드시 \`<Button>\` 사용 (import from @/components/ui/button)
+- ❌ \`<input>\` → 반드시 \`<Input>\` 사용 (type="date"는 \`<DatePicker>\`)
+- ❌ \`<textarea>\` → 반드시 \`<Textarea>\` 사용
+- ❌ \`<select>\` → 반드시 \`<Select>\` 또는 \`<NativeSelect>\` 사용
+- ❌ \`<label>\` → 반드시 \`<Label>\` 사용
+- ❌ \`<table>\` → 반드시 \`<Table>\` 컴포넌트 사용
+- ❌ \`<h1>~<h6>\` → 반드시 \`<TypographyH1>~<TypographyH4>\` 사용
+- ❌ 커스텀 모달 div → 반드시 \`<Dialog>\` 또는 \`<Sheet>\` 사용
+- ❌ 커스텀 드롭다운 div → 반드시 \`<DropdownMenu>\` 또는 \`<Select>\` 사용
 
 ### 절대 금지 — 하드코딩
 - ❌ bg-blue-600, bg-[#1a1a1a], text-white, text-gray-500, bg-slate-100 등 직접 색상 클래스
@@ -191,6 +234,9 @@ ${fontSection}- 시맨틱 색상: var(--primary), var(--secondary), var(--accent
 - ❌ #ffffff, rgb(0,0,0), hsl(0,0%,100%) 등 하드코딩 색상값
 - ❌ next/font 또는 Google Fonts <link> 태그 직접 추가 (DesignSync가 @font-face로 처리)
 - ❌ gap-[13px], p-[20px] 등 토큰에 없는 임의 간격
+- ❌ rounded-md, rounded-lg 등 직접 지정 → var(--ds-button-radius), var(--ds-card-radius) 등 사용
+- ❌ h-9, h-10 등 높이 직접 지정 → var(--ds-button-h-default), var(--ds-input-h) 등 사용
+- ❌ gap-4, gap-6, p-6 등 간격 직접 지정 → var(--ds-section-gap), var(--ds-card-padding) 등 사용
 
 ### 반드시 사용
 - ✅ 배경: bg-background, bg-card, bg-muted, bg-primary, bg-secondary, bg-accent, bg-popover, bg-destructive

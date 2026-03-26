@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { STYLE_PRESETS } from "@/lib/style-presets";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,7 +15,7 @@ export async function GET(
 
   const { data, error } = await supabase
     .from("design_systems")
-    .select("tokens")
+    .select("tokens, style_preset")
     .eq("slug", slug)
     .single();
 
@@ -68,27 +69,14 @@ export async function GET(
     }
   }
 
-  // Density variables (from style preset defaults)
-  const densityDefaults: Record<string, string> = {
-    "ds-button-h-default": "2.25rem",
-    "ds-button-h-sm": "2rem",
-    "ds-button-h-lg": "2.5rem",
-    "ds-button-h-xs": "1.5rem",
-    "ds-input-h": "2.25rem",
-    "ds-card-padding": "1.5rem",
-    "ds-section-gap": "1rem",
-    "ds-internal-gap": "0.5rem",
-    "ds-button-radius": "var(--radius-md-prim)",
-    "ds-element-radius": "var(--radius-md-prim)",
-    "ds-input-radius": "var(--radius-md-prim)",
-    "ds-card-radius": "var(--radius-xl-prim)",
-    "ds-dialog-radius": "var(--radius-xl-prim)",
-    "ds-base-font-size": "0.875rem",
-    "ds-focus-ring-width": "3px",
-  };
-  for (const [key, val] of Object.entries(densityDefaults)) {
-    lightVars[key] = val;
-    darkVars[key] = val;
+  // Density variables (from user's selected style preset)
+  const presetId = data.style_preset || "vega";
+  const preset = STYLE_PRESETS.find((p) => p.id === presetId) || STYLE_PRESETS[0];
+  for (const [key, val] of Object.entries(preset.vars)) {
+    // Convert --ds-xxx to ds-xxx for CSS var output
+    const varName = key.replace(/^--/, "");
+    lightVars[varName] = val;
+    darkVars[varName] = val;
   }
 
   // Resolve semantic tokens
