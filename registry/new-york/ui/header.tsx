@@ -48,7 +48,7 @@ function Header({
       data-slot="header"
       data-sticky={sticky || undefined}
       className={cn(
-        "border-b border-border bg-background/95 backdrop-blur-sm supports-[backdrop-filter]:bg-background/60",
+        "border-b border-border bg-background",
         sticky && "sticky top-0 z-50",
         className
       )}

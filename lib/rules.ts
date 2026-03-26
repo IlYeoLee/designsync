@@ -94,7 +94,7 @@ node -e "require('https').get('${CDN}/api/setup${setupParam}',r=>{let d='';r.on(
   // -- Numbering offset --
   const n = includeInstall ? 2 : 1;
 
-  return `${includeInstall ? "이 프로젝트에 DesignSync 디자인 시스템을 적용해줘.\n\n" : ""}**중요: 아래 규칙은 이번 작업뿐 아니라, 이 대화에서 앞으로 작성하는 모든 코드에 영구적으로 적용된다. 새로운 페이지, 컴포넌트, 기능을 만들 때도 반드시 이 디자인 시스템을 따라야 한다.**
+  return `${includeInstall ? "이 프로젝트에 DesignSync 디자인 시스템을 적용해줘.\n\n" : ""}**[절대 규칙] 아래 규칙은 이번 작업뿐 아니라, 이 대화에서 앞으로 작성하는 모든 코드에 영구적으로 적용된다. 예외 없다. "이건 특수한 경우라서"라는 이유로 규칙을 무시하면 안 된다. 새로운 페이지, 컴포넌트, 기능, 리팩터링 모두 반드시 이 디자인 시스템을 따라야 한다. 코드를 작성한 후 아래 규칙 위반이 없는지 반드시 셀프 체크하라.**
 
 ${installSection}## ${n}. 디자인 토큰
 
@@ -262,17 +262,32 @@ const chartConfig = { revenue: { label: "매출", color: "var(--chart-1)" }, use
 - ✅ 그림자: shadow-sm, shadow-md, shadow-lg
 - ✅ 링/포커스: ring-ring, focus-visible:ring-ring/50
 
-### 컴포넌트 사용 규칙
-- <h1 className="text-4xl font-bold"> 대신 → <TypographyH1> 사용
-- <p className="text-muted-foreground"> 대신 → <TypographyMuted> 사용
-- <code> 대신 → <TypographyCode> 사용
-- <blockquote> 대신 → <TypographyBlockquote> 사용
+### 컴포넌트 사용 규칙 (예외 없이 반드시 준수)
+
+**Typography — 모든 텍스트에 적용:**
+- \`<h1>\`, \`<h2>\`, \`<h3>\` → \`<TypographyH1>\`, \`<TypographyH2>\`, \`<TypographyH3>\`
+- \`<p>\` → \`<TypographyP>\` 또는 \`<TypographyMuted>\`
+- 큰 숫자/KPI 값 (text-2xl font-bold 등) → \`<TypographyLarge>\` 사용
+- 작은 설명 텍스트 → \`<TypographySmall>\` 또는 \`<TypographyMuted>\`
+- \`<code>\` → \`<TypographyCode>\`
+- \`<blockquote>\` → \`<TypographyBlockquote>\`
+- ❌ \`text-2xl font-bold\`, \`text-xl font-semibold\` 등 직접 조합 금지 → Typography 컴포넌트 사용
+
+**레이아웃 — 반드시 DesignSync 컴포넌트:**
+- ❌ 커스텀 \`<aside>\` 금지 → 반드시 \`<Sidebar>\` + \`<SidebarHeader>\` + \`<SidebarContent>\` + \`<SidebarMenu>\` + \`<SidebarMenuItem>\` + \`<SidebarMenuButton>\` + \`<SidebarFooter>\` 사용
+- ❌ 커스텀 \`<header>\` 금지 → 반드시 \`<Header>\` + \`<HeaderLogo>\` + \`<HeaderNav>\` + \`<HeaderNavLink>\` + \`<HeaderActions>\` 사용 (Header 배경은 bg-background 단색)
+- ❌ 커스텀 \`<nav>\` 금지 → \`<NavigationMenu>\` 또는 \`<Menubar>\` 사용
+- ❌ 커스텀 모달 div 금지 → \`<Dialog>\` 또는 \`<Sheet>\` 사용
+- ❌ 커스텀 드롭다운 div 금지 → \`<DropdownMenu>\` 사용
+- ❌ 커스텀 스크롤 영역 금지 → \`<ScrollArea>\` 사용
+
+**기타 필수 규칙:**
 - Button 크기는 반드시 size prop ("sm" | "default" | "lg" | "icon") — className으로 h-12, px-8 등 금지
 - Input 높이는 기본값 유지 — className으로 높이 변경 금지
-- 커스텀 header/aside/nav 만들지 말고 <Header>, <Sidebar>, <NavigationMenu> 사용
-- 모달은 <Dialog> 또는 <Sheet> 사용 — 커스텀 모달 금지
-- 토스트/알림은 <Sonner> 사용
-- 아이콘만 있는 버튼에는 반드시 sr-only 텍스트 추가: <Button size="icon"><X /><span className="sr-only">닫기</span></Button>
+- 토스트/알림은 \`<Sonner>\` 사용
+- 구분선은 \`<Separator>\` 사용 (border-t 직접 사용 금지)
+- 프로그레스 바는 \`<Progress value={n}>\` 사용 (커스텀 div 바 금지)
+- 아이콘만 있는 버튼에는 반드시 sr-only 텍스트 추가: \`<Button size="icon"><X /><span className="sr-only">닫기</span></Button>\`
 
 ### 커스텀 UI 만들 때 (DesignSync에 없는 컴포넌트)
 DesignSync에 해당 컴포넌트가 없더라도 아래 파운데이션 토큰은 **절대적으로** 지켜야 한다:

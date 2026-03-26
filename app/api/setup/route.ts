@@ -52,7 +52,7 @@ function fetchText(url) {
 
   // ── Step 2: Ensure shadcn is initialized ────────────────────────
   if (!fs.existsSync('components.json')) {
-    console.log('  [1/6] shadcn not initialized — running init...');
+    console.log('  [1/7] shadcn not initialized — running init...');
     try {
       execSync('npx -y shadcn@latest init -y -d', { stdio: 'inherit' });
     } catch (e) {
@@ -60,7 +60,7 @@ function fetchText(url) {
       process.exit(1);
     }
   } else {
-    console.log('  [1/6] shadcn project detected');
+    console.log('  [1/7] shadcn project detected');
   }
 
   // ── Step 3: Find and clean globals.css ──────────────────────────
@@ -77,7 +77,7 @@ function fetchText(url) {
     process.exit(1);
   }
 
-  console.log('  [2/6] Found ' + globalsPath + ' — cleaning existing theme...');
+  console.log('  [2/7] Found ' + globalsPath + ' — cleaning existing theme...');
 
   // Backup
   const original = fs.readFileSync(globalsPath, 'utf-8');
@@ -124,7 +124,7 @@ function fetchText(url) {
   console.log('         Theme cleaned (backup: ' + globalsPath + '.bak)');
 
   // ── Step 4: Install DesignSync ──────────────────────────────────
-  console.log('  [3/6] Installing DesignSync (tokens + components)...');
+  console.log('  [3/7] Installing DesignSync (tokens + components)...');
   console.log('');
   try {
     execSync(
@@ -195,7 +195,7 @@ function fetchText(url) {
   var isV3 = cssContent.includes('@tailwind base');
 
   if (isV3) {
-    console.log('  [3.5/6] Tailwind v3 detected — patching tailwind.config...');
+    console.log('  [3.5/7] Tailwind v3 detected — patching tailwind.config...');
 
     var configPath = ['tailwind.config.ts', 'tailwind.config.js', 'tailwind.config.mjs']
       .find(function(f) { return fs.existsSync(f); });
@@ -252,7 +252,7 @@ function fetchText(url) {
 
   // ── Step 5: Generate AI rule files ──────────────────────────────
   console.log('');
-  console.log('  [4/6] Generating AI rule files...');
+  console.log('  [4/7] Generating AI rule files...');
 
   let rulesText = '';
   try {
@@ -391,9 +391,77 @@ function fetchText(url) {
   fs.writeFileSync('.windsurfrules', rulesText);
   console.log('         Created .windsurfrules');
 
-  // ── Step 5: Migrate existing code ─────────────────────────────
+  // ── Step 5b: Install ESLint plugin ─────────────────────────────
   console.log('');
-  console.log('  [5/6] Migrating existing code to DesignSync tokens...');
+  console.log('  [5/7] Installing DesignSync ESLint plugin...');
+
+  try {
+    var eslintPluginUrl = '${CDN}/designsync-eslint.js';
+    var eslintPluginCode = await fetchText(eslintPluginUrl);
+
+    if (eslintPluginCode && !eslintPluginCode.trim().startsWith('<')) {
+      fs.writeFileSync('designsync-eslint.js', eslintPluginCode);
+      console.log('         Downloaded designsync-eslint.js');
+
+      // Try to patch eslint.config.mjs
+      var eslintConfigPath = ['eslint.config.mjs', 'eslint.config.js', 'eslint.config.ts']
+        .find(function(f) { return fs.existsSync(f); });
+
+      if (eslintConfigPath) {
+        var eslintConfig = fs.readFileSync(eslintConfigPath, 'utf-8');
+        if (!eslintConfig.includes('designsync-eslint')) {
+          // Add import at top
+          var importLine = "import designsync from './designsync-eslint.js';";
+          // For .ts files use require-style or keep import
+          eslintConfig = importLine + '\\n' + eslintConfig;
+
+          // Add to the exported array — find the default export array and append
+          // Pattern: export default [...]; or export default tseslint.config(...);
+          if (eslintConfig.includes('export default [')) {
+            eslintConfig = eslintConfig.replace(
+              /export default \\[/,
+              'export default [\\n  designsync,'
+            );
+          } else if (eslintConfig.match(/export default [a-zA-Z]+\\.config\\(/)) {
+            // tseslint.config(...) pattern — add designsync as first arg
+            eslintConfig = eslintConfig.replace(
+              /(export default [a-zA-Z]+\\.config\\()/,
+              '$1\\n  designsync,'
+            );
+          } else {
+            // Fallback: just log instructions
+            console.log('         [NOTE] Could not auto-patch ' + eslintConfigPath);
+            console.log('         Add manually: import designsync from \\'./designsync-eslint.js\\';');
+            console.log('         Then add designsync to your config array.');
+          }
+          fs.writeFileSync(eslintConfigPath, eslintConfig);
+          console.log('         Patched ' + eslintConfigPath + ' with DesignSync rules');
+        } else {
+          console.log('         ESLint config already includes DesignSync');
+        }
+      } else {
+        console.log('         No eslint.config.mjs found — creating one...');
+        var newEslintConfig = [
+          "import designsync from './designsync-eslint.js';",
+          "",
+          "export default [",
+          "  designsync,",
+          "];",
+          "",
+        ].join('\\n');
+        fs.writeFileSync('eslint.config.mjs', newEslintConfig);
+        console.log('         Created eslint.config.mjs with DesignSync rules');
+      }
+    } else {
+      console.log('         [WARN] Could not download ESLint plugin (got HTML response). Skipping.');
+    }
+  } catch (e) {
+    console.log('         [WARN] ESLint plugin setup failed: ' + (e.message || e) + '. Skipping.');
+  }
+
+  // ── Step 6: Migrate existing code ─────────────────────────────
+  console.log('');
+  console.log('  [6/7] Migrating existing code to DesignSync tokens...');
 
   var CLASS_MAP = {
     'bg-white': 'bg-background', 'bg-gray-50': 'bg-background', 'bg-slate-50': 'bg-background',
@@ -577,7 +645,7 @@ function fetchText(url) {
 
   // ── Done ────────────────────────────────────────────────────────
   console.log('');
-  console.log('  [6/6] Done!');
+  console.log('  [7/7] Done!');
   console.log('');
   console.log('  DesignSync has been applied to your project.');
   console.log('  Restart your dev server to see the changes.');
@@ -588,6 +656,7 @@ function fetchText(url) {
   console.log('    - .cursorrules       (Cursor AI rules)');
   console.log('    - CLAUDE.md          (Claude Code AI rules)');
   console.log('    - .windsurfrules     (Windsurf AI rules)');
+  console.log('    - designsync-eslint.js (ESLint plugin — blocks hardcoded values)');
   console.log('');
   if (migratedCount > 0 || elementMigratedCount > 0 || radiusMigratedCount > 0) {
     console.log('  Migrated: ' + migratedCount + ' files (class tokens), ' + elementMigratedCount + ' files (element replacement), ' + radiusMigratedCount + ' files (radius tokens)');
