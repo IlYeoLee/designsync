@@ -94,7 +94,9 @@ node -e "require('https').get('${CDN}/api/setup${setupParam}',r=>{let d='';r.on(
   // -- Numbering offset --
   const n = includeInstall ? 2 : 1;
 
-  return `${includeInstall ? "이 프로젝트에 DesignSync 디자인 시스템을 적용해줘.\n\n" : ""}**[절대 규칙] 아래 규칙은 이번 작업뿐 아니라, 이 대화에서 앞으로 작성하는 모든 코드에 영구적으로 적용된다. 예외 없다. "이건 특수한 경우라서"라는 이유로 규칙을 무시하면 안 된다. 새로운 페이지, 컴포넌트, 기능, 리팩터링 모두 반드시 이 디자인 시스템을 따라야 한다. 코드를 작성한 후 아래 규칙 위반이 없는지 반드시 셀프 체크하라.**
+  return `${includeInstall ? "이 프로젝트에 DesignSync 디자인 시스템을 적용해줘.\n\n" : ""}**[최우선 규칙] 이 프로젝트는 DesignSync 디자인 시스템 + ESLint 강제를 사용한다. 코드를 작성하거나 수정한 후 반드시 \`npx eslint src/\`을 실행하고, 에러가 0이 될 때까지 수정해라. ESLint가 잡는 것: 하드코딩 색상, 하드코딩 radius/height/padding, raw HTML 요소(<button>/<input>/<aside>/<header>/<table>/<h1>~<h6>), SVG 차트. 에러가 남아있으면 작업 완료가 아니다.**
+
+아래는 DesignSync 규칙 상세 레퍼런스다. 위 lint 규칙과 함께 적용된다.
 
 ${installSection}## ${n}. 디자인 토큰
 
