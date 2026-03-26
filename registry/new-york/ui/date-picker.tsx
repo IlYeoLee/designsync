@@ -52,7 +52,7 @@ function DatePicker({
           variant="outline"
           disabled={disabled}
           className={cn(
-            "w-full justify-start font-normal",
+            "w-full justify-start font-normal rounded-[var(--ds-input-radius)]",
             !value && "text-muted-foreground",
             className
           )}

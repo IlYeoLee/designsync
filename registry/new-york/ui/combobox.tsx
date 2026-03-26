@@ -129,7 +129,7 @@ function Combobox({
           aria-expanded={open}
           disabled={disabled}
           className={cn(
-            "w-full justify-between font-normal",
+            "w-full justify-between font-normal rounded-[var(--ds-input-radius)]",
             !displayLabel && !selectedValues.length && "text-muted-foreground",
             className
           )}
