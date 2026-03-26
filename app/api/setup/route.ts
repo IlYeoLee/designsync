@@ -190,7 +190,7 @@ function fetchText(url) {
           '        md: "calc(var(--radius) - 2px)",',
           '        sm: "calc(var(--radius) - 4px)",',
           '      },',
-          '    },',
+          '    }',
         ].join('\\n');
 
         configContent = configContent.replace(
