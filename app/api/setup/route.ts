@@ -432,7 +432,7 @@ function fetchText(url) {
         for (var from in CLASS_MAP) {
           var to = CLASS_MAP[from];
           // Replace whole-word class occurrences
-          var regex = new RegExp('(\\\\s|"|\'|\\x60)' + escapeRegex(from) + '(\\\\s|"|\'|\\x60)', 'g');
+          var regex = new RegExp('(\\\\s|"|\\x27|\\x60)' + escapeRegex(from) + '(\\\\s|"|\\x27|\\x60)', 'g');
           var prev = replaced;
           replaced = replaced.replace(regex, '$1' + to + '$2');
           if (replaced !== prev) changed = true;
