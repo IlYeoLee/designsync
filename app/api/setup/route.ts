@@ -160,33 +160,58 @@ function fetchText(url) {
     console.log('         npm install framer-motion ' + iconPkg);
   }
 
-  // ── Step 3b: Inject density CSS variables ──────────────────────
-  // shadcn add only writes standard shadcn keys; custom ds-* keys are ignored.
-  // We inject density/sizing variables directly into :root block.
-  var updatedCss = fs.readFileSync(globalsPath, 'utf-8');
-  var densityBlock = [
-    '  --ds-button-h-default: 2.25rem;',
-    '  --ds-button-h-sm: 2rem;',
-    '  --ds-button-h-lg: 2.5rem;',
-    '  --ds-button-h-xs: 1.75rem;',
-    '  --ds-input-h: 2.25rem;',
-    '  --ds-card-padding: 1.5rem;',
-    '  --ds-section-gap: 1rem;',
-    '  --ds-internal-gap: 0.5rem;',
-    '  --ds-base-font-size: 0.875rem;',
-    '  --ds-focus-ring-width: 3px;',
-    '  --ds-button-radius: 0.5rem;',
-    '  --ds-element-radius: 0.5rem;',
-    '  --ds-input-radius: 0.5rem;',
-    '  --ds-card-radius: 0.75rem;',
-    '  --ds-dialog-radius: 0.75rem;',
-  ].join('\\n');
-  // Inject before the closing } of the first :root block
-  var rootEnd = updatedCss.indexOf('}');
-  if (rootEnd > 0) {
-    updatedCss = updatedCss.slice(0, rootEnd) + densityBlock + '\\n' + updatedCss.slice(rootEnd);
-    fs.writeFileSync(globalsPath, updatedCss);
-    console.log('         Density variables injected');
+  // ── Step 3b: Inject missing CSS variables ──────────────────────
+  // shadcn add only writes standard shadcn keys (primary, background, etc.)
+  // Custom keys (brand-*, neutral-*, ds-*, radius-*, etc.) are ignored.
+  // Fetch the full token JSON and inject any missing variables.
+  console.log('         Injecting custom CSS variables...');
+  try {
+    var tokensData = JSON.parse(await fetchText('${tokensUrl}'.replace('designsync-all', 'designsync-tokens')));
+    var cssAfterShadcn = fs.readFileSync(globalsPath, 'utf-8');
+
+    // Collect vars that shadcn didn't write
+    var lightMissing = [];
+    var darkMissing = [];
+
+    if (tokensData.cssVars) {
+      var lightVars = tokensData.cssVars.light || {};
+      var darkVars = tokensData.cssVars.dark || {};
+
+      for (var key in lightVars) {
+        if (!cssAfterShadcn.includes('--' + key + ':')) {
+          lightMissing.push('    --' + key + ': ' + lightVars[key] + ';');
+        }
+      }
+      for (var key in darkVars) {
+        if (!cssAfterShadcn.includes('--' + key + ':')) {
+          darkMissing.push('    --' + key + ': ' + darkVars[key] + ';');
+        }
+      }
+    }
+
+    if (lightMissing.length > 0) {
+      // Inject into first :root block
+      var rootEnd = cssAfterShadcn.indexOf('}');
+      if (rootEnd > 0) {
+        cssAfterShadcn = cssAfterShadcn.slice(0, rootEnd) + lightMissing.join('\\n') + '\\n' + cssAfterShadcn.slice(rootEnd);
+      }
+    }
+
+    if (darkMissing.length > 0) {
+      // Inject into .dark block
+      var darkStart = cssAfterShadcn.indexOf('.dark');
+      if (darkStart > 0) {
+        var darkBraceEnd = cssAfterShadcn.indexOf('}', darkStart);
+        if (darkBraceEnd > 0) {
+          cssAfterShadcn = cssAfterShadcn.slice(0, darkBraceEnd) + darkMissing.join('\\n') + '\\n' + cssAfterShadcn.slice(darkBraceEnd);
+        }
+      }
+    }
+
+    fs.writeFileSync(globalsPath, cssAfterShadcn);
+    console.log('         Injected ' + lightMissing.length + ' light + ' + darkMissing.length + ' dark variables');
+  } catch (e) {
+    console.log('         [WARN] Could not inject custom variables: ' + (e.message || e));
   }
 
   // ── Step 4b: Tailwind v3 compatibility ──────────────────────────
