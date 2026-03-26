@@ -145,9 +145,10 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
       setFontUploadStatus({ loading: false, font: fontName, result: data });
       if (!data.error && onFontUpload) onFontUpload(fontName);
       setTimeout(() => setFontUploadStatus(null), 5000);
-    } catch {
-      setFontUploadStatus({ loading: false, font: fontName, result: { error: "로컬 폰트 업로드 실패" } });
-      setTimeout(() => setFontUploadStatus(null), 5000);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "로컬 폰트 업로드 실패";
+      setFontUploadStatus({ loading: false, font: fontName, result: { error: msg } });
+      setTimeout(() => setFontUploadStatus(null), 8000);
     }
   }
 

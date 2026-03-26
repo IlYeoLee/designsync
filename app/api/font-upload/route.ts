@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { compress } from "wawoff2";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,30 +22,29 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const inputBuffer = new Uint8Array(arrayBuffer);
 
-    // Determine if conversion is needed
+    // Determine file format and content type
     const fileName = file.name.toLowerCase();
-    let woff2Buffer: Uint8Array;
-    let isConverted = false;
+    const ext = fileName.split(".").pop() || "ttf";
+    const supportedFormats: Record<string, string> = {
+      ttf: "font/ttf",
+      otf: "font/otf",
+      woff: "font/woff",
+      woff2: "font/woff2",
+    };
 
-    if (fileName.endsWith(".woff2")) {
-      // Already woff2, no conversion needed
-      woff2Buffer = inputBuffer;
-    } else if (fileName.endsWith(".ttf") || fileName.endsWith(".otf") || fileName.endsWith(".woff")) {
-      // Convert to woff2
-      woff2Buffer = await compress(inputBuffer);
-      isConverted = true;
-    } else {
+    const contentType = supportedFormats[ext];
+    if (!contentType) {
       return NextResponse.json({ error: "지원하지 않는 폰트 형식입니다. (ttf, otf, woff, woff2)" }, { status: 400 });
     }
 
-    // Upload to Supabase Storage
+    // Upload to Supabase Storage (original format, no conversion)
     const fontSlug = fontName.replace(/ /g, "-").toLowerCase();
-    const woff2Filename = `${fontSlug}-400.woff2`;
+    const uploadFilename = `${fontSlug}-400.${ext}`;
 
     const { error: uploadError } = await supabase.storage
       .from(STORAGE_BUCKET)
-      .upload(woff2Filename, woff2Buffer, {
-        contentType: "font/woff2",
+      .upload(uploadFilename, inputBuffer, {
+        contentType,
         upsert: true,
       });
 
@@ -54,14 +52,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `업로드 실패: ${uploadError.message}` }, { status: 500 });
     }
 
-    const cdnFontUrl = `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${woff2Filename}`;
+    const cdnFontUrl = `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${uploadFilename}`;
 
     return NextResponse.json({
       success: true,
       fontName,
       cdnFontUrl,
-      isConverted,
-      originalFormat: fileName.split(".").pop(),
+      format: ext,
     });
   } catch (err) {
     console.error("Font upload error:", err);
