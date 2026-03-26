@@ -516,6 +516,11 @@ function fetchText(url) {
         content = content.replace(new RegExp('<' + el.from + '(\\\\s|>)', 'g'), '<' + el.to + '$1');
         content = content.replace(new RegExp('<' + el.from + '/', 'g'), '<' + el.to + '/');
         content = content.replace(closeRegex, '</' + el.to + '>');
+        // Strip className from replaced elements (component handles its own styling)
+        if (el.from !== 'label') {
+          content = content.replace(new RegExp('<' + el.to + '\\\\s+className="[^"]*"', 'g'), '<' + el.to);
+          content = content.replace(new RegExp('<' + el.to + '\\\\s+className=\\\\{[^}]*\\\\}', 'g'), '<' + el.to);
+        }
         importsNeeded.push(el);
         modified = true;
       }
