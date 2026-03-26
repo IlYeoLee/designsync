@@ -139,9 +139,16 @@ function fetchText(url) {
   }
 
   // Install additional peer dependencies
+  console.log('         Installing peer dependencies (framer-motion, lucide-react)...');
   try {
-    execSync('npm install framer-motion lucide-react --save 2>/dev/null || npx pnpm add framer-motion lucide-react 2>/dev/null || true', { stdio: 'pipe' });
-  } catch { /* ignore */ }
+    // Detect package manager
+    var pm = fs.existsSync('pnpm-lock.yaml') ? 'pnpm add' : fs.existsSync('yarn.lock') ? 'yarn add' : 'npm install --save';
+    execSync(pm + ' framer-motion lucide-react', { stdio: 'pipe' });
+    console.log('         Peer dependencies installed');
+  } catch (e) {
+    console.log('         [WARN] Could not auto-install framer-motion/lucide-react. Run manually:');
+    console.log('         npm install framer-motion lucide-react');
+  }
 
   // ── Step 3b: Inject density CSS variables ──────────────────────
   // shadcn add only writes standard shadcn keys; custom ds-* keys are ignored.
