@@ -3,6 +3,10 @@
 import * as React from "react";
 import { TokenState } from "@/lib/tokens";
 import { GOOGLE_FONTS, KOREAN_FONTS, injectGoogleFont, injectKoreanFont } from "@/lib/fonts";
+import { Button } from "@/registry/new-york/ui/button";
+import { Input } from "@/registry/new-york/ui/input";
+import { NativeSelect } from "@/registry/new-york/ui/native-select";
+import { Slider } from "@/registry/new-york/ui/slider";
 
 interface TypographyTabProps {
   tokens: TokenState;
@@ -196,12 +200,14 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
 
         <div className="flex border border-border rounded-[var(--ds-element-radius)] overflow-hidden mb-2">
           {(["google", "local"] as const).map((sec) => (
-            <button
+            <Button
               key={sec}
-              className={`flex-1 text-xs py-1.5 transition-colors ${
-                fontSection === sec
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-background text-muted-foreground hover:bg-accent"
+              variant={fontSection === sec ? "default" : "ghost"}
+              size="sm"
+              className={`flex-1 rounded-none text-xs py-1.5 transition-colors ${
+                fontSection !== sec
+                  ? "text-muted-foreground"
+                  : ""
               }`}
               onClick={() => {
                 setFontSection(sec);
@@ -210,38 +216,42 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
               }}
             >
               {sec === "google" ? "Google 폰트" : "로컬 폰트"}
-            </button>
+            </Button>
           ))}
         </div>
 
-        <input
+        <Input
           type="text"
           placeholder="폰트 검색..."
           value={fontSearch}
           onChange={(e) => setFontSearch(e.target.value)}
-          className="w-full h-8 text-xs px-2.5 rounded-[var(--ds-element-radius)] border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring mb-2"
+          className="h-8 text-xs px-2.5 mb-2"
         />
         <div className="max-h-40 overflow-y-auto border border-border rounded-[var(--ds-element-radius)]">
           {fontSection === "google" ? (
             filteredGoogleFonts.length > 0 ? filteredGoogleFonts.map((font) => (
-              <button
+              <Button
                 key={font}
+                variant="ghost"
+                size="sm"
                 onClick={() => handleSelectFont(font, true)}
-                className={`w-full text-left px-3 py-1.5 text-xs hover:bg-accent transition-colors ${
+                className={`w-full justify-start rounded-none px-3 py-1.5 text-xs ${
                   tokens.primitives.fontFamily === font ? "bg-accent text-accent-foreground font-medium" : ""
                 }`}
-              >{font}</button>
+              >{font}</Button>
             )) : <p className="text-xs text-muted-foreground p-3">폰트를 찾을 수 없습니다</p>
           ) : localFontsLoading ? (
             <p className="text-xs text-muted-foreground p-3">로컬 폰트 로딩 중...</p>
           ) : filteredLocalFonts.length > 0 ? filteredLocalFonts.map((font) => (
-            <button
+            <Button
               key={font}
+              variant="ghost"
+              size="sm"
               onClick={() => handleSelectFont(font, false)}
-              className={`w-full text-left px-3 py-1.5 text-xs hover:bg-accent transition-colors ${
+              className={`w-full justify-start rounded-none px-3 py-1.5 text-xs ${
                 tokens.primitives.fontFamily === font ? "bg-accent text-accent-foreground font-medium" : ""
               }`}
-            >{font}</button>
+            >{font}</Button>
           )) : (
             <p className="text-xs text-muted-foreground p-3">
               {localFonts.length === 0
@@ -263,28 +273,32 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
             {tokens.primitives.fontFamilyKo || '(없음 — 영문 폰트 사용)'}
           </p>
         </div>
-        <input
+        <Input
           type="text"
           placeholder="한글 폰트 검색..."
           value={koFontSearch}
           onChange={(e) => setKoFontSearch(e.target.value)}
-          className="w-full h-8 text-xs px-2.5 rounded-[var(--ds-element-radius)] border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring mb-2"
+          className="h-8 text-xs px-2.5 mb-2"
         />
         <div className="max-h-40 overflow-y-auto border border-border rounded-[var(--ds-element-radius)]">
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => onFontFamilyKoChange('')}
-            className="w-full text-left px-3 py-1.5 text-xs text-muted-foreground hover:bg-accent"
+            className="w-full justify-start rounded-none px-3 py-1.5 text-xs text-muted-foreground"
           >
             없음 (영문 폰트 사용)
-          </button>
+          </Button>
           {KOREAN_FONTS.filter(f => f.toLowerCase().includes(koFontSearch.toLowerCase())).map(font => (
-            <button
+            <Button
               key={font}
+              variant="ghost"
+              size="sm"
               onClick={() => handleSelectKoFont(font)}
-              className={`w-full text-left px-3 py-1.5 text-xs hover:bg-accent ${tokens.primitives.fontFamilyKo === font ? 'bg-accent font-medium' : ''}`}
+              className={`w-full justify-start rounded-none px-3 py-1.5 text-xs ${tokens.primitives.fontFamilyKo === font ? 'bg-accent font-medium' : ''}`}
             >
               {font}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
@@ -297,14 +311,13 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
           {fontSizeKeys.map((key) => (
             <div key={key} className="flex items-center gap-3">
               <span className="text-xs text-muted-foreground w-8 font-mono">{key}</span>
-              <input
-                type="range"
+              <Slider
                 min={8}
                 max={48}
                 step={1}
-                value={Math.round(parseFloat(tokens.primitives.fontSize[key]) * 16)}
-                onChange={(e) => onTokenChange(`--font-size-${key}`, `${(+e.target.value / 16).toFixed(4)}rem`)}
-                className="flex-1 h-1.5 accent-primary"
+                value={[Math.round(parseFloat(tokens.primitives.fontSize[key]) * 16)]}
+                onValueChange={(vals) => onTokenChange(`--font-size-${key}`, `${(vals[0] / 16).toFixed(4)}rem`)}
+                className="flex-1"
               />
               <RemPxInput
                 value={tokens.primitives.fontSize[key]}
@@ -324,15 +337,16 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
           {fontWeightKeys.map((key) => (
             <div key={key} className="flex items-center gap-3">
               <span className="text-xs text-muted-foreground w-12">{key}</span>
-              <select
+              <NativeSelect
+                size="sm"
                 value={tokens.primitives.fontWeight[key]}
                 onChange={(e) => onTokenChange(`--font-weight-${key}`, e.target.value)}
-                className="flex-1 h-7 text-xs px-2 rounded-[var(--ds-element-radius)] border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring"
+                className="flex-1"
               >
                 {[100, 200, 300, 400, 500, 600, 700, 800, 900].map((w) => (
                   <option key={w} value={String(w)}>{w}</option>
                 ))}
-              </select>
+              </NativeSelect>
             </div>
           ))}
         </div>
@@ -345,14 +359,13 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
           {lineHeightKeys.map((key) => (
             <div key={key} className="flex items-center gap-3">
               <span className="text-xs text-muted-foreground w-12">{key}</span>
-              <input
-                type="range"
+              <Slider
                 min={100}
                 max={250}
                 step={5}
-                value={Math.round(parseFloat(tokens.primitives.lineHeight[key]) * 100)}
-                onChange={(e) => onTokenChange(`--line-height-${key}`, String(+e.target.value / 100))}
-                className="flex-1 h-1.5 accent-primary"
+                value={[Math.round(parseFloat(tokens.primitives.lineHeight[key]) * 100)]}
+                onValueChange={(vals) => onTokenChange(`--line-height-${key}`, String(vals[0] / 100))}
+                className="flex-1"
               />
               {/* Line height is unitless — show as plain number, fixed 2 decimals */}
               <div className="flex items-center h-7 rounded-[var(--ds-element-radius)] border border-input bg-background overflow-hidden focus-within:ring-1 focus-within:ring-ring">

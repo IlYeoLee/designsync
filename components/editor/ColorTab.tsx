@@ -4,6 +4,8 @@ import * as React from "react";
 import { ColorScale, TokenState } from "@/lib/tokens";
 import { oklchToHex, generatePaletteFromHex, getAutoForegrounds } from "@/lib/color";
 import { Wand2, ChevronDown } from "lucide-react";
+import { Button } from "@/registry/new-york/ui/button";
+import { Input } from "@/registry/new-york/ui/input";
 
 type ColorScaleName = "brand" | "neutral" | "error" | "success" | "warning";
 const COLOR_SCALES: ColorScaleName[] = ["brand", "neutral", "error", "success", "warning"];
@@ -191,16 +193,18 @@ function SemanticDropdown({
 
   return (
     <div ref={ref} className="relative flex-1">
-      <button
+      <Button
+        variant="outline"
+        size="sm"
         onClick={() => setOpen(!open)}
-        className="w-full h-6 text-[10px] px-1.5 rounded border border-input bg-background focus:outline-none focus:ring-1 focus:ring-ring font-mono truncate text-left flex items-center gap-1"
+        className="w-full h-6 text-[10px] px-1.5 font-mono truncate text-left flex items-center gap-1"
       >
         <span
           className="w-3 h-3 rounded-sm border border-border flex-shrink-0 inline-block"
           style={{ backgroundColor: getColor(value) }}
         />
         <span className="truncate">{currentLabel}</span>
-      </button>
+      </Button>
       {open && (
         <div className="absolute left-0 top-full mt-1 z-40 bg-card border border-border rounded-[var(--ds-element-radius)] shadow-lg max-h-[240px] overflow-y-auto w-full min-w-[180px]">
           {COLOR_SCALES.map((scale) => (
@@ -216,9 +220,11 @@ function SemanticDropdown({
                 const color = getColor(opt.value);
                 const isSelected = opt.value === value;
                 return (
-                  <button
+                  <Button
                     key={opt.value}
-                    className={`w-full px-2 py-0.5 text-[10px] font-mono flex items-center gap-1.5 hover:bg-accent transition-colors ${
+                    variant="ghost"
+                    size="sm"
+                    className={`w-full px-2 py-0.5 h-auto text-[10px] font-mono flex items-center gap-1.5 rounded-none justify-start ${
                       isSelected ? "bg-accent font-medium" : ""
                     }`}
                     onClick={() => {
@@ -231,7 +237,7 @@ function SemanticDropdown({
                       style={{ backgroundColor: color }}
                     />
                     {opt.label}
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -244,9 +250,11 @@ function SemanticDropdown({
             { label: "white", value: "oklch(1 0 0)", color: "#ffffff" },
             { label: "black", value: "oklch(0 0 0)", color: "#000000" },
           ].map((opt) => (
-            <button
+            <Button
               key={opt.value}
-              className={`w-full px-2 py-0.5 text-[10px] font-mono flex items-center gap-1.5 hover:bg-accent transition-colors ${
+              variant="ghost"
+              size="sm"
+              className={`w-full px-2 py-0.5 h-auto text-[10px] font-mono flex items-center gap-1.5 rounded-none justify-start ${
                 opt.value === value ? "bg-accent font-medium" : ""
               }`}
               onClick={() => {
@@ -259,7 +267,7 @@ function SemanticDropdown({
                 style={{ backgroundColor: opt.color }}
               />
               {opt.label}
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -307,9 +315,11 @@ function NeutralPresetSelector({
       {Object.entries(NEUTRAL_PRESETS).map(([name, preset]) => {
         const isActive = activePreset === name;
         return (
-          <button
+          <Button
             key={name}
-            className={`flex items-center gap-1 px-1.5 py-0.5 rounded border text-[10px] transition-colors ${
+            variant="outline"
+            size="sm"
+            className={`flex items-center gap-1 px-1.5 py-0.5 h-auto text-[10px] ${
               isActive
                 ? "border-foreground bg-accent text-foreground font-medium"
                 : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
@@ -322,7 +332,7 @@ function NeutralPresetSelector({
               style={{ backgroundColor: preset["500"] }}
             />
             <span>{name}</span>
-          </button>
+          </Button>
         );
       })}
     </div>
@@ -466,14 +476,16 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-foreground capitalize">{SCALE_LABELS[scale]}</span>
             <div className="relative">
-                <button
-                  className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors px-1.5 py-0.5 rounded border border-border hover:border-primary/50"
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground px-1.5 py-0.5 h-auto hover:border-primary/50"
                   onClick={() => setOpenScalePicker(openScalePicker === scale ? null : scale)}
                   title="기준색 하나로 팔레트 자동 생성"
                 >
                   <Wand2 className="w-2.5 h-2.5" />
                   Auto
-                </button>
+                </Button>
                 {openScalePicker === scale && (
                   <div className="absolute right-0 top-full mt-1 z-30 bg-card border border-border rounded-[var(--ds-element-radius)] shadow-lg p-3 min-w-[200px]">
                     <p className="text-[10px] text-muted-foreground mb-2 font-medium">
@@ -486,7 +498,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
                         onChange={(e) => handleScalePickerChange(scale, e.target.value)}
                         className="w-8 h-8 rounded cursor-pointer border border-border"
                       />
-                      <input
+                      <Input
                         type="text"
                         value={scalePicker[scale]}
                         onChange={(e) => handleScalePickerHexInput(scale, e.target.value)}
@@ -497,22 +509,26 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
                             setScalePicker((prev) => ({ ...prev, [scale]: withHash }));
                           }
                         }}
-                        className="flex-1 h-8 text-xs px-2 rounded border border-input bg-background font-mono focus:outline-none focus:ring-1 focus:ring-ring"
+                        className="flex-1 h-8 text-xs px-2 font-mono"
                         placeholder="#000000"
                       />
                     </div>
-                    <button
-                      className="w-full h-7 bg-primary text-primary-foreground text-xs rounded-[var(--ds-element-radius)] hover:opacity-90 transition-opacity font-medium"
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="w-full h-7 text-xs font-medium"
                       onClick={() => handleGeneratePalette(scale, scalePicker[scale])}
                     >
                       팔레트 생성
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       className="w-full h-6 text-[10px] text-muted-foreground hover:text-foreground mt-1"
                       onClick={() => setOpenScalePicker(null)}
                     >
                       취소
-                    </button>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -531,9 +547,11 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
               const popupAlign = stepIdx <= 2 ? "left-0" : stepIdx >= 7 ? "right-0" : "left-1/2 -translate-x-1/2";
               return (
                 <div key={step} className="relative">
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     title={`${scale}-${step}: ${value}`}
-                    className={`w-full aspect-square rounded-sm border-2 cursor-pointer transition-transform hover:scale-110 ${
+                    className={`w-full aspect-square rounded-sm border-2 cursor-pointer transition-transform hover:scale-110 p-0 h-auto ${
                       isActive ? "border-foreground scale-110 shadow-md" : "border-transparent"
                     }`}
                     style={{ backgroundColor: value }}
@@ -548,10 +566,10 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
                         className="w-full h-8 rounded cursor-pointer border-0"
                         onChange={(e) => handlePickerChange(scale, step, e.target.value)}
                       />
-                      <input
+                      <Input
                         type="text"
                         value={pickerHex}
-                        className="w-full h-6 text-[10px] px-1.5 mt-1 rounded border border-input bg-background font-mono text-center focus:outline-none focus:ring-1 focus:ring-ring"
+                        className="w-full h-6 text-[10px] px-1.5 mt-1 font-mono text-center"
                         onChange={(e) => {
                           const raw = e.target.value;
                           // Allow typing with or without '#'
@@ -589,30 +607,34 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
 
       {/* Semantic Mappings – Editable */}
       <div className="mt-4 pt-4 border-t border-border">
-        <button
-          className="w-full flex items-center justify-between mb-3"
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-full flex items-center justify-between mb-3 h-auto px-0 hover:bg-transparent"
           onClick={() => setSemanticOpen((v) => !v)}
         >
           <p className="text-xs text-muted-foreground font-medium">시멘틱 토큰</p>
           <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${semanticOpen ? "rotate-180" : ""}`} />
-        </button>
+        </Button>
 
         {semanticOpen && (
           <>
             {/* Light / Dark toggle */}
             <div className="flex border border-border rounded-[var(--ds-element-radius)] overflow-hidden mb-3">
               {(["light", "dark"] as const).map((m) => (
-                <button
+                <Button
                   key={m}
-                  className={`flex-1 text-xs py-1 transition-colors ${
-                    semanticMode === m
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-background text-muted-foreground hover:bg-accent"
+                  variant={semanticMode === m ? "default" : "ghost"}
+                  size="sm"
+                  className={`flex-1 text-xs py-1 h-auto rounded-none ${
+                    semanticMode !== m
+                      ? "bg-background text-muted-foreground hover:bg-accent"
+                      : ""
                   }`}
                   onClick={() => setSemanticMode(m)}
                 >
                   {m === "light" ? "라이트" : "다크"}
-                </button>
+                </Button>
               ))}
             </div>
 

@@ -3,6 +3,8 @@
 import * as React from "react";
 import { TokenState } from "@/lib/tokens";
 import { STYLE_PRESETS, applyStylePreset } from "@/lib/style-presets";
+import { Button } from "@/registry/new-york/ui/button";
+import { Input } from "@/registry/new-york/ui/input";
 import { Home, Settings, Search, Bell, Mail } from "lucide-react";
 import { IconHome, IconSettings, IconSearch, IconBell, IconMail } from "@tabler/icons-react";
 import { House, Gear, MagnifyingGlass, BellSimple, Envelope } from "@phosphor-icons/react";
@@ -91,7 +93,7 @@ function RemPxInput({
 
   return (
     <div className="flex items-center h-7 rounded-[var(--ds-element-radius)] border border-input bg-background overflow-hidden focus-within:ring-1 focus-within:ring-ring">
-      <input
+      <Input
         type="number"
         min={min}
         max={max}
@@ -101,7 +103,7 @@ function RemPxInput({
         onBlur={() => { setFocused(false); commit(inputPx); }}
         onChange={(e) => setInputPx(e.target.value)}
         onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
-        className="w-12 h-full text-xs px-1.5 bg-transparent font-mono text-right focus:outline-none"
+        className="w-12 h-full text-xs px-1.5 bg-transparent font-mono text-right focus:outline-none border-0 shadow-none rounded-none"
       />
       <span className="text-[10px] text-muted-foreground px-1.5 bg-muted/30 h-full flex items-center border-l border-input select-none">
         px
@@ -192,13 +194,14 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
                 ? "0"
                 : btnRadius.replace("var(--radius-", "").replace("-prim)", "");
             return (
-              <button
+              <Button
                 key={preset.id}
+                variant={isActive ? "outline" : "ghost"}
                 onClick={() => {
                   applyStylePreset(preset.id);
                   onStylePresetChange(preset.id);
                 }}
-                className={`flex flex-col items-start px-3 py-2.5 rounded-[var(--ds-element-radius)] border text-left transition-colors ${
+                className={`flex flex-col items-start px-3 py-2.5 h-auto rounded-[var(--ds-element-radius)] border text-left transition-colors ${
                   isActive
                     ? "border-primary bg-accent text-foreground"
                     : "border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -211,7 +214,7 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
                   </span>
                 </div>
                 <span className="text-[10px] text-muted-foreground mt-1">{preset.desc}</span>
-              </button>
+              </Button>
             );
           })}
         </div>
@@ -339,10 +342,11 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
         <p className="text-[10px] text-muted-foreground mb-3">Copy 시 AI가 이 아이콘 라이브러리를 사용합니다.</p>
         <div className="grid grid-cols-1 gap-1.5">
           {ICON_LIBRARIES.map((lib) => (
-            <button
+            <Button
               key={lib.id}
+              variant={tokens.primitives.iconLibrary === lib.id ? "outline" : "ghost"}
               onClick={() => onIconLibraryChange(lib.id)}
-              className={`flex flex-col items-start px-3 py-2.5 rounded-[var(--ds-element-radius)] border text-left transition-colors ${
+              className={`flex flex-col items-start px-3 py-2.5 h-auto rounded-[var(--ds-element-radius)] border text-left transition-colors ${
                 tokens.primitives.iconLibrary === lib.id
                   ? "border-primary bg-accent text-foreground"
                   : "border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground"
@@ -366,7 +370,7 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
                 ))}
               </div>
               <span className="text-[10px] text-muted-foreground mt-1">{lib.desc}</span>
-            </button>
+            </Button>
           ))}
         </div>
       </div>

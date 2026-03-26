@@ -25,7 +25,7 @@ function NativeSelect({
   size,
   children,
   ...props
-}: React.ComponentProps<"select"> & VariantProps<typeof nativeSelectVariants>) {
+}: Omit<React.ComponentProps<"select">, "size"> & VariantProps<typeof nativeSelectVariants>) {
   return (
     <div data-slot="native-select" className="relative">
       <select
