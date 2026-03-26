@@ -468,7 +468,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
   const semanticTokens = semanticMode === "light" ? tokens.semantic.light : tokens.semantic.dark;
 
   return (
-    <div className="space-y-5 p-4">
+    <div className="flex flex-col gap-[var(--ds-section-gap)] p-[var(--ds-card-padding)]">
       {/* Color Scales */}
       <div ref={colorGridRef}>
       {COLOR_SCALES.map((scale) => (
@@ -610,7 +610,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
         <Button
           variant="ghost"
           size="sm"
-          className="w-full flex items-center justify-between mb-3 h-auto px-0 hover:bg-transparent"
+          className="w-full flex items-center justify-between mb-[var(--ds-internal-gap)] h-auto px-0 hover:bg-transparent"
           onClick={() => setSemanticOpen((v) => !v)}
         >
           <p className="text-xs text-muted-foreground font-medium">시멘틱 토큰</p>
@@ -620,7 +620,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
         {semanticOpen && (
           <>
             {/* Light / Dark toggle */}
-            <div className="flex border border-border rounded-[var(--ds-element-radius)] overflow-hidden mb-3">
+            <div className="flex border border-border rounded-[var(--ds-element-radius)] overflow-hidden mb-[var(--ds-internal-gap)]">
               {(["light", "dark"] as const).map((m) => (
                 <Button
                   key={m}
@@ -638,7 +638,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
               ))}
             </div>
 
-            <div className="space-y-1.5">
+            <div className="flex flex-col gap-[var(--ds-internal-gap)]">
               {Object.entries(semanticTokens).filter(([key]) => !SEMANTIC_SKIP.has(key)).map(([key, value]) => {
                 const info = SEMANTIC_INFO[key];
                 return (

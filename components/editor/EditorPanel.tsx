@@ -96,14 +96,14 @@ export function EditorPanel({
         <div className="border-t border-border flex-shrink-0">
           <Button
             variant="ghost"
-            className="w-full flex items-center justify-between px-4 py-2 h-auto rounded-none text-xs text-muted-foreground hover:text-foreground hover:bg-accent/30"
+            className="w-full flex items-center justify-between px-[var(--ds-card-padding)] py-2 h-auto rounded-none text-xs text-muted-foreground hover:text-foreground hover:bg-accent/30"
             onClick={() => setHistoryOpen(!historyOpen)}
           >
             <span className="font-medium">최근 변경 ({history.length})</span>
             {historyOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
           </Button>
           {historyOpen && (
-            <div className="px-4 pb-3 space-y-1.5 max-h-32 overflow-y-auto">
+            <div className="px-[var(--ds-card-padding)] pb-[var(--ds-internal-gap)] flex flex-col gap-[var(--ds-internal-gap)] max-h-32 overflow-y-auto">
               {history.map((entry, i) => (
                 <div key={i} className="flex items-start gap-2">
                   <span className="text-muted-foreground mt-0.5">•</span>

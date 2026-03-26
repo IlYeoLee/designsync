@@ -166,12 +166,12 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
   const lineHeightKeys = ["tight", "normal", "loose"] as const;
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="flex flex-col gap-[var(--ds-section-gap)] p-[var(--ds-card-padding)]">
       {/* English Font */}
       <div>
         <p className="text-xs font-medium text-foreground mb-2">영문 폰트</p>
         <div
-          className="w-full p-3 rounded-[var(--ds-element-radius)] border border-border bg-muted/30 mb-3"
+          className="w-full p-[var(--ds-card-padding)] rounded-[var(--ds-element-radius)] border border-border bg-muted/30 mb-[var(--ds-internal-gap)]"
           style={{ fontFamily: tokens.primitives.fontFamily }}
         >
           <p className="text-base font-normal">The quick brown fox</p>
@@ -179,7 +179,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
         </div>
 
         {fontUploadStatus && (
-          <div className={`mb-3 px-3 py-2 rounded-[var(--ds-element-radius)] text-xs border ${
+          <div className={`mb-[var(--ds-internal-gap)] px-[var(--ds-card-padding)] py-2 rounded-[var(--ds-element-radius)] text-xs border ${
             fontUploadStatus.loading
               ? "bg-muted/50 border-border text-muted-foreground"
               : fontUploadStatus.result?.error
@@ -265,7 +265,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
       {/* Korean Font */}
       <div>
         <p className="text-xs font-medium text-foreground mb-2">한글 폰트</p>
-        <div className="w-full p-3 rounded-[var(--ds-element-radius)] border border-border bg-muted/30 mb-3">
+        <div className="w-full p-[var(--ds-card-padding)] rounded-[var(--ds-element-radius)] border border-border bg-muted/30 mb-[var(--ds-internal-gap)]">
           <p className="text-base" style={{ fontFamily: tokens.primitives.fontFamilyKo || undefined }}>
             안녕하세요 Hello
           </p>
@@ -306,10 +306,10 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
       {/* Font Sizes — px display */}
       <div>
         <p className="text-xs font-medium text-foreground mb-1">글자 크기</p>
-        <p className="text-[10px] text-muted-foreground mb-3">px 단위로 표시 (rem으로 저장)</p>
-        <div className="space-y-2">
+        <p className="text-[10px] text-muted-foreground mb-[var(--ds-internal-gap)]">px 단위로 표시 (rem으로 저장)</p>
+        <div className="flex flex-col gap-[var(--ds-internal-gap)]">
           {fontSizeKeys.map((key) => (
-            <div key={key} className="flex items-center gap-3">
+            <div key={key} className="flex items-center gap-[var(--ds-section-gap)]">
               <span className="text-xs text-muted-foreground w-8 font-mono">{key}</span>
               <Slider
                 min={8}
@@ -332,10 +332,10 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
 
       {/* Font Weight */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-3">글자 굵기</p>
-        <div className="space-y-2">
+        <p className="text-xs font-medium text-foreground mb-[var(--ds-internal-gap)]">글자 굵기</p>
+        <div className="flex flex-col gap-[var(--ds-internal-gap)]">
           {fontWeightKeys.map((key) => (
-            <div key={key} className="flex items-center gap-3">
+            <div key={key} className="flex items-center gap-[var(--ds-section-gap)]">
               <span className="text-xs text-muted-foreground w-12">{key}</span>
               <NativeSelect
                 size="sm"
@@ -354,10 +354,10 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
 
       {/* Line Height */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-3">줄 간격</p>
-        <div className="space-y-2">
+        <p className="text-xs font-medium text-foreground mb-[var(--ds-internal-gap)]">줄 간격</p>
+        <div className="flex flex-col gap-[var(--ds-internal-gap)]">
           {lineHeightKeys.map((key) => (
-            <div key={key} className="flex items-center gap-3">
+            <div key={key} className="flex items-center gap-[var(--ds-section-gap)]">
               <span className="text-xs text-muted-foreground w-12">{key}</span>
               <Slider
                 min={100}

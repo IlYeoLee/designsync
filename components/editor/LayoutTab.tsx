@@ -5,6 +5,7 @@ import { TokenState } from "@/lib/tokens";
 import { STYLE_PRESETS, applyStylePreset } from "@/lib/style-presets";
 import { Button } from "@/registry/new-york/ui/button";
 import { Input } from "@/registry/new-york/ui/input";
+import { Slider } from "@/registry/new-york/ui/slider";
 import { Home, Settings, Search, Bell, Mail } from "lucide-react";
 import { IconHome, IconSettings, IconSearch, IconBell, IconMail } from "@tabler/icons-react";
 import { House, Gear, MagnifyingGlass, BellSimple, Envelope } from "@phosphor-icons/react";
@@ -145,16 +146,15 @@ function RadiusScaleSlider({
   }
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center gap-3">
-        <input
-          type="range"
+    <div className="flex flex-col gap-[var(--ds-internal-gap)]">
+      <div className="flex items-center gap-[var(--ds-section-gap)]">
+        <Slider
           min={0}
           max={16}
           step={2}
-          value={currentStep}
-          onChange={(e) => applyScale(+e.target.value)}
-          className="flex-1 h-1.5 accent-primary"
+          value={[currentStep]}
+          onValueChange={(vals) => applyScale(vals[0])}
+          className="flex-1"
         />
         <span className="text-xs font-mono text-muted-foreground w-12 text-right">
           {currentStep}px
@@ -178,11 +178,11 @@ function RadiusScaleSlider({
 
 export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStylePresetChange }: LayoutTabProps) {
   return (
-    <div className="space-y-6 p-4">
+    <div className="flex flex-col gap-[var(--ds-section-gap)] p-[var(--ds-card-padding)]">
       {/* Style Presets */}
       <div>
         <p className="text-xs font-medium text-foreground mb-2">스타일 프리셋</p>
-        <p className="text-[10px] text-muted-foreground mb-3">컴포넌트 밀도와 둥글기를 한 번에 설정합니다.</p>
+        <p className="text-[10px] text-muted-foreground mb-[var(--ds-internal-gap)]">컴포넌트 밀도와 둥글기를 한 번에 설정합니다.</p>
         <div className="grid grid-cols-1 gap-1.5">
           {STYLE_PRESETS.map((preset) => {
             const isActive = tokens.primitives.stylePreset === preset.id;
@@ -222,18 +222,18 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
 
       {/* Border Radius */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-3">테두리 둥글기</p>
+        <p className="text-xs font-medium text-foreground mb-[var(--ds-internal-gap)]">테두리 둥글기</p>
 
         {/* Global scale slider */}
         <RadiusScaleSlider tokens={tokens} onTokenChange={onTokenChange} />
 
         <p className="text-xs text-muted-foreground mb-2 mt-4">커스텀 값</p>
-        <div className="space-y-2">
+        <div className="flex flex-col gap-[var(--ds-internal-gap)]">
           {RADIUS_OPTIONS.map(({ key, label }) => {
             const varKey = key === "none" ? "none" : key === "full" ? "full" : `${key}-prim`;
             const currentValue = tokens.primitives.radius[key as keyof typeof tokens.primitives.radius];
             return (
-              <div key={key} className="flex items-center gap-3">
+              <div key={key} className="flex items-center gap-[var(--ds-section-gap)]">
                 <span className="text-xs text-muted-foreground w-8">{label}</span>
                 <div className="flex-1" />
                 <RemPxInput
@@ -251,13 +251,13 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
       {/* Spacing Scale */}
       <div>
         <p className="text-xs font-medium text-foreground mb-1">간격</p>
-        <p className="text-[10px] text-muted-foreground mb-3">px 단위로 표시 (rem으로 저장)</p>
-        <div className="space-y-2">
+        <p className="text-[10px] text-muted-foreground mb-[var(--ds-internal-gap)]">px 단위로 표시 (rem으로 저장)</p>
+        <div className="flex flex-col gap-[var(--ds-internal-gap)]">
           {SPACING_KEYS.map((key) => {
             const value = tokens.primitives.spacing[key as keyof typeof tokens.primitives.spacing];
             const pxValue = Math.round(parseFloat(value) * 16);
             return (
-              <div key={key} className="flex items-center gap-3">
+              <div key={key} className="flex items-center gap-[var(--ds-section-gap)]">
                 <span className="text-xs text-muted-foreground w-6 font-mono">{key}</span>
                 <div className="flex-1 relative">
                   <div
@@ -279,8 +279,8 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
 
       {/* Shadows */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-3">그림자</p>
-        <div className="space-y-5">
+        <p className="text-xs font-medium text-foreground mb-[var(--ds-internal-gap)]">그림자</p>
+        <div className="flex flex-col gap-[var(--ds-section-gap)]">
           {SHADOW_LEVELS.map(({ key, label, yOffset }) => {
             const currentShadow = tokens.primitives.shadows?.[key] ??
               `0 ${yOffset}px ${yOffset * 2}px 0px oklch(0 0 0 / 0.05)`;
@@ -303,30 +303,30 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
                 {/* Blur */}
                 <div className="flex items-center gap-2 mb-1 pl-8">
                   <span className="text-[10px] text-muted-foreground w-10">블러</span>
-                  <input
-                    type="range" min={0} max={30} step={1} value={blur}
-                    onChange={(e) => update(+e.target.value, spread, opacity)}
-                    className="flex-1 h-1.5 accent-primary"
+                  <Slider
+                    min={0} max={30} step={1} value={[blur]}
+                    onValueChange={(vals) => update(vals[0], spread, opacity)}
+                    className="flex-1"
                   />
                   <span className="text-[10px] font-mono text-muted-foreground w-8 text-right">{blur}px</span>
                 </div>
                 {/* Spread */}
                 <div className="flex items-center gap-2 mb-1 pl-8">
                   <span className="text-[10px] text-muted-foreground w-10">확산</span>
-                  <input
-                    type="range" min={-10} max={10} step={1} value={spread}
-                    onChange={(e) => update(blur, +e.target.value, opacity)}
-                    className="flex-1 h-1.5 accent-primary"
+                  <Slider
+                    min={-10} max={10} step={1} value={[spread]}
+                    onValueChange={(vals) => update(blur, vals[0], opacity)}
+                    className="flex-1"
                   />
                   <span className="text-[10px] font-mono text-muted-foreground w-8 text-right">{spread}px</span>
                 </div>
                 {/* Opacity */}
                 <div className="flex items-center gap-2 pl-8">
                   <span className="text-[10px] text-muted-foreground w-10">투명도</span>
-                  <input
-                    type="range" min={0} max={0.5} step={0.01} value={opacity}
-                    onChange={(e) => update(blur, spread, +e.target.value)}
-                    className="flex-1 h-1.5 accent-primary"
+                  <Slider
+                    min={0} max={0.5} step={0.01} value={[opacity]}
+                    onValueChange={(vals) => update(blur, spread, vals[0])}
+                    className="flex-1"
                   />
                   <span className="text-[10px] font-mono text-muted-foreground w-8 text-right">{Math.round(opacity * 100)}%</span>
                 </div>
@@ -339,7 +339,7 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
       {/* Icon Library */}
       <div>
         <p className="text-xs font-medium text-foreground mb-2">아이콘 라이브러리</p>
-        <p className="text-[10px] text-muted-foreground mb-3">Copy 시 AI가 이 아이콘 라이브러리를 사용합니다.</p>
+        <p className="text-[10px] text-muted-foreground mb-[var(--ds-internal-gap)]">Copy 시 AI가 이 아이콘 라이브러리를 사용합니다.</p>
         <div className="grid grid-cols-1 gap-1.5">
           {ICON_LIBRARIES.map((lib) => (
             <Button
@@ -375,7 +375,7 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
         </div>
       </div>
 
-      <div className="rounded-[var(--ds-element-radius)] bg-muted/50 p-3 border border-border">
+      <div className="rounded-[var(--ds-element-radius)] bg-muted/50 p-[var(--ds-card-padding)] border border-border">
         <p className="text-xs text-muted-foreground">
           그림자는 CSS 변수를 통해 <code className="font-mono text-xs">shadow-sm/md/lg</code> Tailwind 유틸리티에 연결됩니다.
           간격 변경은 모든 <code className="font-mono text-xs">p-*</code>, <code className="font-mono text-xs">gap-*</code> 유틸리티에 영향을 줍니다.
