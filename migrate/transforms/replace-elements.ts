@@ -43,7 +43,7 @@ export default function transformer(file: FileInfo, api: API) {
         }
 
         // Remove className for elements where the component handles styling
-        if (htmlTag === "input" || htmlTag === "textarea" || htmlTag === "select") {
+        if (htmlTag === "button" || htmlTag === "input" || htmlTag === "textarea" || htmlTag === "select") {
           el.openingElement.attributes = el.openingElement.attributes?.filter(
             (attr) =>
               !(attr.type === "JSXAttribute" && attr.name.name === "className")
