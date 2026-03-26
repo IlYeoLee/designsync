@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GOOGLE_FONTS, KOREAN_FONTS } from "@/lib/fonts";
 import { generateRules } from "@/lib/rules";
+import { readableColor } from "colorizr";
+import { oklchToHex } from "@/lib/color";
 
 const CDN_BASE = "https://designsync-omega.vercel.app";
 
@@ -138,10 +140,19 @@ export async function POST(req: NextRequest) {
     lightVars["chart-3"] = flatPrimitives["--warning-500"];
     lightVars["chart-4"] = flatPrimitives["--error-500"];
     lightVars["chart-5"] = flatPrimitives["--neutral-500"];
+    // Auto-contrast: pick white or black foreground based on brand luminance
+    const brand600Hex = oklchToHex(flatPrimitives["--brand-600"] || "#000000");
+    const brand400Hex = oklchToHex(flatPrimitives["--brand-400"] || "#000000");
+    const lightPrimaryFg = readableColor(brand600Hex);  // '#ffffff' or '#000000'
+    const darkPrimaryFg = readableColor(brand400Hex);
+
+    lightVars["primary-foreground"] = lightPrimaryFg === "#ffffff"
+      ? flatPrimitives["--neutral-50"] : flatPrimitives["--neutral-900"];
     lightVars["sidebar"] = flatPrimitives["--neutral-100"];
     lightVars["sidebar-foreground"] = flatPrimitives["--neutral-900"];
     lightVars["sidebar-primary"] = flatPrimitives["--brand-600"];
-    lightVars["sidebar-primary-foreground"] = flatPrimitives["--neutral-50"];
+    lightVars["sidebar-primary-foreground"] = lightPrimaryFg === "#ffffff"
+      ? flatPrimitives["--neutral-50"] : flatPrimitives["--neutral-900"];
     lightVars["sidebar-accent"] = flatPrimitives["--brand-100"];
     lightVars["sidebar-accent-foreground"] = flatPrimitives["--brand-900"];
     lightVars["sidebar-border"] = flatPrimitives["--neutral-200"];
@@ -154,10 +165,13 @@ export async function POST(req: NextRequest) {
     )) {
       darkVars[key] = resolveToken(val, flatPrimitives);
     }
+    darkVars["primary-foreground"] = darkPrimaryFg === "#ffffff"
+      ? flatPrimitives["--neutral-50"] : flatPrimitives["--neutral-900"];
     darkVars["sidebar"] = flatPrimitives["--neutral-800"];
     darkVars["sidebar-foreground"] = flatPrimitives["--neutral-50"];
     darkVars["sidebar-primary"] = flatPrimitives["--brand-400"];
-    darkVars["sidebar-primary-foreground"] = flatPrimitives["--neutral-900"];
+    darkVars["sidebar-primary-foreground"] = darkPrimaryFg === "#ffffff"
+      ? flatPrimitives["--neutral-50"] : flatPrimitives["--neutral-900"];
     darkVars["sidebar-accent"] = flatPrimitives["--brand-900"];
     darkVars["sidebar-accent-foreground"] = flatPrimitives["--brand-100"];
     darkVars["sidebar-border"] = flatPrimitives["--neutral-700"];
