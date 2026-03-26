@@ -72,10 +72,10 @@ function fetchText(url) {
     process.exit(1);
   }
 
-  console.log('  [1/3] Found ' + globalsPath);
+  console.log('  [1/4] Found ' + globalsPath);
 
   // 2. Fetch latest tokens
-  console.log('  [2/3] Fetching latest tokens...');
+  console.log('  [2/4] Fetching latest tokens...');
   let tokens;
   try {
     tokens = await fetchJSON(TOKENS_URL);
@@ -89,10 +89,11 @@ function fetchText(url) {
     process.exit(1);
   }
 
-  // 3. Update globals.css — replace :root and .dark blocks
+  // 3. Update globals.css — replace ALL :root and .dark blocks
+  console.log('  [3/4] Updating design tokens...');
   let css = fs.readFileSync(globalsPath, 'utf-8');
 
-  // Build new :root and .dark blocks
+  // Build new :root and .dark blocks (includes primitives + semantic + density + font)
   const lightVars = Object.entries(tokens.cssVars.light || {})
     .map(([k, v]) => '    --' + k + ': ' + v + ';')
     .join('\\n');
@@ -100,65 +101,61 @@ function fetchText(url) {
     .map(([k, v]) => '    --' + k + ': ' + v + ';')
     .join('\\n');
 
-  // Remove existing semantic :root and .dark blocks (keep primitive :root)
-  // Strategy: find the LAST :root block (semantic) and .dark block, replace them
-  function removeBlock(src, pattern) {
+  // Remove ALL :root and .dark blocks (primitives + semantic — rewrite everything fresh)
+  function removeAllBlocks(src, pattern) {
     let result = src;
-    // Find the LAST occurrence
-    let lastIdx = -1;
-    let match;
-    const re = new RegExp(pattern.source, pattern.flags);
-    while ((match = re.exec(result)) !== null) {
-      lastIdx = match.index;
-      if (!pattern.global) break;
+    // Remove blocks from last to first to preserve indices
+    const re = new RegExp(pattern.source, pattern.flags.replace('g', '') + 'g');
+    const matches = [...result.matchAll(re)];
+    for (let m = matches.length - 1; m >= 0; m--) {
+      const start = matches[m].index;
+      let depth = 0, end = start, opened = false;
+      for (let i = start; i < result.length; i++) {
+        if (result[i] === '{') { depth++; opened = true; }
+        if (result[i] === '}') { depth--; }
+        if (opened && depth === 0) { end = i + 1; break; }
+      }
+      // Also remove preceding comment line if it exists
+      let commentStart = start;
+      const before = result.slice(0, start);
+      const lastNewline = before.lastIndexOf('\\n');
+      if (lastNewline !== -1) {
+        const lineBeforeBlock = before.slice(lastNewline + 1).trim();
+        if (lineBeforeBlock.startsWith('/*') && lineBeforeBlock.endsWith('*/')) {
+          commentStart = lastNewline + 1;
+        }
+      }
+      result = result.slice(0, commentStart) + result.slice(end);
     }
-    if (lastIdx === -1) return result;
-
-    const start = lastIdx;
-    let depth = 0, end = start, opened = false;
-    for (let i = start; i < result.length; i++) {
-      if (result[i] === '{') { depth++; opened = true; }
-      if (result[i] === '}') { depth--; }
-      if (opened && depth === 0) { end = i + 1; break; }
-    }
-    return result.slice(0, start) + result.slice(end);
+    return result;
   }
 
-  // Remove semantic :root (second one) and .dark
-  // Count :root blocks — if more than 1, remove the last one
-  const rootMatches = [...css.matchAll(/:root\\s*\\{/g)];
-  if (rootMatches.length >= 2) {
-    // Remove last :root block (semantic tokens)
-    const lastRoot = rootMatches[rootMatches.length - 1];
-    let depth = 0, end = lastRoot.index, opened = false;
-    for (let i = lastRoot.index; i < css.length; i++) {
-      if (css[i] === '{') { depth++; opened = true; }
-      if (css[i] === '}') { depth--; }
-      if (opened && depth === 0) { end = i + 1; break; }
-    }
-    css = css.slice(0, lastRoot.index) + css.slice(end);
-  }
+  // Remove ALL :root blocks and ALL .dark blocks
+  css = removeAllBlocks(css, /:root\\s*\\{/);
+  css = removeAllBlocks(css, /\\.dark\\s*\\{/);
 
-  // Remove .dark block
-  css = removeBlock(css, /\\.dark\\s*\\{/);
+  // Clean up excessive blank lines left after removal
+  css = css.replace(/(\\n\\s*){3,}/g, '\\n\\n');
 
-  // Append new semantic blocks
+  // Append new complete blocks (primitives + semantic + density + font all in one)
   css = css.trimEnd() + '\\n\\n' +
-    '/* Semantic tokens (synced from DesignSync) */\\n' +
+    '/* Design tokens (synced from DesignSync) */\\n' +
     ':root {\\n' + lightVars + '\\n}\\n\\n' +
     '.dark {\\n' + darkVars + '\\n}\\n';
 
   fs.writeFileSync(globalsPath, css);
-  console.log('  [2/3] Tokens updated in ' + globalsPath);
+  console.log('  [3/4] Tokens updated in ' + globalsPath);
 
-  // 3. Update .cursorrules and CLAUDE.md
-  console.log('  [3/3] Updating AI rules...');
+  // 4. Create/update AI rules files
+  console.log('  [4/4] Updating AI rules...');
   try {
     const rulesText = await fetchText(RULES_URL);
     if (rulesText && !rulesText.trim().startsWith('<')) {
-      if (fs.existsSync('.cursorrules')) fs.writeFileSync('.cursorrules', rulesText);
-      if (fs.existsSync('CLAUDE.md')) fs.writeFileSync('CLAUDE.md', rulesText);
-      if (fs.existsSync('.windsurfrules')) fs.writeFileSync('.windsurfrules', rulesText);
+      // Always create these files (not just update existing ones)
+      fs.writeFileSync('.cursorrules', rulesText);
+      fs.writeFileSync('CLAUDE.md', rulesText);
+      fs.writeFileSync('.windsurfrules', rulesText);
+      console.log('  [4/4] AI rules written to .cursorrules, CLAUDE.md, .windsurfrules');
     }
   } catch {
     console.log('  [WARN] AI rules update skipped.');
