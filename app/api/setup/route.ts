@@ -138,6 +138,11 @@ function fetchText(url) {
     process.exit(1);
   }
 
+  // Install additional peer dependencies
+  try {
+    execSync('npm install framer-motion --save 2>/dev/null || npx pnpm add framer-motion 2>/dev/null || true', { stdio: 'pipe' });
+  } catch { /* ignore */ }
+
   // ── Step 5: Generate AI rule files ──────────────────────────────
   console.log('');
   console.log('  [4/5] Generating AI rule files...');
