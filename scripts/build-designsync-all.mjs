@@ -9,9 +9,11 @@
  * Or via: pnpm registry:build && pnpm build:all
  */
 import { readFileSync, writeFileSync, readdirSync, statSync } from "fs";
-import { join, basename } from "path";
+import { join, basename, dirname } from "path";
+import { fileURLToPath } from "url";
 
-const BASE = new URL("../public/r", import.meta.url).pathname;
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const BASE = join(__dirname, "..", "public", "r");
 
 // Files to skip when bundling
 const EXCLUDE = new Set([
@@ -28,8 +30,34 @@ const EXCLUDE = new Set([
   "typography",
 ]);
 
-// Load tokens cssVars
+// Load tokens cssVars and inject density variables
 const tokens = JSON.parse(readFileSync(join(BASE, "designsync-tokens.json"), "utf8"));
+
+// shadcn build doesn't include custom ds-* keys from registry.json,
+// so we inject density/sizing CSS variables directly.
+const densityVars = {
+  "ds-button-h-default": "2.25rem",
+  "ds-button-h-sm": "2rem",
+  "ds-button-h-lg": "2.5rem",
+  "ds-button-h-xs": "1.75rem",
+  "ds-input-h": "2.25rem",
+  "ds-card-padding": "1.5rem",
+  "ds-section-gap": "1rem",
+  "ds-internal-gap": "0.5rem",
+  "ds-base-font-size": "0.875rem",
+  "ds-focus-ring-width": "3px",
+  "ds-button-radius": "0.5rem",
+  "ds-element-radius": "0.5rem",
+  "ds-input-radius": "0.5rem",
+  "ds-card-radius": "0.75rem",
+  "ds-dialog-radius": "0.75rem",
+};
+if (!tokens.cssVars) tokens.cssVars = { light: {}, dark: {} };
+Object.assign(tokens.cssVars.light, densityVars);
+Object.assign(tokens.cssVars.dark, densityVars);
+
+// Write updated tokens back
+writeFileSync(join(BASE, "designsync-tokens.json"), JSON.stringify(tokens, null, 2));
 
 const allFiles = [];
 const allDeps = new Set(["lucide-react"]); // always include icons

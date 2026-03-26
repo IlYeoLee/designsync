@@ -51,7 +51,22 @@
       "font-weight-bold": "700",
       "line-height-tight": "1.25",
       "line-height-normal": "1.5",
-      "line-height-loose": "1.75"
+      "line-height-loose": "1.75",
+      "ds-button-h-default": "2.25rem",
+      "ds-button-h-sm": "2rem",
+      "ds-button-h-lg": "2.5rem",
+      "ds-button-h-xs": "1.75rem",
+      "ds-input-h": "2.25rem",
+      "ds-card-padding": "1.5rem",
+      "ds-section-gap": "1rem",
+      "ds-internal-gap": "0.5rem",
+      "ds-base-font-size": "0.875rem",
+      "ds-focus-ring-width": "3px",
+      "ds-button-radius": "0.5rem",
+      "ds-element-radius": "0.5rem",
+      "ds-input-radius": "0.5rem",
+      "ds-card-radius": "0.75rem",
+      "ds-dialog-radius": "0.75rem"
     },
     "dark": {
       "background": "oklch(0.13 0 0)",
@@ -94,7 +109,22 @@
       "font-weight-bold": "700",
       "line-height-tight": "1.25",
       "line-height-normal": "1.5",
-      "line-height-loose": "1.75"
+      "line-height-loose": "1.75",
+      "ds-button-h-default": "2.25rem",
+      "ds-button-h-sm": "2rem",
+      "ds-button-h-lg": "2.5rem",
+      "ds-button-h-xs": "1.75rem",
+      "ds-input-h": "2.25rem",
+      "ds-card-padding": "1.5rem",
+      "ds-section-gap": "1rem",
+      "ds-internal-gap": "0.5rem",
+      "ds-base-font-size": "0.875rem",
+      "ds-focus-ring-width": "3px",
+      "ds-button-radius": "0.5rem",
+      "ds-element-radius": "0.5rem",
+      "ds-input-radius": "0.5rem",
+      "ds-card-radius": "0.75rem",
+      "ds-dialog-radius": "0.75rem"
     }
   },
   "type": "registry:style"

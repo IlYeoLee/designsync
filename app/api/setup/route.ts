@@ -143,6 +143,35 @@ function fetchText(url) {
     execSync('npm install framer-motion lucide-react --save 2>/dev/null || npx pnpm add framer-motion lucide-react 2>/dev/null || true', { stdio: 'pipe' });
   } catch { /* ignore */ }
 
+  // ── Step 3b: Inject density CSS variables ──────────────────────
+  // shadcn add only writes standard shadcn keys; custom ds-* keys are ignored.
+  // We inject density/sizing variables directly into :root block.
+  var updatedCss = fs.readFileSync(globalsPath, 'utf-8');
+  var densityBlock = [
+    '  --ds-button-h-default: 2.25rem;',
+    '  --ds-button-h-sm: 2rem;',
+    '  --ds-button-h-lg: 2.5rem;',
+    '  --ds-button-h-xs: 1.75rem;',
+    '  --ds-input-h: 2.25rem;',
+    '  --ds-card-padding: 1.5rem;',
+    '  --ds-section-gap: 1rem;',
+    '  --ds-internal-gap: 0.5rem;',
+    '  --ds-base-font-size: 0.875rem;',
+    '  --ds-focus-ring-width: 3px;',
+    '  --ds-button-radius: 0.5rem;',
+    '  --ds-element-radius: 0.5rem;',
+    '  --ds-input-radius: 0.5rem;',
+    '  --ds-card-radius: 0.75rem;',
+    '  --ds-dialog-radius: 0.75rem;',
+  ].join('\\n');
+  // Inject before the closing } of the first :root block
+  var rootEnd = updatedCss.indexOf('}');
+  if (rootEnd > 0) {
+    updatedCss = updatedCss.slice(0, rootEnd) + densityBlock + '\\n' + updatedCss.slice(rootEnd);
+    fs.writeFileSync(globalsPath, updatedCss);
+    console.log('         Density variables injected');
+  }
+
   // ── Step 4b: Tailwind v3 compatibility ──────────────────────────
   // If @tailwind directives exist (v3), add color mappings to tailwind.config
   var cssContent = fs.readFileSync(globalsPath, 'utf-8');
