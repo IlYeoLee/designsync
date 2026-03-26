@@ -26,6 +26,8 @@ export interface RulesParams {
   fontSansValue?: string;
   /** Icon library id — e.g. "lucide", "tabler" */
   iconLibrary?: string;
+  /** Design system slug for dynamic URLs */
+  dsSlug?: string;
   /** Include the install command section (for clipboard prompt) */
   includeInstall?: boolean;
 }
@@ -36,8 +38,11 @@ export function generateRules(params: RulesParams = {}): string {
     fontFamilyKo,
     fontSansValue,
     iconLibrary = "lucide",
+    dsSlug,
     includeInstall = false,
   } = params;
+
+  const setupParam = dsSlug ? `?ds=${dsSlug}` : "";
 
   const iconInfo = ICON_LIBRARY_INFO[iconLibrary] || ICON_LIBRARY_INFO.lucide;
   const otherIconLibs = Object.values(ICON_LIBRARY_INFO)
@@ -63,17 +68,17 @@ export function generateRules(params: RulesParams = {}): string {
 
 **macOS / Linux:**
 \`\`\`bash
-curl -fsSL ${CDN}/api/setup | node
+curl -fsSL ${CDN}/api/setup${setupParam} | node
 \`\`\`
 
 **Windows (PowerShell):**
 \`\`\`powershell
-(Invoke-WebRequest -Uri ${CDN}/api/setup -UseBasicParsing).Content | node -
+(Invoke-WebRequest -Uri "${CDN}/api/setup${setupParam}" -UseBasicParsing).Content | node -
 \`\`\`
 
 **또는 (Node 18+ 어디서든):**
 \`\`\`bash
-node -e "require('https').get('${CDN}/api/setup',r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>{require('fs').writeFileSync('.ds-setup.cjs',d);require('./.ds-setup.cjs')})})"
+node -e "require('https').get('${CDN}/api/setup${setupParam}',r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>{require('fs').writeFileSync('.ds-setup.cjs',d);require('./.ds-setup.cjs')})})"
 \`\`\`
 
 이 명령어가 하는 일:

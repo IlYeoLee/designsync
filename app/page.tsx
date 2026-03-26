@@ -439,6 +439,7 @@ export default function Home() {
         fontFamily={tokens.primitives.fontFamily}
         fontFamilyKo={tokens.primitives.fontFamilyKo}
         iconLibrary={tokens.primitives.iconLibrary}
+        dsSlug={activeDs?.slug ?? ""}
       />
       <div className="flex-1 flex overflow-hidden">
         <EditorPanel

@@ -8,7 +8,6 @@ import {
   HeaderActions,
 } from "@/registry/new-york/ui/header";
 import { SidebarTrigger } from "@/registry/new-york/ui/sidebar";
-import { Separator } from "@/registry/new-york/ui/separator";
 import { Button } from "@/registry/new-york/ui/button";
 
 interface EditorHeaderProps {
@@ -23,6 +22,7 @@ interface EditorHeaderProps {
   fontFamily: string;
   fontFamilyKo: string;
   iconLibrary: string;
+  dsSlug: string;
 }
 
 export function EditorHeader({
@@ -37,6 +37,7 @@ export function EditorHeader({
   fontFamily,
   fontFamilyKo,
   iconLibrary,
+  dsSlug,
 }: EditorHeaderProps) {
   const [copyState, setCopyState] = React.useState<"idle" | "saving" | "copied">("idle");
   const [confirmReset, setConfirmReset] = React.useState(false);
@@ -65,6 +66,7 @@ export function EditorHeader({
       fontFamilyKo: fontFamilyKo || undefined,
       fontSansValue: fontSansValue || undefined,
       iconLibrary: iconLibrary || "lucide",
+      dsSlug: dsSlug || undefined,
       includeInstall: true,
     });
 
@@ -90,7 +92,6 @@ export function EditorHeader({
   return (
     <HeaderRoot className="flex-shrink-0">
       <SidebarTrigger />
-      <Separator orientation="vertical" className="mx-2 h-4" />
 
       <HeaderActions>
         {/* Copy Prompt (Save + Copy) */}

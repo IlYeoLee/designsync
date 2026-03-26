@@ -205,12 +205,16 @@ export function AppSidebar({
                         onClick={() => onSelect(ds)}
                         isActive={activeId === ds.id}
                         tooltip={ds.name}
+                        className="group-data-[collapsible=icon]:hidden"
                       >
                         <div
-                          className="flex aspect-square size-4 items-center justify-center rounded-sm shrink-0"
+                          className="size-3 rounded-full shrink-0 ring-1 ring-sidebar-border"
                           style={{ backgroundColor: getBrandColor(ds) }}
                         />
-                        <span className="truncate">{ds.name}</span>
+                        <div className="flex flex-col gap-0 leading-none min-w-0">
+                          <span className="text-sm truncate">{ds.name}</span>
+                          <span className="text-[10px] text-sidebar-foreground/50 truncate">{ds.slug}</span>
+                        </div>
                       </SidebarMenuButton>
 
                       <DropdownMenu>
@@ -244,7 +248,7 @@ export function AppSidebar({
                   ))}
 
                   {/* 새로 만들기 */}
-                  <SidebarMenuItem>
+                  <SidebarMenuItem className="group-data-[collapsible=icon]:hidden">
                     <SidebarMenuButton
                       onClick={() => { setCloneFrom(null); setNewName(""); setCreateOpen(true); }}
                       tooltip="새 디자인 시스템"

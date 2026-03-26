@@ -2,7 +2,18 @@ import { NextResponse } from "next/server";
 
 const CDN = "https://designsync-omega.vercel.app";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const dsSlug = searchParams.get("ds") || "";
+
+  // If slug provided, use dynamic URLs; otherwise fallback to static
+  const tokensUrl = dsSlug
+    ? `${CDN}/r/${dsSlug}/designsync-all.json`
+    : `${CDN}/r/designsync-all.json`;
+  const rulesUrl = dsSlug
+    ? `${CDN}/api/rules?ds=${dsSlug}`
+    : `${CDN}/api/rules`;
+
   const script = `#!/usr/bin/env node
 'use strict';
 
@@ -119,7 +130,7 @@ function fetchText(url) {
   console.log('');
   try {
     execSync(
-      'npx -y shadcn@latest add -o -y ' + CDN + '/r/designsync-all.json',
+      'npx -y shadcn@latest add -o -y ' + '${tokensUrl}',
       { stdio: 'inherit' }
     );
   } catch (e) {
@@ -135,7 +146,7 @@ function fetchText(url) {
 
   let rulesText = '';
   try {
-    rulesText = await fetchText(CDN + '/api/rules');
+    rulesText = await fetchText('${rulesUrl}');
     // Guard against HTML error pages (e.g. 404/500 rendered as HTML)
     if (rulesText.trim().startsWith('<') || rulesText.trim().startsWith('<!')) {
       throw new Error('Received HTML instead of rules text');
