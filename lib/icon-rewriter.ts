@@ -66,15 +66,22 @@ export function rewriteIconImports(source: string, targetLib: string): string {
 
 /**
  * Rewrite icon dependency in a registry JSON's dependencies field.
+ * Handles both array format (shadcn v2) and object format.
  */
 export function rewriteIconDependency(
-  deps: Record<string, string>,
+  deps: string[] | Record<string, string>,
   targetLib: string
-): Record<string, string> {
+): string[] | Record<string, string> {
   if (targetLib === "lucide" || !targetLib) return deps;
   const targetPkg = LIBRARY_PKG[targetLib];
   if (!targetPkg) return deps;
 
+  // Array format: ["lucide-react", "@radix-ui/react-accordion"]
+  if (Array.isArray(deps)) {
+    return deps.map((d) => (d === "lucide-react" ? targetPkg : d));
+  }
+
+  // Object format: { "lucide-react": "^0.x" }
   const newDeps = { ...deps };
   if (newDeps["lucide-react"]) {
     delete newDeps["lucide-react"];
