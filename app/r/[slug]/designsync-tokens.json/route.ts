@@ -30,6 +30,7 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
+  try {
   const supabase = getSupabase();
 
   const { data, error } = await supabase
@@ -272,4 +273,10 @@ export async function GET(
       "Access-Control-Allow-Origin": "*",
     },
   });
+  } catch (err) {
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Unknown error", stack: err instanceof Error ? err.stack : undefined },
+      { status: 500, headers: { "Access-Control-Allow-Origin": "*" } }
+    );
+  }
 }
