@@ -208,6 +208,51 @@ function fetchText(url) {
       }
     }
 
+    // Inject @theme inline mappings for typography/shadow tokens
+    // so text-sm, font-medium, shadow-md etc. use DesignSync values
+    if (cssAfterShadcn.includes('@theme inline')) {
+      var themeEnd = cssAfterShadcn.indexOf('}', cssAfterShadcn.indexOf('@theme inline'));
+      if (themeEnd > 0) {
+        var extraMappings = [];
+        // Font size mappings
+        var fontSizes = ['xs','sm','base','lg','xl','2xl','3xl','4xl','5xl'];
+        for (var fi = 0; fi < fontSizes.length; fi++) {
+          var fs_key = '--text-' + fontSizes[fi];
+          if (!cssAfterShadcn.includes(fs_key + ':')) {
+            extraMappings.push('  ' + fs_key + ': var(--font-size-' + fontSizes[fi] + ');');
+          }
+        }
+        // Font weight mappings
+        var weights = ['normal','medium','semibold','bold','extrabold'];
+        for (var wi = 0; wi < weights.length; wi++) {
+          var fw_key = '--font-weight-' + weights[wi];
+          if (!cssAfterShadcn.includes(fw_key + ':') || cssAfterShadcn.indexOf(fw_key + ':', cssAfterShadcn.indexOf('@theme')) === -1) {
+            extraMappings.push('  ' + fw_key + ': var(--font-weight-' + weights[wi] + ');');
+          }
+        }
+        // Line height mappings
+        var leadings = {tight:'tight',snug:'snug',normal:'normal',relaxed:'relaxed',loose:'loose'};
+        for (var lk in leadings) {
+          var lh_key = '--leading-' + lk;
+          if (!cssAfterShadcn.includes(lh_key + ':')) {
+            extraMappings.push('  ' + lh_key + ': var(--line-height-' + leadings[lk] + ');');
+          }
+        }
+        // Shadow mappings
+        var shadows = ['sm','md','lg'];
+        for (var si = 0; si < shadows.length; si++) {
+          var sh_key = '--shadow-' + shadows[si];
+          if (!cssAfterShadcn.includes(sh_key + ':')) {
+            extraMappings.push('  ' + sh_key + ': var(--ds-shadow-' + shadows[si] + ');');
+          }
+        }
+        if (extraMappings.length > 0) {
+          cssAfterShadcn = cssAfterShadcn.slice(0, themeEnd) + '\\n' + extraMappings.join('\\n') + '\\n' + cssAfterShadcn.slice(themeEnd);
+          console.log('         Injected ' + extraMappings.length + ' @theme inline mappings (typography + shadows)');
+        }
+      }
+    }
+
     fs.writeFileSync(globalsPath, cssAfterShadcn);
     console.log('         Injected ' + lightMissing.length + ' light + ' + darkMissing.length + ' dark variables');
   } catch (e) {
