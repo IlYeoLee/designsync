@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { rewriteIconImports, rewriteIconDependency } from "@/lib/icon-map";
-import { readFile } from "fs/promises";
-import { join } from "path";
+
+const CDN_BASE = "https://designsync-omega.vercel.app";
 
 function getSupabase() {
   return createClient(
@@ -23,16 +23,14 @@ export async function GET(
   }
 
   try {
-    // 1. Read static JSON from public/r/
-    const filePath = join(process.cwd(), "public", "r", component);
-    let raw: string;
-    try {
-      raw = await readFile(filePath, "utf-8");
-    } catch {
+    // 1. Fetch static JSON from public/r/ via internal URL
+    const staticUrl = `${CDN_BASE}/r/${component}`;
+    const staticRes = await fetch(staticUrl);
+    if (!staticRes.ok) {
       return NextResponse.json({ error: "Component not found" }, { status: 404 });
     }
 
-    const json = JSON.parse(raw);
+    const json = await staticRes.json();
 
     // 2. Look up user's icon library preference
     const supabase = getSupabase();
