@@ -12,6 +12,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "DesignSync - Design Token Editor",
   description: "Visual design system token editor built with shadcn/ui",
