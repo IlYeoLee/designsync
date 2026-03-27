@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { rewriteIconImports, rewriteIconDependency } from "@/lib/icon-map";
+import { rewriteIconImports, rewriteIconDependency } from "@/lib/icon-rewriter";
 
 const CDN_BASE = "https://designsync-omega.vercel.app";
 
