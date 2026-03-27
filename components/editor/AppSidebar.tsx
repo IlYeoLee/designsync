@@ -4,6 +4,7 @@ import * as React from "react";
 import { getIconMap } from "@/lib/icon-map";
 import { createClient } from "@/lib/supabase";
 import { DEFAULT_TOKENS, type TokenState } from "@/lib/tokens";
+import { Github, ExternalLink, Unlink } from "lucide-react";
 import { Button } from "@/registry/new-york/ui/button";
 import { Avatar, AvatarFallback } from "@/registry/new-york/ui/avatar";
 import {
@@ -53,6 +54,9 @@ export interface DesignSystem {
   tokens: TokenState;
   icon_library: string;
   style_preset: string;
+  github_repo: string | null;
+  github_branch: string | null;
+  github_token: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -64,6 +68,7 @@ interface AppSidebarProps {
   onCreated: (ds: DesignSystem) => void;
   onDeleted: (id: string) => void;
   onRenamed: (id: string, name: string) => void;
+  onGithubUpdated?: (ds: DesignSystem) => void;
   userName: string;
   userEmail: string;
   iconLibrary: string;
@@ -76,6 +81,7 @@ export function AppSidebar({
   onCreated,
   onDeleted,
   onRenamed,
+  onGithubUpdated,
   userName,
   userEmail,
   iconLibrary,
@@ -89,6 +95,11 @@ export function AppSidebar({
   const [deleteTarget, setDeleteTarget] = React.useState<DesignSystem | null>(null);
   const [renameTarget, setRenameTarget] = React.useState<DesignSystem | null>(null);
   const [renameName, setRenameName] = React.useState("");
+  const [githubTarget, setGithubTarget] = React.useState<DesignSystem | null>(null);
+  const [ghRepo, setGhRepo] = React.useState("");
+  const [ghBranch, setGhBranch] = React.useState("main");
+  const [ghToken, setGhToken] = React.useState("");
+  const [ghSaving, setGhSaving] = React.useState(false);
 
   function generateSlug(name: string): string {
     return name
@@ -163,6 +174,46 @@ export function AppSidebar({
     setRenameName("");
   }
 
+  async function handleGithubSave() {
+    if (!githubTarget) return;
+    setGhSaving(true);
+    const updateData: Record<string, unknown> = {
+      github_repo: ghRepo.trim() || null,
+      github_branch: ghBranch.trim() || "main",
+      github_token: ghToken.trim() || null,
+    };
+    const { error } = await supabase
+      .from("design_systems")
+      .update(updateData)
+      .eq("id", githubTarget.id);
+
+    if (error) {
+      alert(`GitHub 연결 실패: ${error.message}`);
+    } else {
+      // Update local state
+      const updated = {
+        ...githubTarget,
+        github_repo: updateData.github_repo as string | null,
+        github_branch: updateData.github_branch as string | null,
+        github_token: updateData.github_token as string | null,
+      };
+      onGithubUpdated?.(updated);
+      setGithubTarget(null);
+    }
+    setGhSaving(false);
+  }
+
+  async function handleGithubDisconnect(ds: DesignSystem) {
+    const { error } = await supabase
+      .from("design_systems")
+      .update({ github_repo: null, github_branch: "main", github_token: null })
+      .eq("id", ds.id);
+
+    if (!error) {
+      onGithubUpdated?.({ ...ds, github_repo: null, github_branch: "main", github_token: null });
+    }
+  }
+
   async function handleLogout() {
     await supabase.auth.signOut();
     window.location.href = "/login";
@@ -217,7 +268,10 @@ export function AppSidebar({
                         />
                         <div className="flex flex-col gap-0 leading-none min-w-0">
                           <span className="text-sm truncate">{ds.name}</span>
-                          <span className="text-[10px] text-sidebar-foreground/50 truncate">{ds.slug}</span>
+                          <span className="text-[10px] text-sidebar-foreground/50 truncate flex items-center gap-1">
+                            {ds.slug}
+                            {ds.github_repo && <Github className="w-2.5 h-2.5 shrink-0" />}
+                          </span>
                         </div>
                       </SidebarMenuButton>
 
@@ -239,6 +293,20 @@ export function AppSidebar({
                           <DropdownMenuItem onClick={() => { setCloneFrom(ds.id); setNewName(`${ds.name} (사본)`); setCreateOpen(true); }}>
                             <icons.copy className="w-3.5 h-3.5 mr-2" /> 복제
                           </DropdownMenuItem>
+                          {ds.github_repo ? (
+                            <DropdownMenuItem onClick={() => handleGithubDisconnect(ds)}>
+                              <Unlink className="w-3.5 h-3.5 mr-2" /> GitHub 연결 해제
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem onClick={() => {
+                              setGithubTarget(ds);
+                              setGhRepo(ds.github_repo || "");
+                              setGhBranch(ds.github_branch || "main");
+                              setGhToken(ds.github_token || "");
+                            }}>
+                              <Github className="w-3.5 h-3.5 mr-2" /> GitHub 연결
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem
                             className="text-destructive"
                             onClick={() => setDeleteTarget(ds)}
@@ -357,6 +425,65 @@ export function AppSidebar({
           <DialogFooter>
             <Button variant="outline" onClick={() => setRenameTarget(null)}>취소</Button>
             <Button onClick={handleRename} disabled={!renameName.trim()}>저장</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* GitHub Connect Dialog */}
+      <Dialog open={!!githubTarget} onOpenChange={() => setGithubTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              <Github className="w-5 h-5 inline-block mr-2 -mt-0.5" />
+              GitHub 레포 연결
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-[var(--ds-internal-gap)]">
+            <div className="space-y-1.5">
+              <Label>레포지토리</Label>
+              <Input
+                value={ghRepo}
+                onChange={(e) => setGhRepo(e.target.value)}
+                placeholder="owner/repo (예: IlYeoLee/my-app)"
+              />
+              <p className="text-xs text-muted-foreground">
+                owner/repo 형식으로 입력하세요
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <Label>브랜치</Label>
+              <Input
+                value={ghBranch}
+                onChange={(e) => setGhBranch(e.target.value)}
+                placeholder="main"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>GitHub Personal Access Token</Label>
+              <Input
+                type="password"
+                value={ghToken}
+                onChange={(e) => setGhToken(e.target.value)}
+                placeholder="ghp_..."
+              />
+              <p className="text-xs text-muted-foreground">
+                <code className="text-[10px] bg-muted px-1 py-0.5 rounded-sm">repo</code> 권한이 필요합니다.{" "}
+                <a
+                  href="https://github.com/settings/tokens/new?scopes=repo&description=DesignSync"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline inline-flex items-center gap-0.5"
+                >
+                  토큰 생성 <ExternalLink className="w-3 h-3" />
+                </a>
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setGithubTarget(null)}>취소</Button>
+            <Button onClick={handleGithubSave} disabled={ghSaving || !ghRepo.trim() || !ghToken.trim()}>
+              {ghSaving ? "저장 중..." : "연결"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

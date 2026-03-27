@@ -328,11 +328,18 @@ export default function Home() {
     ].slice(0, 10));
   }
 
+  // ── PR state ───────────────────────────────────────────────────
+  const [prResult, setPrResult] = React.useState<{ url: string; number: number } | null>(null);
+  const [prError, setPrError] = React.useState<string | null>(null);
+  const [prCreating, setPrCreating] = React.useState(false);
+
   // ── Save to Supabase ────────────────────────────────────────────
   async function handleSave(): Promise<boolean> {
     if (!activeDs) return false;
     setIsSaving(true);
     setSaveSuccess(false);
+    setPrResult(null);
+    setPrError(null);
     try {
       const { error } = await supabase
         .from("design_systems")
@@ -359,12 +366,39 @@ export default function Home() {
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
       setIsSaving(false);
+
+      // Auto-PR: if GitHub repo is connected, create PR in background
+      if (activeDs.github_repo && activeDs.github_token) {
+        triggerAutoPR(activeDs.id, activeDs.slug);
+      }
+
       return true;
     } catch {
       alert("저장 실패: network error");
       setIsSaving(false);
       return false;
     }
+  }
+
+  async function triggerAutoPR(dsId: string, dsSlug: string) {
+    setPrCreating(true);
+    setPrError(null);
+    try {
+      const res = await fetch("/api/github-pr", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ designSystemId: dsId, dsSlug }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPrError(data.error || "PR 생성 실패");
+      } else {
+        setPrResult({ url: data.prUrl, number: data.prNumber });
+      }
+    } catch {
+      setPrError("PR 생성 중 네트워크 오류");
+    }
+    setPrCreating(false);
   }
 
   // ── Sidebar handlers ────────────────────────────────────────────
@@ -401,6 +435,15 @@ export default function Home() {
     }
   }
 
+  function handleGithubUpdated(updated: DesignSystem) {
+    setDesignSystems((prev) =>
+      prev.map((ds) => ds.id === updated.id ? { ...ds, github_repo: updated.github_repo, github_branch: updated.github_branch, github_token: updated.github_token } : ds)
+    );
+    if (activeDs?.id === updated.id) {
+      setActiveDs((prev) => prev ? { ...prev, github_repo: updated.github_repo, github_branch: updated.github_branch, github_token: updated.github_token } : prev);
+    }
+  }
+
   if (!loaded) {
     return (
       <div className="h-screen flex items-center justify-center bg-background">
@@ -423,6 +466,7 @@ export default function Home() {
         onCreated={handleDsCreated}
         onDeleted={handleDsDeleted}
         onRenamed={handleDsRenamed}
+        onGithubUpdated={handleGithubUpdated}
         userName={userName}
         userEmail={userEmail}
         iconLibrary={tokens.primitives.iconLibrary}
@@ -441,6 +485,9 @@ export default function Home() {
         fontFamilyKo={tokens.primitives.fontFamilyKo}
         iconLibrary={tokens.primitives.iconLibrary}
         dsSlug={activeDs?.slug ?? ""}
+        prResult={prResult}
+        prError={prError}
+        prCreating={prCreating}
       />
       <div className="flex-1 flex overflow-hidden">
         <EditorPanel
