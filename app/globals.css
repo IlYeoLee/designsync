@@ -163,6 +163,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@source not "../public";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
