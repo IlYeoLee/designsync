@@ -247,11 +247,24 @@ export async function GET(
     fontSansKoValue = `'${fontFamilyKo}', sans-serif`;
   }
 
+  // DEBUG: check resolution state
+  const _dbg = {
+    hasSemLight: !!tokens.semantic?.light,
+    semLightKeys: tokens.semantic?.light ? Object.keys(tokens.semantic.light).length : 0,
+    flatPrimKeys: Object.keys(flatPrimitives).length,
+    samplePrim: flatPrimitives["--brand-600"] || "MISSING",
+    resolveTest: resolveToken("var(--brand-600)", flatPrimitives),
+    lightPrimary: lightVars["primary"],
+    lightSidebar: lightVars["sidebar"],
+    lightChart1: lightVars["chart-1"],
+  };
+
   const result: Record<string, unknown> = {
     $schema: "https://ui.shadcn.com/schema/registry-item.json",
     name: "designsync-tokens",
     type: "registry:style",
     cssVars: { light: lightVars, dark: darkVars },
+    _debug: _dbg,
   };
 
   if (registryDependencies.length > 0) {
