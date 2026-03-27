@@ -205,6 +205,7 @@ export function AppSidebar({
                   {designSystems.map((ds) => (
                     <SidebarMenuItem key={ds.id}>
                       <SidebarMenuButton
+                        size="lg"
                         onClick={() => onSelect(ds)}
                         isActive={activeId === ds.id}
                         tooltip={ds.name}
