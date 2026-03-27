@@ -217,11 +217,28 @@ export async function GET(
       darkVars[`font-size-${key}`] = val as string;
     }
   }
+  // Font weights — ensure all Tailwind utility weights have values
+  const defaultWeights: Record<string, string> = {
+    normal: "400", medium: "500", semibold: "600", bold: "700", extrabold: "800",
+  };
+  for (const [key, val] of Object.entries(defaultWeights)) {
+    lightVars[`font-weight-${key}`] = val;
+    darkVars[`font-weight-${key}`] = val;
+  }
   if (tokens.primitives?.fontWeight) {
     for (const [key, val] of Object.entries(tokens.primitives.fontWeight)) {
       lightVars[`font-weight-${key}`] = val as string;
       darkVars[`font-weight-${key}`] = val as string;
     }
+  }
+
+  // Line heights — ensure all Tailwind utility line-heights have values
+  const defaultLineHeights: Record<string, string> = {
+    tight: "1.25", snug: "1.375", normal: "1.5", relaxed: "1.625", loose: "1.75",
+  };
+  for (const [key, val] of Object.entries(defaultLineHeights)) {
+    lightVars[`line-height-${key}`] = val;
+    darkVars[`line-height-${key}`] = val;
   }
   if (tokens.primitives?.lineHeight) {
     for (const [key, val] of Object.entries(tokens.primitives.lineHeight)) {
