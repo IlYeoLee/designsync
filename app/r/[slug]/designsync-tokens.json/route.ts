@@ -1,11 +1,27 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { STYLE_PRESETS } from "@/lib/style-presets";
+import { oklchToHex } from "@/lib/color";
+import { readableColor } from "colorizr";
+import { GOOGLE_FONTS, KOREAN_FONTS } from "@/lib/fonts";
+
+const CDN_BASE = "https://designsync-omega.vercel.app";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
+
+/** Resolve var(--brand-600) → actual value from primitives map */
+function resolveToken(
+  value: string,
+  primitives: Record<string, string>
+): string {
+  if (!value.startsWith("var(")) return value;
+  const varName = value.match(/var\(([^)]+)\)/)?.[1];
+  if (!varName) return value;
+  return primitives[varName] ?? value;
+}
 
 export async function GET(
   _request: Request,
@@ -27,6 +43,35 @@ export async function GET(
   }
 
   const tokens = data.tokens;
+
+  // 1. Flatten primitives for resolving var() references
+  const flatPrimitives: Record<string, string> = {};
+  const { brand, neutral, error: errorScale, success, warning, radius } =
+    tokens.primitives || {};
+
+  for (const [step, val] of Object.entries((brand || {}) as Record<string, string>)) {
+    flatPrimitives[`--brand-${step}`] = val;
+  }
+  for (const [step, val] of Object.entries((neutral || {}) as Record<string, string>)) {
+    flatPrimitives[`--neutral-${step}`] = val;
+  }
+  for (const [step, val] of Object.entries((errorScale || {}) as Record<string, string>)) {
+    flatPrimitives[`--error-${step}`] = val;
+  }
+  for (const [step, val] of Object.entries((success || {}) as Record<string, string>)) {
+    flatPrimitives[`--success-${step}`] = val;
+  }
+  for (const [step, val] of Object.entries((warning || {}) as Record<string, string>)) {
+    flatPrimitives[`--warning-${step}`] = val;
+  }
+  if (radius) {
+    flatPrimitives["--radius-none"] = radius.none;
+    flatPrimitives["--radius-sm-prim"] = radius.sm;
+    flatPrimitives["--radius-md-prim"] = radius.md;
+    flatPrimitives["--radius-lg-prim"] = radius.lg;
+    flatPrimitives["--radius-xl-prim"] = radius.xl;
+    flatPrimitives["--radius-full"] = radius.full;
+  }
 
   // Build cssVars from tokens (light + dark)
   const lightVars: Record<string, string> = {};
@@ -73,32 +118,88 @@ export async function GET(
   const presetId = data.style_preset || "vega";
   const preset = STYLE_PRESETS.find((p) => p.id === presetId) || STYLE_PRESETS[0];
   for (const [key, val] of Object.entries(preset.vars)) {
-    // Convert --ds-xxx to ds-xxx for CSS var output
     const varName = key.replace(/^--/, "");
     lightVars[varName] = val;
     darkVars[varName] = val;
   }
 
-  // Resolve semantic tokens
+  // 2. Resolve semantic tokens — var(--brand-600) → actual oklch value
   if (tokens.semantic?.light) {
     for (const [key, val] of Object.entries(tokens.semantic.light)) {
-      lightVars[key] = val as string;
+      lightVars[key] = resolveToken(val as string, flatPrimitives);
     }
   }
   if (tokens.semantic?.dark) {
     for (const [key, val] of Object.entries(tokens.semantic.dark)) {
-      darkVars[key] = val as string;
+      darkVars[key] = resolveToken(val as string, flatPrimitives);
     }
   }
 
-  // Font
+  // 3. Chart colors (mapped from color scales)
+  lightVars["chart-1"] = flatPrimitives["--brand-500"] || lightVars["chart-1"] || "";
+  lightVars["chart-2"] = flatPrimitives["--success-500"] || lightVars["chart-2"] || "";
+  lightVars["chart-3"] = flatPrimitives["--warning-500"] || lightVars["chart-3"] || "";
+  lightVars["chart-4"] = flatPrimitives["--error-500"] || lightVars["chart-4"] || "";
+  lightVars["chart-5"] = flatPrimitives["--neutral-500"] || lightVars["chart-5"] || "";
+  darkVars["chart-1"] = flatPrimitives["--brand-500"] || darkVars["chart-1"] || "";
+  darkVars["chart-2"] = flatPrimitives["--success-500"] || darkVars["chart-2"] || "";
+  darkVars["chart-3"] = flatPrimitives["--warning-500"] || darkVars["chart-3"] || "";
+  darkVars["chart-4"] = flatPrimitives["--error-500"] || darkVars["chart-4"] || "";
+  darkVars["chart-5"] = flatPrimitives["--neutral-500"] || darkVars["chart-5"] || "";
+
+  // 4. Auto-contrast foreground for primary
+  const brand600Hex = oklchToHex(flatPrimitives["--brand-600"] || "#000000");
+  const brand400Hex = oklchToHex(flatPrimitives["--brand-400"] || "#000000");
+  const lightPrimaryFg = readableColor(brand600Hex);
+  const darkPrimaryFg = readableColor(brand400Hex);
+
+  lightVars["primary-foreground"] = lightPrimaryFg === "#ffffff"
+    ? flatPrimitives["--neutral-50"] || "oklch(1 0 0)"
+    : flatPrimitives["--neutral-900"] || "oklch(0.145 0 0)";
+  darkVars["primary-foreground"] = darkPrimaryFg === "#ffffff"
+    ? flatPrimitives["--neutral-50"] || "oklch(1 0 0)"
+    : flatPrimitives["--neutral-900"] || "oklch(0.145 0 0)";
+
+  // 5. Sidebar tokens (light)
+  lightVars["sidebar"] = flatPrimitives["--neutral-100"] || lightVars["sidebar"] || "";
+  lightVars["sidebar-foreground"] = flatPrimitives["--neutral-900"] || lightVars["sidebar-foreground"] || "";
+  lightVars["sidebar-primary"] = flatPrimitives["--brand-600"] || lightVars["sidebar-primary"] || "";
+  lightVars["sidebar-primary-foreground"] = lightPrimaryFg === "#ffffff"
+    ? flatPrimitives["--neutral-50"] || "oklch(1 0 0)"
+    : flatPrimitives["--neutral-900"] || "oklch(0.145 0 0)";
+  lightVars["sidebar-accent"] = flatPrimitives["--brand-100"] || lightVars["sidebar-accent"] || "";
+  lightVars["sidebar-accent-foreground"] = flatPrimitives["--brand-900"] || lightVars["sidebar-accent-foreground"] || "";
+  lightVars["sidebar-border"] = flatPrimitives["--neutral-200"] || lightVars["sidebar-border"] || "";
+  lightVars["sidebar-ring"] = flatPrimitives["--brand-400"] || lightVars["sidebar-ring"] || "";
+
+  // 5b. Sidebar tokens (dark)
+  darkVars["sidebar"] = flatPrimitives["--neutral-800"] || darkVars["sidebar"] || "";
+  darkVars["sidebar-foreground"] = flatPrimitives["--neutral-50"] || darkVars["sidebar-foreground"] || "";
+  darkVars["sidebar-primary"] = flatPrimitives["--brand-400"] || darkVars["sidebar-primary"] || "";
+  darkVars["sidebar-primary-foreground"] = darkPrimaryFg === "#ffffff"
+    ? flatPrimitives["--neutral-50"] || "oklch(1 0 0)"
+    : flatPrimitives["--neutral-900"] || "oklch(0.145 0 0)";
+  darkVars["sidebar-accent"] = flatPrimitives["--brand-900"] || darkVars["sidebar-accent"] || "";
+  darkVars["sidebar-accent-foreground"] = flatPrimitives["--brand-100"] || darkVars["sidebar-accent-foreground"] || "";
+  darkVars["sidebar-border"] = flatPrimitives["--neutral-700"] || darkVars["sidebar-border"] || "";
+  darkVars["sidebar-ring"] = flatPrimitives["--brand-500"] || darkVars["sidebar-ring"] || "";
+
+  // 6. Font
   const fontFamily = tokens.primitives?.fontFamily || "Geist";
   const fontFamilyKo = tokens.primitives?.fontFamilyKo || "";
-  if (fontFamily !== "Geist") {
-    const parts = [fontFamily, fontFamilyKo].filter(Boolean);
-    const stack = parts.map((f: string) => `'${f}'`).join(", ") + ", sans-serif";
-    lightVars["font-sans"] = stack;
-    darkVars["font-sans"] = stack;
+
+  let fontSansValue = "";
+  if (fontFamilyKo && fontFamily !== "Geist") {
+    fontSansValue = `'${fontFamily}', '${fontFamilyKo}', sans-serif`;
+  } else if (fontFamilyKo) {
+    fontSansValue = `'${fontFamilyKo}', sans-serif`;
+  } else if (fontFamily !== "Geist") {
+    fontSansValue = `'${fontFamily}', sans-serif`;
+  }
+
+  if (fontSansValue) {
+    lightVars["font-sans"] = fontSansValue;
+    darkVars["font-sans"] = fontSansValue;
   }
 
   // Typography tokens
@@ -121,12 +222,46 @@ export async function GET(
     }
   }
 
-  const result = {
+  // 7. Font registry dependencies
+  const registryDependencies: string[] = [];
+  const isGoogleFont = fontFamily !== "Geist" && GOOGLE_FONTS.includes(fontFamily);
+  if (isGoogleFont) {
+    const fontSlug = fontFamily.replace(/ /g, "-").toLowerCase();
+    registryDependencies.push(`${CDN_BASE}/r/font-${fontSlug}.json`);
+  }
+  const koIsGoogleFont = KOREAN_FONTS.includes(fontFamilyKo) && fontFamilyKo !== "Pretendard";
+  if (koIsGoogleFont) {
+    const koSlug = fontFamilyKo.replace(/ /g, "-").toLowerCase();
+    registryDependencies.push(`${CDN_BASE}/r/font-${koSlug}.json`);
+  }
+
+  // lang="ko" override for Korean font priority
+  let fontSansKoValue = "";
+  if (fontFamilyKo && fontFamily !== "Geist") {
+    fontSansKoValue = `'${fontFamilyKo}', '${fontFamily}', sans-serif`;
+  } else if (fontFamilyKo) {
+    fontSansKoValue = `'${fontFamilyKo}', sans-serif`;
+  }
+
+  const result: Record<string, unknown> = {
     $schema: "https://ui.shadcn.com/schema/registry-item.json",
     name: "designsync-tokens",
     type: "registry:style",
     cssVars: { light: lightVars, dark: darkVars },
   };
+
+  if (registryDependencies.length > 0) {
+    result.registryDependencies = registryDependencies;
+  }
+
+  // lang="ko" CSS override
+  if (fontSansKoValue && fontSansKoValue !== fontSansValue) {
+    result.css = {
+      ":root:lang(ko)": {
+        "--font-sans": fontSansKoValue,
+      },
+    };
+  }
 
   return NextResponse.json(result, {
     headers: {

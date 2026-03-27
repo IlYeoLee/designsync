@@ -1,0 +1,9 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "font-nanum-gothic",
+  "type": "registry:style",
+  "description": "Nanum Gothic font — loaded from Google Fonts CDN.",
+  "css": {
+    "@import": "url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap')"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "font-jua",
+  "type": "registry:style",
+  "description": "Jua font — loaded from Google Fonts CDN.",
+  "css": {
+    "@import": "url('https://fonts.googleapis.com/css2?family=Jua&display=swap')"
+  }
+}

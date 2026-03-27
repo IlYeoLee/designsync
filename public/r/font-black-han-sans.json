@@ -1,0 +1,9 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "font-black-han-sans",
+  "type": "registry:style",
+  "description": "Black Han Sans font — loaded from Google Fonts CDN.",
+  "css": {
+    "@import": "url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap')"
+  }
+}

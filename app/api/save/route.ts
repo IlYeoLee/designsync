@@ -267,9 +267,8 @@ export async function POST(req: NextRequest) {
       const fontSlug = fontFamily.replace(/ /g, '-').toLowerCase();
       registryDependencies.push(`${CDN_BASE}/r/font-${fontSlug}.json`);
     }
-    // 한글 폰트도 (Noto Sans KR, Nanum Gothic 등 Google Fonts에 있는 것)
-    const koIsGoogleFont = KOREAN_FONTS.includes(fontFamilyKo) && fontFamilyKo !== 'Pretendard';
-    if (koIsGoogleFont) {
+    // 한글 폰트 — 모든 KOREAN_FONTS에 대해 registry 파일 있음 (Pretendard 포함)
+    if (fontFamilyKo && KOREAN_FONTS.includes(fontFamilyKo)) {
       const koSlug = fontFamilyKo.replace(/ /g, '-').toLowerCase();
       registryDependencies.push(`${CDN_BASE}/r/font-${koSlug}.json`);
     }
