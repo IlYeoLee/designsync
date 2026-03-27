@@ -182,8 +182,16 @@
   --text-4xl: var(--font-size-4xl);
   --text-5xl: var(--font-size-5xl);
   --leading-tight: var(--line-height-tight);
+  --leading-snug: var(--line-height-snug, 1.375);
   --leading-normal: var(--line-height-normal);
+  --leading-relaxed: var(--line-height-relaxed, 1.625);
   --leading-loose: var(--line-height-loose);
+  /* Wire font-weight utilities to our CSS variable tokens */
+  --font-weight-normal: var(--font-weight-normal);
+  --font-weight-medium: var(--font-weight-medium);
+  --font-weight-semibold: var(--font-weight-semibold, 600);
+  --font-weight-bold: var(--font-weight-bold);
+  --font-weight-extrabold: var(--font-weight-extrabold, 800);
   --shadow-sm: var(--ds-shadow-sm);
   --shadow-md: var(--ds-shadow-md);
   --shadow-lg: var(--ds-shadow-lg);
