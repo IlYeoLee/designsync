@@ -209,6 +209,10 @@ export async function POST(req: NextRequest) {
       darkVars["font-sans"] = fontSansValue;
     }
 
+    // Tailwind v4 requires --spacing for gap-*/p-*/m-* utilities
+    lightVars["spacing"] = "0.25rem";
+    darkVars["spacing"] = "0.25rem";
+
     // lang="ko" 오버라이드: 한글 폰트 먼저 → 한글+영문 혼합 문장도 한글 폰트 하나로 통일
     // (Pretendard/Noto Sans KR은 Latin 글리프 포함하므로 영문도 커버 가능)
     // 번역 플러그인이 lang 어트리뷰트 변경 시 자동 전환됨
@@ -243,16 +247,16 @@ export async function POST(req: NextRequest) {
     tokensJson.cssVars = { light: lightVars, dark: darkVars };
     tokensJson.type = "registry:style";
 
-    // lang="ko" 시 한글 폰트 우선 오버라이드
+    // Tailwind v4 border reset + lang="ko" font override
+    const css: Record<string, Record<string, string>> = {
+      "*, ::after, ::before": {
+        "border-color": "var(--color-border, currentColor)",
+      },
+    };
     if (fontSansKoValue && fontSansKoValue !== fontSansValue) {
-      tokensJson.css = {
-        ":root:lang(ko)": {
-          "--font-sans": fontSansKoValue,
-        },
-      };
-    } else {
-      delete tokensJson.css;
+      css[":root:lang(ko)"] = { "--font-sans": fontSansKoValue };
     }
+    tokensJson.css = css;
 
     // Clean up stale squircle/cornerkit artifacts from old saves
     delete tokensJson.files;

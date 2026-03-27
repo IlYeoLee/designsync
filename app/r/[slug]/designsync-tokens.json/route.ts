@@ -206,6 +206,10 @@ export async function GET(
     darkVars["font-sans"] = fontSansValue;
   }
 
+  // Tailwind v4 requires --spacing for gap-*/p-*/m-* utilities
+  lightVars["spacing"] = "0.25rem";
+  darkVars["spacing"] = "0.25rem";
+
   // Typography tokens
   if (tokens.primitives?.fontSize) {
     for (const [key, val] of Object.entries(tokens.primitives.fontSize)) {
@@ -257,14 +261,16 @@ export async function GET(
     result.registryDependencies = registryDependencies;
   }
 
-  // lang="ko" CSS override
+  // Tailwind v4 border reset + lang="ko" font override
+  const css: Record<string, Record<string, string>> = {
+    "*, ::after, ::before": {
+      "border-color": "var(--color-border, currentColor)",
+    },
+  };
   if (fontSansKoValue && fontSansKoValue !== fontSansValue) {
-    result.css = {
-      ":root:lang(ko)": {
-        "--font-sans": fontSansKoValue,
-      },
-    };
+    css[":root:lang(ko)"] = { "--font-sans": fontSansKoValue };
   }
+  result.css = css;
 
   return NextResponse.json(result, {
     headers: {
