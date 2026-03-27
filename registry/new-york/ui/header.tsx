@@ -90,7 +90,7 @@ function HeaderNav({
   return (
     <nav
       data-slot="header-nav"
-      className={cn("hidden md:flex items-center gap-1", className)}
+      className={cn("hidden md:flex items-center gap-1 min-w-0 overflow-hidden", className)}
       {...props}
     >
       {children}
@@ -109,7 +109,7 @@ function HeaderNavLink({
       data-slot="header-nav-link"
       data-active={active || undefined}
       className={cn(
-        "text-sm font-medium text-muted-foreground transition-colors hover:text-foreground px-3 py-2 rounded-[var(--ds-element-radius)]",
+        "text-sm font-medium text-muted-foreground transition-colors hover:text-foreground px-3 py-2 rounded-[var(--ds-element-radius)] whitespace-nowrap",
         active && "text-foreground bg-accent",
         className
       )}
@@ -128,7 +128,7 @@ function HeaderActions({
   return (
     <div
       data-slot="header-actions"
-      className={cn("ml-auto flex items-center gap-2", className)}
+      className={cn("ml-auto flex items-center gap-2 shrink-0", className)}
       {...props}
     >
       {children}
