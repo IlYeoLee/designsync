@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 const STORAGE_BUCKET = "fonts";
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 
 export async function POST(req: NextRequest) {
   try {
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
     const fontSlug = fontName.replace(/ /g, "-").toLowerCase();
     const uploadFilename = `${fontSlug}-400.${ext}`;
 
-    const { error: uploadError } = await supabase.storage
+    const { error: uploadError } = await getSupabase().storage
       .from(STORAGE_BUCKET)
       .upload(uploadFilename, inputBuffer, {
         contentType,
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `업로드 실패: ${uploadError.message}` }, { status: 500 });
     }
 
-    const cdnFontUrl = `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${uploadFilename}`;
+    const cdnFontUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${uploadFilename}`;
 
     return NextResponse.json({
       success: true,
