@@ -6,13 +6,7 @@ const CDN_BASE = "https://designsync-omega.vercel.app";
 
 // ── GitHub API helpers ──────────────────────────────────────────────
 
-interface GitHubHeaders {
-  Authorization: string;
-  Accept: string;
-  "Content-Type": string;
-}
-
-function ghHeaders(token: string): GitHubHeaders {
+function ghHeaders(token: string): Record<string, string> {
   return {
     Authorization: `Bearer ${token}`,
     Accept: "application/vnd.github.v3+json",
@@ -20,7 +14,7 @@ function ghHeaders(token: string): GitHubHeaders {
   };
 }
 
-async function ghGet(url: string, headers: GitHubHeaders) {
+async function ghGet(url: string, headers: Record<string, string>) {
   const res = await fetch(url, { headers });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -29,7 +23,7 @@ async function ghGet(url: string, headers: GitHubHeaders) {
   return res.json();
 }
 
-async function ghPost(url: string, headers: GitHubHeaders, body: unknown) {
+async function ghPost(url: string, headers: Record<string, string>, body: unknown) {
   const res = await fetch(url, {
     method: "POST",
     headers,
@@ -42,7 +36,7 @@ async function ghPost(url: string, headers: GitHubHeaders, body: unknown) {
   return res.json();
 }
 
-async function ghPatch(url: string, headers: GitHubHeaders, body: unknown) {
+async function ghPatch(url: string, headers: Record<string, string>, body: unknown) {
   const res = await fetch(url, {
     method: "PATCH",
     headers,
