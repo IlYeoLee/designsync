@@ -8,6 +8,9 @@
     "sonner",
     "next-themes"
   ],
+  "registryDependencies": [
+    "https://designsync-omega.vercel.app/r/designsync-tokens.json"
+  ],
   "files": [
     {
       "path": "registry/new-york/ui/sonner.tsx",

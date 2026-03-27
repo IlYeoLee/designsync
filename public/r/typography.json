@@ -4,6 +4,9 @@
   "type": "registry:ui",
   "title": "Typography",
   "description": "Styles for headings, paragraphs, lists and more.",
+  "registryDependencies": [
+    "https://designsync-omega.vercel.app/r/designsync-tokens.json"
+  ],
   "files": [
     {
       "path": "registry/new-york/ui/typography.tsx",

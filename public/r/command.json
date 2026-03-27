@@ -8,6 +8,7 @@
     "cmdk"
   ],
   "registryDependencies": [
+    "https://designsync-omega.vercel.app/r/designsync-tokens.json",
     "https://designsync-omega.vercel.app/r/dialog.json"
   ],
   "files": [

@@ -7,6 +7,9 @@
   "dependencies": [
     "@radix-ui/react-navigation-menu"
   ],
+  "registryDependencies": [
+    "https://designsync-omega.vercel.app/r/designsync-tokens.json"
+  ],
   "files": [
     {
       "path": "registry/new-york/ui/navigation-menu.tsx",
