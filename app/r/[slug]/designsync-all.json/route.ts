@@ -4,10 +4,12 @@ import { generateRules } from "@/lib/rules";
 
 const CDN = "https://designsync-omega.vercel.app";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 // All component JSON URLs (shared across all users)
 const COMPONENT_URLS = [
@@ -30,6 +32,7 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;
+  const supabase = getSupabase();
 
   const { data, error } = await supabase
     .from("design_systems")
