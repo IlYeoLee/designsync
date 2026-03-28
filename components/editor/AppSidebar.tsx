@@ -295,7 +295,7 @@ export function AppSidebar({
                           </DropdownMenuItem>
                           {ds.github_repo ? (
                             <DropdownMenuItem onClick={() => handleGithubDisconnect(ds)}>
-                              <Unlink className="w-3.5 h-3.5 mr-2" /> GitHub 연결 해제
+                              <Unlink className="w-3.5 h-3.5 mr-2" /> 프로젝트 연결 해제
                             </DropdownMenuItem>
                           ) : (
                             <DropdownMenuItem onClick={() => {
@@ -304,7 +304,7 @@ export function AppSidebar({
                               setGhBranch(ds.github_branch || "main");
                               setGhToken(ds.github_token || "");
                             }}>
-                              <Github className="w-3.5 h-3.5 mr-2" /> GitHub 연결
+                              <Github className="w-3.5 h-3.5 mr-2" /> 내 프로젝트에 연결
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem
@@ -431,58 +431,82 @@ export function AppSidebar({
 
       {/* GitHub Connect Dialog */}
       <Dialog open={!!githubTarget} onOpenChange={() => setGithubTarget(null)}>
-        <DialogContent>
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>
-              <Github className="w-5 h-5 inline-block mr-2 -mt-0.5" />
-              GitHub 레포 연결
+            <DialogTitle className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-[var(--ds-element-radius)] bg-foreground flex items-center justify-center">
+                <Github className="w-4 h-4 text-background" />
+              </div>
+              내 프로젝트에 자동 반영
             </DialogTitle>
           </DialogHeader>
+
+          <p className="text-sm text-muted-foreground -mt-1">
+            디자인 토큰을 저장하면 GitHub 프로젝트에 자동으로 PR이 생성됩니다.
+          </p>
+
+          {/* Step indicator */}
           <div className="space-y-[var(--ds-internal-gap)]">
-            <div className="space-y-1.5">
-              <Label>레포지토리</Label>
-              <Input
-                value={ghRepo}
-                onChange={(e) => setGhRepo(e.target.value)}
-                placeholder="owner/repo (예: IlYeoLee/my-app)"
-              />
-              <p className="text-xs text-muted-foreground">
-                owner/repo 형식으로 입력하세요
-              </p>
+
+            {/* Step 1: Repo */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-medium shrink-0">1</span>
+                <Label className="font-medium">GitHub 프로젝트 주소</Label>
+              </div>
+              <div className="ml-7">
+                <Input
+                  value={ghRepo}
+                  onChange={(e) => setGhRepo(e.target.value)}
+                  placeholder="IlYeoLee/my-app"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  GitHub에서 프로젝트 이름을 복사하세요. 예: <code className="text-[10px] bg-muted px-1 py-0.5 rounded-sm">이름/프로젝트명</code>
+                </p>
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <Label>브랜치</Label>
-              <Input
-                value={ghBranch}
-                onChange={(e) => setGhBranch(e.target.value)}
-                placeholder="main"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>GitHub Personal Access Token</Label>
-              <Input
-                type="password"
-                value={ghToken}
-                onChange={(e) => setGhToken(e.target.value)}
-                placeholder="ghp_..."
-              />
-              <p className="text-xs text-muted-foreground">
-                <code className="text-[10px] bg-muted px-1 py-0.5 rounded-sm">repo</code> 권한이 필요합니다.{" "}
-                <a
-                  href="https://github.com/settings/tokens/new?scopes=repo&description=DesignSync"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline inline-flex items-center gap-0.5"
-                >
-                  토큰 생성 <ExternalLink className="w-3 h-3" />
-                </a>
-              </p>
+
+            {/* Step 2: Token */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-medium shrink-0">2</span>
+                <Label className="font-medium">연결 키 (토큰)</Label>
+              </div>
+              <div className="ml-7">
+                <Input
+                  type="password"
+                  value={ghToken}
+                  onChange={(e) => setGhToken(e.target.value)}
+                  placeholder="ghp_xxxxxxxxxxxx"
+                />
+                <div className="mt-2 p-[var(--ds-card-padding)] rounded-[var(--ds-card-radius)] bg-muted/50 space-y-1.5">
+                  <p className="text-xs font-medium text-foreground">연결 키 만드는 법:</p>
+                  <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
+                    <li>아래 버튼을 클릭하세요</li>
+                    <li>GitHub에서 로그인 후 초록색 <strong>Generate token</strong> 클릭</li>
+                    <li>생성된 <code className="text-[10px] bg-muted px-1 py-0.5 rounded-sm">ghp_</code>로 시작하는 키를 복사해서 위에 붙여넣기</li>
+                  </ol>
+                  <a
+                    href="https://github.com/settings/tokens/new?scopes=repo&description=DesignSync%20%EC%97%B0%EA%B2%B0"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 mt-1"
+                  >
+                    <Button type="button" variant="outline" size="sm" className="h-7 text-xs">
+                      <ExternalLink className="w-3 h-3" />
+                      GitHub에서 키 만들기
+                    </Button>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
-          <DialogFooter>
+
+          <DialogFooter className="mt-2">
             <Button variant="outline" onClick={() => setGithubTarget(null)}>취소</Button>
             <Button onClick={handleGithubSave} disabled={ghSaving || !ghRepo.trim() || !ghToken.trim()}>
-              {ghSaving ? "저장 중..." : "연결"}
+              <Github className="w-4 h-4" />
+              {ghSaving ? "연결 중..." : "연결하기"}
             </Button>
           </DialogFooter>
         </DialogContent>
