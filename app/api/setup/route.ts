@@ -63,18 +63,47 @@ function fetchText(url) {
     console.log('  [1/7] shadcn project detected');
   }
 
-  // ── Step 3: Find and clean globals.css ──────────────────────────
-  const candidates = [
-    'app/globals.css',
-    'src/app/globals.css',
-    'styles/globals.css',
-    'src/styles/globals.css',
-    'src/index.css',
-  ];
-  const globalsPath = candidates.find((c) => fs.existsSync(c));
+  // ── Step 3: Find CSS file (auto-detect from project) ───────────
+  var globalsPath = null;
+
+  // 1) components.json이 있으면 shadcn이 쓰는 CSS 경로를 읽음
+  if (fs.existsSync('components.json')) {
+    try {
+      var compJson = JSON.parse(fs.readFileSync('components.json', 'utf-8'));
+      var tailwindCss = compJson.tailwind?.css || compJson.style?.css || '';
+      if (tailwindCss && fs.existsSync(tailwindCss)) {
+        globalsPath = tailwindCss;
+      }
+    } catch (e) {}
+  }
+
+  // 2) 못 찾았으면 main entry에서 import하는 CSS 추적
+  if (!globalsPath) {
+    var entryFiles = ['src/main.tsx', 'src/main.ts', 'src/main.jsx', 'src/main.js', 'src/index.tsx', 'src/index.ts', 'pages/_app.tsx', 'pages/_app.js'];
+    for (var ei = 0; ei < entryFiles.length; ei++) {
+      if (fs.existsSync(entryFiles[ei])) {
+        var entryContent = fs.readFileSync(entryFiles[ei], 'utf-8');
+        var cssImportMatch = entryContent.match(/import\\s+['\"]([^'\"]+\\.css)['\"]/) || entryContent.match(/require\\(['\"]([^'\"]+\\.css)['\"]\\)/);
+        if (cssImportMatch) {
+          var cssRelPath = cssImportMatch[1];
+          var cssFullPath = path.join(path.dirname(entryFiles[ei]), cssRelPath);
+          if (fs.existsSync(cssFullPath)) {
+            globalsPath = cssFullPath;
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  // 3) 그래도 못 찾으면 일반적인 경로 후보에서 찾기
+  if (!globalsPath) {
+    var candidates = ['app/globals.css', 'src/app/globals.css', 'styles/globals.css', 'src/styles/globals.css', 'src/index.css', 'src/global.css', 'src/globals.css'];
+    globalsPath = candidates.find(function(c) { return fs.existsSync(c); }) || null;
+  }
 
   if (!globalsPath) {
-    console.error('  [ERROR] globals.css not found in standard locations.');
+    console.error('  [ERROR] CSS file not found. Please specify your main CSS file location.');
     process.exit(1);
   }
 
