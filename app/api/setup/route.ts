@@ -259,6 +259,18 @@ function fetchText(url) {
     console.log('         [WARN] Could not inject custom variables: ' + (e.message || e));
   }
 
+  // ── Step 4a-2: Add live CSS import for real-time token sync ─────
+  var dsSlugVal = '${dsSlug}';
+  if (dsSlugVal) {
+    var liveImportUrl = '${CDN}/r/' + dsSlugVal + '/designsync-tokens.css';
+    var liveImportLine = '@import url("' + liveImportUrl + '");';
+    var currentCss = fs.readFileSync(globalsPath, 'utf-8');
+    if (!currentCss.includes(liveImportUrl)) {
+      fs.writeFileSync(globalsPath, liveImportLine + '\\n' + currentCss);
+      console.log('         Added live token import: ' + liveImportUrl);
+    }
+  }
+
   // ── Step 4b: Tailwind v3 compatibility ──────────────────────────
   // If @tailwind directives exist (v3), add color mappings to tailwind.config
   var cssContent = fs.readFileSync(globalsPath, 'utf-8');
