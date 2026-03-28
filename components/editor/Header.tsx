@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { getIconMap } from "@/lib/icon-map";
-import { generateRules } from "@/lib/rules";
 import {
   Header as HeaderRoot,
   HeaderActions,
@@ -60,26 +59,12 @@ export function EditorHeader({
       return;
     }
 
-    let fontSansValue = "";
-    if (fontFamilyKo && fontFamily && fontFamily !== "Geist") {
-      fontSansValue = `'${fontFamily}', '${fontFamilyKo}', sans-serif`;
-    } else if (fontFamilyKo) {
-      fontSansValue = `'${fontFamilyKo}', sans-serif`;
-    } else if (fontFamily && fontFamily !== "Geist") {
-      fontSansValue = `'${fontFamily}', sans-serif`;
-    }
-
-    const prompt = generateRules({
-      fontFamily: fontFamily !== "Geist" ? fontFamily : undefined,
-      fontFamilyKo: fontFamilyKo || undefined,
-      fontSansValue: fontSansValue || undefined,
-      iconLibrary: iconLibrary || "lucide",
-      dsSlug: dsSlug || undefined,
-      includeInstall: true,
-    });
+    const installCmd = dsSlug
+      ? `DESIGNSYNC_SLUG=${dsSlug} npm install github:IlYeoLee/designsync-ui`
+      : `npm install github:IlYeoLee/designsync-ui`;
 
     try {
-      await navigator.clipboard.writeText(prompt);
+      await navigator.clipboard.writeText(installCmd);
       setCopyState("copied");
       setTimeout(() => setCopyState("idle"), 3000);
     } catch {
@@ -102,12 +87,12 @@ export function EditorHeader({
       <SidebarTrigger />
 
       <HeaderActions>
-        {/* Copy Prompt (Save + Copy) */}
+        {/* Save + Copy Install Command */}
         <Button
           size="sm"
           onClick={handleCopyPrompt}
           disabled={copyState !== "idle"}
-          title="Save &amp; copy setup prompt for AI tools"
+          title="저장 후 설치 명령어 복사"
         >
           {copyState === "saving" ? (
             <icons.loader className="w-3.5 h-3.5 animate-spin" />
@@ -117,7 +102,7 @@ export function EditorHeader({
             <icons.copy className="w-3.5 h-3.5" />
           )}
           <span className="hidden sm:inline">
-            {copyState === "saving" ? "저장 중..." : copyState === "copied" ? "복사됨!" : "복사"}
+            {copyState === "saving" ? "저장 중..." : copyState === "copied" ? "복사됨!" : "저장 · 복사"}
           </span>
         </Button>
 
