@@ -471,7 +471,6 @@ export default function Home() {
         onGithubUpdated={handleGithubUpdated}
         userName={userName}
         userEmail={userEmail}
-        authProvider={authProvider}
         iconLibrary={tokens.primitives.iconLibrary}
       />
       <SidebarInset className="flex flex-col h-screen overflow-hidden">

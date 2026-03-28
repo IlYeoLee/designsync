@@ -72,7 +72,6 @@ interface AppSidebarProps {
   onGithubUpdated?: (ds: DesignSystem) => void;
   userName: string;
   userEmail: string;
-  authProvider: string;
   iconLibrary: string;
 }
 
@@ -86,7 +85,6 @@ export function AppSidebar({
   onGithubUpdated,
   userName,
   userEmail,
-  authProvider,
   iconLibrary,
 }: AppSidebarProps) {
   const icons = getIconMap(iconLibrary);
