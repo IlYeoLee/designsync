@@ -180,7 +180,8 @@ export function AppSidebar({
     const updateData: Record<string, unknown> = {
       github_repo: ghRepo.trim() || null,
       github_branch: ghBranch.trim() || "main",
-      github_token: ghToken.trim() || null,
+      // 기존 토큰이 있고 새 토큰을 입력 안 했으면 기존 유지
+      github_token: ghToken.trim() || githubTarget.github_token || null,
     };
     const { error } = await supabase
       .from("design_systems")
@@ -431,81 +432,82 @@ export function AppSidebar({
 
       {/* GitHub Connect Dialog */}
       <Dialog open={!!githubTarget} onOpenChange={() => setGithubTarget(null)}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-[var(--ds-element-radius)] bg-foreground flex items-center justify-center">
+              <div className="w-8 h-8 rounded-[var(--ds-element-radius)] bg-foreground flex items-center justify-center shrink-0">
                 <Github className="w-4 h-4 text-background" />
               </div>
               내 프로젝트에 자동 반영
             </DialogTitle>
           </DialogHeader>
 
-          <p className="text-sm text-muted-foreground -mt-1">
-            디자인 토큰을 저장하면 GitHub 프로젝트에 자동으로 PR이 생성됩니다.
+          <p className="text-sm text-muted-foreground">
+            저장할 때마다 프로젝트에 디자인 변경사항이 자동 제안됩니다.
           </p>
 
-          {/* Step indicator */}
           <div className="space-y-[var(--ds-internal-gap)]">
-
-            {/* Step 1: Repo */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-medium shrink-0">1</span>
-                <Label className="font-medium">GitHub 프로젝트 주소</Label>
-              </div>
-              <div className="ml-7">
-                <Input
-                  value={ghRepo}
-                  onChange={(e) => setGhRepo(e.target.value)}
-                  placeholder="IlYeoLee/my-app"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  GitHub에서 프로젝트 이름을 복사하세요. 예: <code className="text-[10px] bg-muted px-1 py-0.5 rounded-sm">이름/프로젝트명</code>
-                </p>
-              </div>
+            <div className="space-y-1.5">
+              <Label>프로젝트 주소</Label>
+              <Input
+                value={ghRepo}
+                onChange={(e) => {
+                  // https://github.com/owner/repo 또는 owner/repo 둘 다 지원
+                  const val = e.target.value
+                    .replace(/^https?:\/\/github\.com\//, "")
+                    .replace(/\.git$/, "")
+                    .replace(/\/$/, "");
+                  setGhRepo(val);
+                }}
+                placeholder="GitHub 주소를 붙여넣기"
+              />
+              <p className="text-xs text-muted-foreground">
+                GitHub 프로젝트 페이지의 URL을 그대로 붙여넣으세요
+              </p>
             </div>
 
-            {/* Step 2: Token */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center font-medium shrink-0">2</span>
-                <Label className="font-medium">연결 키 (토큰)</Label>
-              </div>
-              <div className="ml-7">
+            {/* 토큰이 없을 때만 표시 */}
+            {!githubTarget?.github_token && (
+              <div className="space-y-1.5">
+                <Label>연결 키</Label>
                 <Input
                   type="password"
                   value={ghToken}
                   onChange={(e) => setGhToken(e.target.value)}
-                  placeholder="ghp_xxxxxxxxxxxx"
+                  placeholder="ghp_..."
                 />
-                <div className="mt-2 p-[var(--ds-card-padding)] rounded-[var(--ds-card-radius)] bg-muted/50 space-y-1.5">
-                  <p className="text-xs font-medium text-foreground">연결 키 만드는 법:</p>
-                  <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
-                    <li>아래 버튼을 클릭하세요</li>
-                    <li>GitHub에서 로그인 후 초록색 <strong>Generate token</strong> 클릭</li>
-                    <li>생성된 <code className="text-[10px] bg-muted px-1 py-0.5 rounded-sm">ghp_</code>로 시작하는 키를 복사해서 위에 붙여넣기</li>
-                  </ol>
+                <div className="p-3 rounded-[var(--ds-card-radius)] bg-muted/50 space-y-1.5">
+                  <p className="text-xs text-muted-foreground">
+                    GitHub 로그인을 다시 하면 자동 연결되지만, 수동으로도 가능해요:
+                  </p>
                   <a
-                    href="https://github.com/settings/tokens/new?scopes=repo&description=DesignSync%20%EC%97%B0%EA%B2%B0"
+                    href="https://github.com/settings/tokens/new?scopes=repo&description=DesignSync"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 mt-1"
                   >
-                    <Button type="button" variant="outline" size="sm" className="h-7 text-xs">
+                    <Button type="button" variant="outline" size="sm" className="h-7 text-xs w-full">
                       <ExternalLink className="w-3 h-3" />
-                      GitHub에서 키 만들기
+                      키 만들기 (GitHub 이동)
                     </Button>
                   </a>
                 </div>
               </div>
-            </div>
+            )}
+
+            {githubTarget?.github_token && (
+              <div className="flex items-center gap-2 p-3 rounded-[var(--ds-card-radius)] bg-muted/50">
+                <icons.check className="w-4 h-4 text-[var(--success-500)] shrink-0" />
+                <p className="text-xs text-muted-foreground">GitHub 계정 연결됨</p>
+              </div>
+            )}
           </div>
 
-          <DialogFooter className="mt-2">
+          <DialogFooter>
             <Button variant="outline" onClick={() => setGithubTarget(null)}>취소</Button>
-            <Button onClick={handleGithubSave} disabled={ghSaving || !ghRepo.trim() || !ghToken.trim()}>
-              <Github className="w-4 h-4" />
+            <Button
+              onClick={handleGithubSave}
+              disabled={ghSaving || !ghRepo.trim() || (!ghToken.trim() && !githubTarget?.github_token)}
+            >
               {ghSaving ? "연결 중..." : "연결하기"}
             </Button>
           </DialogFooter>

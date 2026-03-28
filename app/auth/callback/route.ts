@@ -37,7 +37,21 @@ export async function GET(request: Request) {
       }
     );
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (!error && data.session) {
+      // GitHub provider_token 저장 — PR 생성에 필요
+      const providerToken = data.session.provider_token;
+      if (providerToken && data.session.user) {
+        await supabase
+          .from("design_systems")
+          .update({ github_token: providerToken })
+          .eq("user_id", data.session.user.id)
+          .is("github_token", null);
+      }
+
+      return NextResponse.redirect(`${origin}${next}`);
+    }
 
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
