@@ -71,6 +71,7 @@ interface AppSidebarProps {
   onGithubUpdated?: (ds: DesignSystem) => void;
   userName: string;
   userEmail: string;
+  authProvider: string;
   iconLibrary: string;
 }
 
@@ -84,6 +85,7 @@ export function AppSidebar({
   onGithubUpdated,
   userName,
   userEmail,
+  authProvider,
   iconLibrary,
 }: AppSidebarProps) {
   const icons = getIconMap(iconLibrary);
@@ -466,54 +468,66 @@ export function AppSidebar({
               </p>
             </div>
 
-            {/* 토큰 상태 */}
+            {/* 토큰 상태 — 로그인 방식에 따라 분기 */}
             {githubTarget?.github_token ? (
               <div className="flex items-center gap-2 p-3 rounded-[var(--ds-card-radius)] bg-muted/50">
                 <icons.check className="w-4 h-4 text-[var(--success-500)] shrink-0" />
                 <p className="text-xs text-muted-foreground">GitHub 계정 연결됨</p>
               </div>
-            ) : (
+            ) : authProvider === "github" ? (
+              /* GitHub 로그인 유저: 원클릭 권한 연결 */
               <div className="space-y-2">
-                <Label>GitHub 계정 연결</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={async () => {
-                      const { error } = await supabase.auth.signInWithOAuth({
-                        provider: "github",
-                        options: {
-                          redirectTo: `${window.location.origin}/auth/callback`,
-                          scopes: "repo",
-                        },
-                      });
-                      if (error) alert("GitHub 연결 실패: " + error.message);
-                    }}
-                  >
-                    <Github className="w-3.5 h-3.5" />
-                    자동 연결
-                  </Button>
+                <Button
+                  type="button"
+                  className="w-full"
+                  onClick={async () => {
+                    const { error } = await supabase.auth.signInWithOAuth({
+                      provider: "github",
+                      options: {
+                        redirectTo: `${window.location.origin}/auth/callback`,
+                        scopes: "repo",
+                      },
+                    });
+                    if (error) alert("GitHub 연결 실패: " + error.message);
+                  }}
+                >
+                  <Github className="w-4 h-4" />
+                  GitHub 권한 연결하기
+                </Button>
+                <p className="text-xs text-muted-foreground text-center">
+                  클릭하면 GitHub에서 프로젝트 접근 권한을 승인하는 화면이 열립니다
+                </p>
+              </div>
+            ) : (
+              /* 이메일 로그인 유저: 토큰 직접 입력 */
+              <div className="space-y-2">
+                <div className="space-y-1.5">
+                  <Label>GitHub 연결 키</Label>
+                  <Input
+                    type="password"
+                    value={ghToken}
+                    onChange={(e) => setGhToken(e.target.value)}
+                    placeholder="ghp_..."
+                  />
+                </div>
+                <div className="p-3 rounded-[var(--ds-card-radius)] bg-muted/50 space-y-1.5">
+                  <p className="text-xs font-medium text-foreground">연결 키 만드는 법</p>
+                  <ol className="text-xs text-muted-foreground space-y-0.5 list-decimal list-inside">
+                    <li>아래 버튼으로 GitHub 이동</li>
+                    <li>초록색 <strong>Generate token</strong> 클릭</li>
+                    <li>나온 키를 복사해서 위에 붙여넣기</li>
+                  </ol>
                   <a
                     href="https://github.com/settings/tokens/new?scopes=repo&description=DesignSync"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <Button type="button" variant="outline" size="sm" className="w-full">
-                      <ExternalLink className="w-3.5 h-3.5" />
-                      토큰 직접 발급
+                    <Button type="button" variant="outline" size="sm" className="w-full mt-1">
+                      <ExternalLink className="w-3 h-3" />
+                      GitHub에서 키 만들기
                     </Button>
                   </a>
                 </div>
-                <Input
-                  type="password"
-                  value={ghToken}
-                  onChange={(e) => setGhToken(e.target.value)}
-                  placeholder="토큰 붙여넣기 (자동 연결 시 불필요)"
-                />
-                <p className="text-xs text-muted-foreground">
-                  GitHub 계정이 있으면 <strong>자동 연결</strong>, 없으면 <strong>토큰 직접 발급</strong> 후 붙여넣기
-                </p>
               </div>
             )}
           </div>
