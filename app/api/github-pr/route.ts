@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { getInstallationToken } from "@/lib/github-app";
 
 const CDN_BASE = "https://designsync-omega.vercel.app";
 
@@ -166,14 +167,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Design system not found" }, { status: 404 });
     }
 
-    if (!ds.github_repo || !ds.github_token) {
-      return NextResponse.json(
-        { error: "GitHub repo or token not configured" },
-        { status: 400 }
-      );
+    if (!ds.github_repo) {
+      return NextResponse.json({ error: "GitHub repo not configured" }, { status: 400 });
     }
 
-    const ghToken = ds.github_token as string;
+    // Resolve token: App installation > PAT
+    let ghToken: string;
+    if (ds.github_installation_id) {
+      try {
+        ghToken = await getInstallationToken(ds.github_installation_id);
+      } catch (e) {
+        return NextResponse.json(
+          { error: `GitHub App token failed: ${e instanceof Error ? e.message : "unknown"}` },
+          { status: 500 }
+        );
+      }
+    } else if (ds.github_token) {
+      ghToken = ds.github_token as string;
+    } else {
+      return NextResponse.json({ error: "GitHub not connected" }, { status: 400 });
+    }
+
     const repo = ds.github_repo as string;
     const baseBranch = (ds.github_branch as string) || "main";
     const headers = ghHeaders(ghToken);

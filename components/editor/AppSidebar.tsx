@@ -57,6 +57,7 @@ export interface DesignSystem {
   github_repo: string | null;
   github_branch: string | null;
   github_token: string | null;
+  github_installation_id: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -102,6 +103,8 @@ export function AppSidebar({
   const [ghBranch, setGhBranch] = React.useState("main");
   const [ghToken, setGhToken] = React.useState("");
   const [ghSaving, setGhSaving] = React.useState(false);
+  const [ghRepos, setGhRepos] = React.useState<{ full_name: string; default_branch: string }[]>([]);
+  const [ghReposLoading, setGhReposLoading] = React.useState(false);
 
   function generateSlug(name: string): string {
     return name
@@ -301,11 +304,22 @@ export function AppSidebar({
                               <Unlink className="w-3.5 h-3.5 mr-2" /> 프로젝트 연결 해제
                             </DropdownMenuItem>
                           ) : (
-                            <DropdownMenuItem onClick={() => {
+                            <DropdownMenuItem onClick={async () => {
                               setGithubTarget(ds);
                               setGhRepo(ds.github_repo || "");
                               setGhBranch(ds.github_branch || "main");
                               setGhToken(ds.github_token || "");
+                              setGhRepos([]);
+                              // App이 설치되어 있으면 레포 목록 로드
+                              if (ds.github_installation_id) {
+                                setGhReposLoading(true);
+                                try {
+                                  const res = await fetch(`/api/github-app/repos?dsId=${ds.id}`);
+                                  const data = await res.json();
+                                  if (data.repos) setGhRepos(data.repos);
+                                } catch {}
+                                setGhReposLoading(false);
+                              }
                             }}>
                               <Github className="w-3.5 h-3.5 mr-2" /> 내 프로젝트에 연결
                             </DropdownMenuItem>
@@ -449,86 +463,109 @@ export function AppSidebar({
           </p>
 
           <div className="space-y-[var(--ds-internal-gap)]">
-            <div className="space-y-1.5">
-              <Label>프로젝트 주소</Label>
-              <Input
-                value={ghRepo}
-                onChange={(e) => {
-                  // https://github.com/owner/repo 또는 owner/repo 둘 다 지원
-                  const val = e.target.value
-                    .replace(/^https?:\/\/github\.com\//, "")
-                    .replace(/\.git$/, "")
-                    .replace(/\/$/, "");
-                  setGhRepo(val);
-                }}
-                placeholder="GitHub 주소를 붙여넣기"
-              />
-              <p className="text-xs text-muted-foreground">
-                GitHub 프로젝트 페이지의 URL을 그대로 붙여넣으세요
-              </p>
-            </div>
-
-            {/* 토큰 상태 — 로그인 방식에 따라 분기 */}
-            {githubTarget?.github_token ? (
-              <div className="flex items-center gap-2 p-3 rounded-[var(--ds-card-radius)] bg-muted/50">
-                <icons.check className="w-4 h-4 text-[var(--success-500)] shrink-0" />
-                <p className="text-xs text-muted-foreground">GitHub 계정 연결됨</p>
-              </div>
-            ) : authProvider === "github" ? (
-              /* GitHub 로그인 유저: 원클릭 권한 연결 */
-              <div className="space-y-2">
-                <Button
-                  type="button"
-                  className="w-full"
-                  onClick={async () => {
-                    const { error } = await supabase.auth.signInWithOAuth({
-                      provider: "github",
-                      options: {
-                        redirectTo: `${window.location.origin}/auth/callback`,
-                        scopes: "repo",
-                      },
-                    });
-                    if (error) alert("GitHub 연결 실패: " + error.message);
-                  }}
-                >
-                  <Github className="w-4 h-4" />
-                  GitHub 권한 연결하기
-                </Button>
-                <p className="text-xs text-muted-foreground text-center">
-                  클릭하면 GitHub에서 프로젝트 접근 권한을 승인하는 화면이 열립니다
-                </p>
-              </div>
-            ) : (
-              /* 이메일 로그인 유저: 토큰 직접 입력 */
-              <div className="space-y-2">
+            {/* Case 1: App 설치됨 → 레포 선택 드롭다운 */}
+            {githubTarget?.github_installation_id ? (
+              <>
+                <div className="flex items-center gap-2 p-3 rounded-[var(--ds-card-radius)] bg-muted/50">
+                  <icons.check className="w-4 h-4 text-[var(--success-500)] shrink-0" />
+                  <p className="text-xs text-muted-foreground">GitHub 연결됨</p>
+                </div>
                 <div className="space-y-1.5">
-                  <Label>GitHub 연결 키</Label>
-                  <Input
-                    type="password"
-                    value={ghToken}
-                    onChange={(e) => setGhToken(e.target.value)}
-                    placeholder="ghp_..."
-                  />
+                  <Label>프로젝트 선택</Label>
+                  {ghReposLoading ? (
+                    <div className="flex items-center gap-2 p-3 text-sm text-muted-foreground">
+                      <icons.loader className="w-4 h-4 animate-spin" /> 프로젝트 목록 불러오는 중...
+                    </div>
+                  ) : ghRepos.length > 0 ? (
+                    <select
+                      className="w-full h-[var(--ds-input-h)] rounded-[var(--ds-input-radius)] border border-input bg-background px-3 text-sm"
+                      value={ghRepo}
+                      onChange={(e) => {
+                        const selected = ghRepos.find(r => r.full_name === e.target.value);
+                        setGhRepo(e.target.value);
+                        if (selected) setGhBranch(selected.default_branch);
+                      }}
+                    >
+                      <option value="">프로젝트를 선택하세요</option>
+                      {ghRepos.map((r) => (
+                        <option key={r.full_name} value={r.full_name}>{r.full_name}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <div className="space-y-2">
+                      <Input
+                        value={ghRepo}
+                        onChange={(e) => {
+                          const val = e.target.value
+                            .replace(/^https?:\/\/github\.com\//, "")
+                            .replace(/\.git$/, "")
+                            .replace(/\/$/, "");
+                          setGhRepo(val);
+                        }}
+                        placeholder="GitHub 주소를 붙여넣기"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        GitHub 프로젝트 페이지의 URL을 그대로 붙여넣으세요
+                      </p>
+                    </div>
+                  )}
                 </div>
-                <div className="p-3 rounded-[var(--ds-card-radius)] bg-muted/50 space-y-1.5">
-                  <p className="text-xs font-medium text-foreground">연결 키 만드는 법</p>
-                  <ol className="text-xs text-muted-foreground space-y-0.5 list-decimal list-inside">
-                    <li>아래 버튼으로 GitHub 이동</li>
-                    <li>초록색 <strong>Generate token</strong> 클릭</li>
-                    <li>나온 키를 복사해서 위에 붙여넣기</li>
-                  </ol>
-                  <a
-                    href="https://github.com/settings/tokens/new?scopes=repo&description=DesignSync"
-                    target="_blank"
-                    rel="noopener noreferrer"
+              </>
+            ) : (
+              /* Case 2: App 미설치 → 설치 버튼 */
+              <>
+                <div className="space-y-3">
+                  <Button
+                    type="button"
+                    className="w-full"
+                    onClick={() => {
+                      const appSlug = "designsync";
+                      const state = githubTarget?.id || "";
+                      window.location.href = `https://github.com/apps/${appSlug}/installations/new?state=${state}`;
+                    }}
                   >
-                    <Button type="button" variant="outline" size="sm" className="w-full mt-1">
-                      <ExternalLink className="w-3 h-3" />
-                      GitHub에서 키 만들기
-                    </Button>
-                  </a>
+                    <Github className="w-4 h-4" />
+                    GitHub에서 프로젝트 연결
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center">
+                    GitHub에서 연결할 프로젝트를 선택하면 자동으로 돌아옵니다
+                  </p>
                 </div>
-              </div>
+
+                {/* PAT fallback (접혀있음) */}
+                <details className="group">
+                  <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
+                    직접 연결하기 (개발자용)
+                  </summary>
+                  <div className="mt-2 space-y-2">
+                    <Input
+                      value={ghRepo}
+                      onChange={(e) => {
+                        const val = e.target.value
+                          .replace(/^https?:\/\/github\.com\//, "")
+                          .replace(/\.git$/, "")
+                          .replace(/\/$/, "");
+                        setGhRepo(val);
+                      }}
+                      placeholder="GitHub 주소 붙여넣기"
+                    />
+                    <Input
+                      type="password"
+                      value={ghToken}
+                      onChange={(e) => setGhToken(e.target.value)}
+                      placeholder="GitHub 토큰 (ghp_...)"
+                    />
+                    <a
+                      href="https://github.com/settings/tokens/new?scopes=repo&description=DesignSync"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-primary hover:underline inline-flex items-center gap-0.5"
+                    >
+                      토큰 만들기 <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                </details>
+              </>
             )}
           </div>
 
@@ -536,7 +573,7 @@ export function AppSidebar({
             <Button variant="outline" onClick={() => setGithubTarget(null)}>취소</Button>
             <Button
               onClick={handleGithubSave}
-              disabled={ghSaving || !ghRepo.trim() || (!ghToken.trim() && !githubTarget?.github_token)}
+              disabled={ghSaving || !ghRepo.trim() || (!githubTarget?.github_installation_id && !ghToken.trim() && !githubTarget?.github_token)}
             >
               {ghSaving ? "연결 중..." : "연결하기"}
             </Button>
