@@ -61,6 +61,7 @@ export function generateRules(params: RulesParams = {}): string {
   const fontSection = fontLine ? `${fontLine}\n` : "";
 
   // -- Install section (only in clipboard prompt) --
+  const tokensCssUrl = dsSlug ? `${CDN}/r/${dsSlug}/designsync-tokens.css` : "";
   const installSection = includeInstall
     ? `## 1. 설치
 
@@ -87,7 +88,18 @@ node -e "require('https').get('${CDN}/api/setup${setupParam}',r=>{let d='';r.on(
 3. UI 컴포넌트를 설치 또는 덮어쓰기
 4. .cursorrules 와 CLAUDE.md 에 디자인 규칙을 자동 생성 (매 대화 자동 로드)
 5. 원본 globals.css 는 .bak 으로 백업
+${tokensCssUrl ? `
+## 실시간 토큰 연동 (선택)
 
+DesignSync 웹에서 디자인 토큰을 수정하면 이 프로젝트에 즉시 반영되게 하려면,
+globals.css 최상단에 아래 한 줄을 추가해줘:
+
+\`\`\`css
+@import url("${tokensCssUrl}");
+\`\`\`
+
+이렇게 하면 DesignSync에서 저장할 때마다 프로젝트에 자동 반영된다.
+` : ""}
 `
     : "";
 
