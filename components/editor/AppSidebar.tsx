@@ -517,7 +517,7 @@ export function AppSidebar({
                     type="button"
                     className="w-full"
                     onClick={() => {
-                      const appSlug = "designsync";
+                      const appSlug = "designsync-app";
                       const state = githubTarget?.id || "";
                       window.location.href = `https://github.com/apps/${appSlug}/installations/new?state=${state}`;
                     }}

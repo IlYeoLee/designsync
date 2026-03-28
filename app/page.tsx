@@ -36,7 +36,6 @@ export default function Home() {
   const [activeDs, setActiveDs] = React.useState<DesignSystem | null>(null);
   const [userName, setUserName] = React.useState("");
   const [userEmail, setUserEmail] = React.useState("");
-  const [authProvider, setAuthProvider] = React.useState("");
   const [loaded, setLoaded] = React.useState(false);
 
   // ── Mount: load user + design systems from Supabase ──────
@@ -47,7 +46,6 @@ export default function Home() {
 
       setUserName(user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split("@")[0] || "User");
       setUserEmail(user.email || "");
-      setAuthProvider(user.app_metadata?.provider || "email");
 
       const { data: dsList } = await supabase
         .from("design_systems")
