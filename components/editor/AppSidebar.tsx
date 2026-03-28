@@ -466,31 +466,62 @@ export function AppSidebar({
               </p>
             </div>
 
-            {/* 토큰이 없을 때만 표시 */}
-            {!githubTarget?.github_token && (
+            {/* 토큰이 없을 때: 원클릭 GitHub 인증 또는 수동 PAT */}
+            {!githubTarget?.github_token && !ghToken && (
+              <div className="space-y-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={async () => {
+                    const { error } = await supabase.auth.signInWithOAuth({
+                      provider: "github",
+                      options: {
+                        redirectTo: `${window.location.origin}/auth/callback`,
+                        scopes: "repo",
+                      },
+                    });
+                    if (error) alert("GitHub 연결 실패: " + error.message);
+                  }}
+                >
+                  <Github className="w-4 h-4" />
+                  GitHub 계정으로 권한 연결
+                </Button>
+                <p className="text-xs text-muted-foreground text-center">
+                  또는{" "}
+                  <button
+                    type="button"
+                    className="text-primary hover:underline"
+                    onClick={() => setGhToken(" ")}
+                  >
+                    직접 토큰 입력
+                  </button>
+                </p>
+              </div>
+            )}
+
+            {/* 수동 토큰 입력 모드 */}
+            {!githubTarget?.github_token && ghToken && (
               <div className="space-y-1.5">
                 <Label>연결 키</Label>
                 <Input
                   type="password"
-                  value={ghToken}
+                  value={ghToken.trim()}
                   onChange={(e) => setGhToken(e.target.value)}
                   placeholder="ghp_..."
+                  autoFocus
                 />
-                <div className="p-3 rounded-[var(--ds-card-radius)] bg-muted/50 space-y-1.5">
-                  <p className="text-xs text-muted-foreground">
-                    GitHub 로그인을 다시 하면 자동 연결되지만, 수동으로도 가능해요:
-                  </p>
+                <p className="text-xs text-muted-foreground">
                   <a
                     href="https://github.com/settings/tokens/new?scopes=repo&description=DesignSync"
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="text-primary hover:underline inline-flex items-center gap-0.5"
                   >
-                    <Button type="button" variant="outline" size="sm" className="h-7 text-xs w-full">
-                      <ExternalLink className="w-3 h-3" />
-                      키 만들기 (GitHub 이동)
-                    </Button>
+                    GitHub에서 토큰 만들기 <ExternalLink className="w-3 h-3" />
                   </a>
-                </div>
+                  {" "}후 붙여넣기
+                </p>
               </div>
             )}
 
