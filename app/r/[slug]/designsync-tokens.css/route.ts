@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { STYLE_PRESETS } from "@/lib/style-presets";
 import { oklchToHex } from "@/lib/color";
