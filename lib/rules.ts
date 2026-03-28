@@ -65,23 +65,19 @@ export function generateRules(params: RulesParams = {}): string {
   const installSection = includeInstall
     ? `## 1. 설치
 
-아래 두 가지를 순서대로 실행해줘:
+아래 명령어를 실행해줘 (한 줄이면 끝):
 
-**Step 1: 컴포넌트 설치 (약 5초)**
 \`\`\`bash
-npm install github:IlYeoLee/designsync-ui
+${dsSlug ? `DESIGNSYNC_SLUG=${dsSlug} ` : ""}npm install github:IlYeoLee/designsync-ui
 \`\`\`
 
-**Step 2: 디자인 토큰 + 규칙 적용**
-\`\`\`bash
-curl -fsSL ${CDN}/api/setup${setupParam} | node
-\`\`\`
+이 명령어가 자동으로 하는 일:
+1. UI 컴포넌트 60개 설치${dsSlug ? `
+2. 디자인 토큰 실시간 연동 (@import url 자동 삽입)
+3. .cursorrules + CLAUDE.md 디자인 규칙 생성` : `
+2. .cursorrules + CLAUDE.md 디자인 규칙 생성`}
 ${tokensCssUrl ? `
-설치가 끝나면, 프로젝트의 메인 CSS 파일 최상단에 아래 한 줄이 자동 추가된다:
-\`\`\`css
-@import url("${tokensCssUrl}");
-\`\`\`
-이 한 줄 덕분에 DesignSync 웹에서 디자인 토큰을 수정하고 저장하면 프로젝트에 즉시 반영된다.
+설치 후 DesignSync 웹에서 디자인 토큰을 수정하고 저장하면 프로젝트에 즉시 반영된다.
 ` : ""}
 `
     : "";
