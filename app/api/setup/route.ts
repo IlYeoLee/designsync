@@ -69,6 +69,7 @@ function fetchText(url) {
     'src/app/globals.css',
     'styles/globals.css',
     'src/styles/globals.css',
+    'src/index.css',
   ];
   const globalsPath = candidates.find((c) => fs.existsSync(c));
 
