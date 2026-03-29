@@ -25,27 +25,30 @@ export async function GET(
 
 ---
 
+## 중요: 대부분의 프로젝트는 방법 1을 사용합니다
+
+바이브코딩 도구(Cursor, v0, Bolt, Lovable 등)로 만든 프로젝트는 거의 100% Tailwind + React 스택입니다.
+**components.json이 없더라도 Tailwind + React 프로젝트라면 먼저 shadcn을 초기화한 뒤 방법 1을 사용하세요.**
+
 ## 스택 자동 감지 규칙
 
 현재 프로젝트의 package.json, 설정 파일을 확인하여 아래 순서대로 판단하세요:
 
-### 1. shadcn/ui 프로젝트 (components.json 존재)
-→ shadcn 레지스트리로 설치 (토큰 + 컴포넌트 전체)
+### 1. Tailwind + React 프로젝트 (추천, 기본값)
+조건: package.json에 react와 tailwindcss가 있거나, tailwind.config.* 또는 @tailwindcss/postcss가 존재
+→ components.json이 없으면 먼저 초기화:
+\`\`\`bash
+npx shadcn@latest init
+\`\`\`
+→ 그 다음 DesignSync 전체 설치 (토큰 + 컴포넌트 55개):
 \`\`\`bash
 npx shadcn@latest add ${base}/designsync-all.json
 \`\`\`
+이 한 줄로 디자인 토큰, 색상, 타이포그래피, 컴포넌트가 모두 설치됩니다.
+**새 프로젝트를 만들 때도 이 방법을 기본으로 사용하세요.**
 
-### 2. Tailwind CSS 프로젝트 (tailwind.config.* 또는 @tailwindcss/postcss 존재)
-→ CSS 토큰만 설치
-\`\`\`bash
-curl -o designsync-tokens.css ${base}/designsync-tokens.css
-\`\`\`
-그리고 프로젝트의 메인 CSS 파일(globals.css 등) 최상단에 추가:
-\`\`\`css
-@import "./designsync-tokens.css";
-\`\`\`
-
-### 3. SCSS 프로젝트 (.scss 파일 존재 또는 sass 의존성)
+### 2. SCSS 프로젝트 (React 없이 SCSS만 사용하는 경우)
+조건: .scss 파일이 존재하거나 sass 의존성이 있고, React를 사용하지 않는 경우
 → SCSS 토큰 설치
 \`\`\`bash
 curl -o _designsync-tokens.scss ${base}/designsync-tokens.scss
@@ -55,7 +58,8 @@ curl -o _designsync-tokens.scss ${base}/designsync-tokens.scss
 @import "designsync-tokens";
 \`\`\`
 
-### 4. 순수 CSS 프로젝트 (위 해당 없음)
+### 3. 순수 HTML/CSS 프로젝트 (프레임워크 없음)
+조건: package.json이 없거나, React/Vue/Svelte 등 프레임워크가 없는 경우
 → CSS 변수 파일 설치
 \`\`\`bash
 curl -o designsync-tokens.css ${base}/designsync-tokens.css
@@ -65,7 +69,7 @@ curl -o designsync-tokens.css ${base}/designsync-tokens.css
 <link rel="stylesheet" href="./designsync-tokens.css">
 \`\`\`
 
-### 5. Design Token 도구 연동 (Style Dictionary, Figma Tokens 등)
+### 4. Design Token 도구 연동 (Style Dictionary, Figma Tokens 등)
 → W3C DTCG 포맷
 \`\`\`bash
 curl -o tokens.json ${base}/designsync-tokens.dtcg.json
