@@ -61,7 +61,6 @@ export async function GET(
 
     // Color scales
     const colorScales = ["brand", "neutral", "error", "success", "warning"];
-    const isColorScale = (k: string) => colorScales.some((s) => k.startsWith(`${s}-`));
 
     // Semantic tokens
     const semanticKeys = [
