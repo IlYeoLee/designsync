@@ -136,23 +136,6 @@ export function EditorHeader({
           {isDark ? <icons.sun className="w-4 h-4" /> : <icons.moon className="w-4 h-4" />}
         </Button>
 
-        {/* Save */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onSave()}
-          disabled={isSaving}
-        >
-          {isSaving ? (
-            <icons.loader className="w-3.5 h-3.5 animate-spin" />
-          ) : saveSuccess ? (
-            <icons.check className="w-3.5 h-3.5 text-[var(--success-500)]" />
-          ) : (
-            <icons.save className="w-3.5 h-3.5" />
-          )}
-          <span>{isSaving ? "저장 중..." : saveSuccess ? "저장됨!" : "저장"}</span>
-        </Button>
-
         {/* PR Status */}
         {prCreating && (
           <span className="text-xs text-muted-foreground flex items-center gap-1">
