@@ -61,33 +61,24 @@ export function generateRules(params: RulesParams = {}): string {
   const fontSection = fontLine ? `${fontLine}\n` : "";
 
   // -- Install section (only in clipboard prompt) --
+  const tokensCssUrl = dsSlug ? `${CDN}/r/${dsSlug}/designsync-tokens.css` : "";
   const installSection = includeInstall
     ? `## 1. 설치
 
-아래 명령어 중 환경에 맞는 것을 실행해줘:
+아래 명령어를 실행해줘 (한 줄이면 끝):
 
-**macOS / Linux:**
 \`\`\`bash
-curl -fsSL ${CDN}/api/setup${setupParam} | node
+${dsSlug ? `DESIGNSYNC_SLUG=${dsSlug} ` : ""}npm install github:IlYeoLee/designsync-ui
 \`\`\`
 
-**Windows (PowerShell):**
-\`\`\`powershell
-(Invoke-WebRequest -Uri "${CDN}/api/setup${setupParam}" -UseBasicParsing).Content | node -
-\`\`\`
-
-**또는 (Node 18+ 어디서든):**
-\`\`\`bash
-node -e "require('https').get('${CDN}/api/setup${setupParam}',r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>{require('fs').writeFileSync('.ds-setup.cjs',d);require('./.ds-setup.cjs')})})"
-\`\`\`
-
-이 명령어가 하는 일:
-1. globals.css의 기존 테마(색상, 폰트, 다크모드)를 깨끗이 제거
-2. DesignSync 디자인 토큰을 적용 (light/dark 모드 포함)
-3. UI 컴포넌트를 설치 또는 덮어쓰기
-4. .cursorrules 와 CLAUDE.md 에 디자인 규칙을 자동 생성 (매 대화 자동 로드)
-5. 원본 globals.css 는 .bak 으로 백업
-
+이 명령어가 자동으로 하는 일:
+1. UI 컴포넌트 60개 설치${dsSlug ? `
+2. 디자인 토큰 실시간 연동 (@import url 자동 삽입)
+3. .cursorrules + CLAUDE.md 디자인 규칙 생성` : `
+2. .cursorrules + CLAUDE.md 디자인 규칙 생성`}
+${tokensCssUrl ? `
+설치 후 DesignSync 웹에서 디자인 토큰을 수정하고 저장하면 프로젝트에 즉시 반영된다.
+` : ""}
 `
     : "";
 

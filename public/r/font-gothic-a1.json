@@ -1,0 +1,9 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "font-gothic-a1",
+  "type": "registry:style",
+  "description": "Gothic A1 font — loaded from Google Fonts CDN.",
+  "css": {
+    "@import": "url('https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;500;700&display=swap')"
+  }
+}

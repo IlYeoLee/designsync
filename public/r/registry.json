@@ -113,12 +113,18 @@
       "type": "registry:ui",
       "title": "Button",
       "description": "A button component with multiple variants and sizes.",
-      "dependencies": ["@radix-ui/react-slot", "class-variance-authority"],
+      "dependencies": [
+        "@radix-ui/react-slot",
+        "class-variance-authority"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/button.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -131,6 +137,9 @@
           "path": "registry/new-york/ui/card.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -143,6 +152,9 @@
           "path": "registry/new-york/ui/input.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -150,12 +162,17 @@
       "type": "registry:ui",
       "title": "Label",
       "description": "A label component for form elements.",
-      "dependencies": ["@radix-ui/react-label"],
+      "dependencies": [
+        "@radix-ui/react-label"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/label.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -168,6 +185,9 @@
           "path": "registry/new-york/ui/textarea.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -175,12 +195,17 @@
       "type": "registry:ui",
       "title": "Accordion",
       "description": "A vertically stacked set of interactive headings.",
-      "dependencies": ["@radix-ui/react-accordion"],
+      "dependencies": [
+        "@radix-ui/react-accordion"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/accordion.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -188,12 +213,17 @@
       "type": "registry:ui",
       "title": "Alert",
       "description": "Displays a callout for user attention.",
-      "dependencies": ["class-variance-authority"],
+      "dependencies": [
+        "class-variance-authority"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/alert.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -201,8 +231,13 @@
       "type": "registry:ui",
       "title": "Alert Dialog",
       "description": "A modal dialog that interrupts the user with important content.",
-      "dependencies": ["@radix-ui/react-alert-dialog"],
-      "registryDependencies": ["https://designsync-omega.vercel.app/r/button.json"],
+      "dependencies": [
+        "@radix-ui/react-alert-dialog"
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json",
+        "https://designsync-omega.vercel.app/r/button.json"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/alert-dialog.tsx",
@@ -215,12 +250,17 @@
       "type": "registry:ui",
       "title": "Aspect Ratio",
       "description": "Displays content within a desired ratio.",
-      "dependencies": ["@radix-ui/react-aspect-ratio"],
+      "dependencies": [
+        "@radix-ui/react-aspect-ratio"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/aspect-ratio.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -228,12 +268,17 @@
       "type": "registry:ui",
       "title": "Avatar",
       "description": "An image element with a fallback for representing the user.",
-      "dependencies": ["@radix-ui/react-avatar"],
+      "dependencies": [
+        "@radix-ui/react-avatar"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/avatar.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -241,12 +286,18 @@
       "type": "registry:ui",
       "title": "Badge",
       "description": "Displays a badge or a component that looks like a badge.",
-      "dependencies": ["@radix-ui/react-slot", "class-variance-authority"],
+      "dependencies": [
+        "@radix-ui/react-slot",
+        "class-variance-authority"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/badge.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -254,12 +305,17 @@
       "type": "registry:ui",
       "title": "Breadcrumb",
       "description": "Displays the path to the current resource using a hierarchy of links.",
-      "dependencies": ["@radix-ui/react-slot"],
+      "dependencies": [
+        "@radix-ui/react-slot"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/breadcrumb.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -267,12 +323,17 @@
       "type": "registry:ui",
       "title": "Checkbox",
       "description": "A control that allows the user to toggle between checked and not checked.",
-      "dependencies": ["@radix-ui/react-checkbox"],
+      "dependencies": [
+        "@radix-ui/react-checkbox"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/checkbox.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -280,12 +341,17 @@
       "type": "registry:ui",
       "title": "Collapsible",
       "description": "An interactive component which expands/collapses a panel.",
-      "dependencies": ["@radix-ui/react-collapsible"],
+      "dependencies": [
+        "@radix-ui/react-collapsible"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/collapsible.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -293,12 +359,17 @@
       "type": "registry:ui",
       "title": "Dialog",
       "description": "A window overlaid on either the primary window or another dialog window.",
-      "dependencies": ["@radix-ui/react-dialog"],
+      "dependencies": [
+        "@radix-ui/react-dialog"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/dialog.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -306,12 +377,17 @@
       "type": "registry:ui",
       "title": "Dropdown Menu",
       "description": "Displays a menu to the user triggered by a button.",
-      "dependencies": ["@radix-ui/react-dropdown-menu"],
+      "dependencies": [
+        "@radix-ui/react-dropdown-menu"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/dropdown-menu.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -319,8 +395,16 @@
       "type": "registry:ui",
       "title": "Form",
       "description": "Building forms with React Hook Form and Zod validation.",
-      "dependencies": ["react-hook-form", "@hookform/resolvers", "@radix-ui/react-label", "@radix-ui/react-slot"],
-      "registryDependencies": ["https://designsync-omega.vercel.app/r/label.json"],
+      "dependencies": [
+        "react-hook-form",
+        "@hookform/resolvers",
+        "@radix-ui/react-label",
+        "@radix-ui/react-slot"
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json",
+        "https://designsync-omega.vercel.app/r/label.json"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/form.tsx",
@@ -333,12 +417,17 @@
       "type": "registry:ui",
       "title": "Hover Card",
       "description": "For sighted users to preview content available behind a link.",
-      "dependencies": ["@radix-ui/react-hover-card"],
+      "dependencies": [
+        "@radix-ui/react-hover-card"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/hover-card.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -346,7 +435,10 @@
       "type": "registry:ui",
       "title": "Pagination",
       "description": "Pagination with page navigation, next and previous links.",
-      "registryDependencies": ["https://designsync-omega.vercel.app/r/button.json"],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json",
+        "https://designsync-omega.vercel.app/r/button.json"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/pagination.tsx",
@@ -359,12 +451,17 @@
       "type": "registry:ui",
       "title": "Popover",
       "description": "Displays rich content in a portal, triggered by a button.",
-      "dependencies": ["@radix-ui/react-popover"],
+      "dependencies": [
+        "@radix-ui/react-popover"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/popover.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -372,12 +469,17 @@
       "type": "registry:ui",
       "title": "Progress",
       "description": "Displays an indicator showing the completion progress of a task.",
-      "dependencies": ["@radix-ui/react-progress"],
+      "dependencies": [
+        "@radix-ui/react-progress"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/progress.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -385,12 +487,17 @@
       "type": "registry:ui",
       "title": "Radio Group",
       "description": "A set of checkable buttons where no more than one can be checked at a time.",
-      "dependencies": ["@radix-ui/react-radio-group"],
+      "dependencies": [
+        "@radix-ui/react-radio-group"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/radio-group.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -398,12 +505,17 @@
       "type": "registry:ui",
       "title": "Scroll Area",
       "description": "Augments native scroll functionality for custom, cross-browser styling.",
-      "dependencies": ["@radix-ui/react-scroll-area"],
+      "dependencies": [
+        "@radix-ui/react-scroll-area"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/scroll-area.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -411,12 +523,17 @@
       "type": "registry:ui",
       "title": "Select",
       "description": "Displays a list of options for the user to pick from.",
-      "dependencies": ["@radix-ui/react-select"],
+      "dependencies": [
+        "@radix-ui/react-select"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/select.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -424,12 +541,17 @@
       "type": "registry:ui",
       "title": "Separator",
       "description": "Visually or semantically separates content.",
-      "dependencies": ["@radix-ui/react-separator"],
+      "dependencies": [
+        "@radix-ui/react-separator"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/separator.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -437,12 +559,18 @@
       "type": "registry:ui",
       "title": "Sheet",
       "description": "Extends the Dialog component to display content that complements the main content of the screen.",
-      "dependencies": ["@radix-ui/react-dialog", "class-variance-authority"],
+      "dependencies": [
+        "@radix-ui/react-dialog",
+        "class-variance-authority"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/sheet.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -455,6 +583,9 @@
           "path": "registry/new-york/ui/skeleton.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -462,12 +593,17 @@
       "type": "registry:ui",
       "title": "Slider",
       "description": "An input where the user selects a value from within a given range.",
-      "dependencies": ["@radix-ui/react-slider"],
+      "dependencies": [
+        "@radix-ui/react-slider"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/slider.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -475,12 +611,17 @@
       "type": "registry:ui",
       "title": "Switch",
       "description": "A control that allows the user to toggle between checked and not checked.",
-      "dependencies": ["@radix-ui/react-switch"],
+      "dependencies": [
+        "@radix-ui/react-switch"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/switch.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -493,6 +634,9 @@
           "path": "registry/new-york/ui/table.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -500,12 +644,17 @@
       "type": "registry:ui",
       "title": "Tabs",
       "description": "A set of layered sections of content that are displayed one at a time.",
-      "dependencies": ["@radix-ui/react-tabs"],
+      "dependencies": [
+        "@radix-ui/react-tabs"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/tabs.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -513,12 +662,18 @@
       "type": "registry:ui",
       "title": "Toggle",
       "description": "A two-state button that can be either on or off.",
-      "dependencies": ["@radix-ui/react-toggle", "class-variance-authority"],
+      "dependencies": [
+        "@radix-ui/react-toggle",
+        "class-variance-authority"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/toggle.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -526,8 +681,13 @@
       "type": "registry:ui",
       "title": "Toggle Group",
       "description": "A set of two-state buttons that can be toggled on or off.",
-      "dependencies": ["@radix-ui/react-toggle-group"],
-      "registryDependencies": ["https://designsync-omega.vercel.app/r/toggle.json"],
+      "dependencies": [
+        "@radix-ui/react-toggle-group"
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json",
+        "https://designsync-omega.vercel.app/r/toggle.json"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/toggle-group.tsx",
@@ -540,12 +700,17 @@
       "type": "registry:ui",
       "title": "Tooltip",
       "description": "A popup that displays information related to an element when focused or hovered.",
-      "dependencies": ["@radix-ui/react-tooltip"],
+      "dependencies": [
+        "@radix-ui/react-tooltip"
+      ],
       "files": [
         {
           "path": "registry/new-york/ui/tooltip.tsx",
           "type": "registry:ui"
         }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
       ]
     },
     {
@@ -553,90 +718,194 @@
       "type": "registry:ui",
       "title": "Calendar",
       "description": "A date field component that allows users to enter and edit date.",
-      "dependencies": ["react-day-picker", "date-fns"],
-      "registryDependencies": ["https://designsync-omega.vercel.app/r/button.json"],
-      "files": [{"path": "registry/new-york/ui/calendar.tsx", "type": "registry:ui"}]
+      "dependencies": [
+        "react-day-picker",
+        "date-fns"
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json",
+        "https://designsync-omega.vercel.app/r/button.json"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/calendar.tsx",
+          "type": "registry:ui"
+        }
+      ]
     },
     {
       "name": "carousel",
       "type": "registry:ui",
       "title": "Carousel",
       "description": "A carousel with motion and swipe built using Embla.",
-      "dependencies": ["embla-carousel-react"],
-      "files": [{"path": "registry/new-york/ui/carousel.tsx", "type": "registry:ui"}]
+      "dependencies": [
+        "embla-carousel-react"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/carousel.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
+      ]
     },
     {
       "name": "chart",
       "type": "registry:ui",
       "title": "Chart",
       "description": "Beautiful charts built using Recharts.",
-      "dependencies": ["recharts"],
-      "files": [{"path": "registry/new-york/ui/chart.tsx", "type": "registry:ui"}]
+      "dependencies": [
+        "recharts"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/chart.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
+      ]
     },
     {
       "name": "command",
       "type": "registry:ui",
       "title": "Command",
       "description": "Fast, composable, unstyled command menu for React.",
-      "dependencies": ["cmdk"],
-      "registryDependencies": ["https://designsync-omega.vercel.app/r/dialog.json"],
-      "files": [{"path": "registry/new-york/ui/command.tsx", "type": "registry:ui"}]
+      "dependencies": [
+        "cmdk"
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json",
+        "https://designsync-omega.vercel.app/r/dialog.json"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/command.tsx",
+          "type": "registry:ui"
+        }
+      ]
     },
     {
       "name": "context-menu",
       "type": "registry:ui",
       "title": "Context Menu",
       "description": "Displays a menu to the user — such as a set of actions or functions — triggered by a right-click.",
-      "dependencies": ["@radix-ui/react-context-menu"],
-      "files": [{"path": "registry/new-york/ui/context-menu.tsx", "type": "registry:ui"}]
+      "dependencies": [
+        "@radix-ui/react-context-menu"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/context-menu.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
+      ]
     },
     {
       "name": "drawer",
       "type": "registry:ui",
       "title": "Drawer",
       "description": "A drawer component for React.",
-      "dependencies": ["vaul"],
-      "files": [{"path": "registry/new-york/ui/drawer.tsx", "type": "registry:ui"}]
+      "dependencies": [
+        "vaul"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/drawer.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
+      ]
     },
     {
       "name": "input-otp",
       "type": "registry:ui",
       "title": "Input OTP",
       "description": "Accessible one-time password component with copy paste functionality.",
-      "dependencies": ["input-otp"],
-      "files": [{"path": "registry/new-york/ui/input-otp.tsx", "type": "registry:ui"}]
+      "dependencies": [
+        "input-otp"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/input-otp.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
+      ]
     },
     {
       "name": "menubar",
       "type": "registry:ui",
       "title": "Menubar",
       "description": "A visually persistent menu common in desktop applications that provides quick access to a consistent set of commands.",
-      "dependencies": ["@radix-ui/react-menubar"],
-      "files": [{"path": "registry/new-york/ui/menubar.tsx", "type": "registry:ui"}]
+      "dependencies": [
+        "@radix-ui/react-menubar"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/menubar.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
+      ]
     },
     {
       "name": "navigation-menu",
       "type": "registry:ui",
       "title": "Navigation Menu",
       "description": "A collection of links for navigating websites.",
-      "dependencies": ["@radix-ui/react-navigation-menu"],
-      "files": [{"path": "registry/new-york/ui/navigation-menu.tsx", "type": "registry:ui"}]
+      "dependencies": [
+        "@radix-ui/react-navigation-menu"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/navigation-menu.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
+      ]
     },
     {
       "name": "resizable",
       "type": "registry:ui",
       "title": "Resizable",
       "description": "Accessible resizable panel groups and layouts with keyboard support.",
-      "dependencies": ["react-resizable-panels"],
-      "files": [{"path": "registry/new-york/ui/resizable.tsx", "type": "registry:ui"}]
+      "dependencies": [
+        "react-resizable-panels"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/resizable.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
+      ]
     },
     {
       "name": "sidebar",
       "type": "registry:ui",
       "title": "Sidebar",
       "description": "A composable, themeable and customizable sidebar component.",
-      "dependencies": ["@radix-ui/react-collapsible"],
+      "dependencies": [
+        "@radix-ui/react-collapsible"
+      ],
       "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json",
         "https://designsync-omega.vercel.app/r/button.json",
         "https://designsync-omega.vercel.app/r/input.json",
         "https://designsync-omega.vercel.app/r/separator.json",
@@ -644,22 +913,46 @@
         "https://designsync-omega.vercel.app/r/skeleton.json",
         "https://designsync-omega.vercel.app/r/tooltip.json"
       ],
-      "files": [{"path": "registry/new-york/ui/sidebar.tsx", "type": "registry:ui"}]
+      "files": [
+        {
+          "path": "registry/new-york/ui/sidebar.tsx",
+          "type": "registry:ui"
+        }
+      ]
     },
     {
       "name": "sonner",
       "type": "registry:ui",
       "title": "Sonner",
       "description": "An opinionated toast component for React.",
-      "dependencies": ["sonner", "next-themes"],
-      "files": [{"path": "registry/new-york/ui/sonner.tsx", "type": "registry:ui"}]
+      "dependencies": [
+        "sonner",
+        "next-themes"
+      ],
+      "files": [
+        {
+          "path": "registry/new-york/ui/sonner.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
+      ]
     },
     {
       "name": "typography",
       "type": "registry:ui",
       "title": "Typography",
       "description": "Styles for headings, paragraphs, lists and more.",
-      "files": [{"path": "registry/new-york/ui/typography.tsx", "type": "registry:ui"}]
+      "files": [
+        {
+          "path": "registry/new-york/ui/typography.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "registryDependencies": [
+        "https://designsync-omega.vercel.app/r/designsync-tokens.json"
+      ]
     },
     {
       "name": "combobox",

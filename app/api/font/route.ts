@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 const STORAGE_BUCKET = "fonts";
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 
 /** Parse the first latin @font-face block */
 function parseFontBlock(css: string): { weight: string; url: string } | null {
@@ -84,7 +85,7 @@ export async function POST(req: NextRequest) {
     const buf = Buffer.from(await fontRes.arrayBuffer());
 
     // 3. Upload to Supabase Storage
-    const { error: uploadError } = await supabase.storage
+    const { error: uploadError } = await getSupabase().storage
       .from(STORAGE_BUCKET)
       .upload(woff2Filename, buf, {
         contentType: "font/woff2",
@@ -96,7 +97,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Public URL
-    const cdnFontUrl = `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${woff2Filename}`;
+    const cdnFontUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${woff2Filename}`;
     const fontWeight = fontBlock.weight;
 
     return NextResponse.json({

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "font-gowun-batang",
+  "type": "registry:style",
+  "description": "Gowun Batang font — loaded from Google Fonts CDN.",
+  "css": {
+    "@import": "url('https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap')"
+  }
+}

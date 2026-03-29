@@ -4,10 +4,12 @@ import { createClient } from "@supabase/supabase-js";
 
 const CDN = "https://designsync-omega.vercel.app";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+function getSupabase() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+}
 
 /**
  * GET /api/rules?ds=[slug]
@@ -24,7 +26,7 @@ export async function GET(request: NextRequest) {
   if (dsSlug) {
     // Slug provided → fetch from DB
     try {
-      const { data } = await supabase
+      const { data } = await getSupabase()
         .from("design_systems")
         .select("tokens, icon_library")
         .eq("slug", dsSlug)

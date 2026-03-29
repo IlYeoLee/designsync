@@ -63,17 +63,47 @@ function fetchText(url) {
     console.log('  [1/7] shadcn project detected');
   }
 
-  // ── Step 3: Find and clean globals.css ──────────────────────────
-  const candidates = [
-    'app/globals.css',
-    'src/app/globals.css',
-    'styles/globals.css',
-    'src/styles/globals.css',
-  ];
-  const globalsPath = candidates.find((c) => fs.existsSync(c));
+  // ── Step 3: Find CSS file (auto-detect from project) ───────────
+  var globalsPath = null;
+
+  // 1) components.json이 있으면 shadcn이 쓰는 CSS 경로를 읽음
+  if (fs.existsSync('components.json')) {
+    try {
+      var compJson = JSON.parse(fs.readFileSync('components.json', 'utf-8'));
+      var tailwindCss = compJson.tailwind?.css || compJson.style?.css || '';
+      if (tailwindCss && fs.existsSync(tailwindCss)) {
+        globalsPath = tailwindCss;
+      }
+    } catch (e) {}
+  }
+
+  // 2) 못 찾았으면 main entry에서 import하는 CSS 추적
+  if (!globalsPath) {
+    var entryFiles = ['src/main.tsx', 'src/main.ts', 'src/main.jsx', 'src/main.js', 'src/index.tsx', 'src/index.ts', 'pages/_app.tsx', 'pages/_app.js'];
+    for (var ei = 0; ei < entryFiles.length; ei++) {
+      if (fs.existsSync(entryFiles[ei])) {
+        var entryContent = fs.readFileSync(entryFiles[ei], 'utf-8');
+        var cssImportMatch = entryContent.match(/import\\s+['\"]([^'\"]+\\.css)['\"]/) || entryContent.match(/require\\(['\"]([^'\"]+\\.css)['\"]\\)/);
+        if (cssImportMatch) {
+          var cssRelPath = cssImportMatch[1];
+          var cssFullPath = path.join(path.dirname(entryFiles[ei]), cssRelPath);
+          if (fs.existsSync(cssFullPath)) {
+            globalsPath = cssFullPath;
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  // 3) 그래도 못 찾으면 일반적인 경로 후보에서 찾기
+  if (!globalsPath) {
+    var candidates = ['app/globals.css', 'src/app/globals.css', 'styles/globals.css', 'src/styles/globals.css', 'src/index.css', 'src/global.css', 'src/globals.css'];
+    globalsPath = candidates.find(function(c) { return fs.existsSync(c); }) || null;
+  }
 
   if (!globalsPath) {
-    console.error('  [ERROR] globals.css not found in standard locations.');
+    console.error('  [ERROR] CSS file not found. Please specify your main CSS file location.');
     process.exit(1);
   }
 
@@ -208,10 +238,67 @@ function fetchText(url) {
       }
     }
 
+    // Inject @theme inline mappings for typography/shadow tokens
+    // so text-sm, font-medium, shadow-md etc. use DesignSync values
+    if (cssAfterShadcn.includes('@theme inline')) {
+      var themeEnd = cssAfterShadcn.indexOf('}', cssAfterShadcn.indexOf('@theme inline'));
+      if (themeEnd > 0) {
+        var extraMappings = [];
+        // Font size mappings
+        var fontSizes = ['xs','sm','base','lg','xl','2xl','3xl','4xl','5xl'];
+        for (var fi = 0; fi < fontSizes.length; fi++) {
+          var fs_key = '--text-' + fontSizes[fi];
+          if (!cssAfterShadcn.includes(fs_key + ':')) {
+            extraMappings.push('  ' + fs_key + ': var(--font-size-' + fontSizes[fi] + ');');
+          }
+        }
+        // Font weight mappings
+        var weights = ['normal','medium','semibold','bold','extrabold'];
+        for (var wi = 0; wi < weights.length; wi++) {
+          var fw_key = '--font-weight-' + weights[wi];
+          if (!cssAfterShadcn.includes(fw_key + ':') || cssAfterShadcn.indexOf(fw_key + ':', cssAfterShadcn.indexOf('@theme')) === -1) {
+            extraMappings.push('  ' + fw_key + ': var(--font-weight-' + weights[wi] + ');');
+          }
+        }
+        // Line height mappings
+        var leadings = {tight:'tight',snug:'snug',normal:'normal',relaxed:'relaxed',loose:'loose'};
+        for (var lk in leadings) {
+          var lh_key = '--leading-' + lk;
+          if (!cssAfterShadcn.includes(lh_key + ':')) {
+            extraMappings.push('  ' + lh_key + ': var(--line-height-' + leadings[lk] + ');');
+          }
+        }
+        // Shadow mappings
+        var shadows = ['sm','md','lg'];
+        for (var si = 0; si < shadows.length; si++) {
+          var sh_key = '--shadow-' + shadows[si];
+          if (!cssAfterShadcn.includes(sh_key + ':')) {
+            extraMappings.push('  ' + sh_key + ': var(--ds-shadow-' + shadows[si] + ');');
+          }
+        }
+        if (extraMappings.length > 0) {
+          cssAfterShadcn = cssAfterShadcn.slice(0, themeEnd) + '\\n' + extraMappings.join('\\n') + '\\n' + cssAfterShadcn.slice(themeEnd);
+          console.log('         Injected ' + extraMappings.length + ' @theme inline mappings (typography + shadows)');
+        }
+      }
+    }
+
     fs.writeFileSync(globalsPath, cssAfterShadcn);
     console.log('         Injected ' + lightMissing.length + ' light + ' + darkMissing.length + ' dark variables');
   } catch (e) {
     console.log('         [WARN] Could not inject custom variables: ' + (e.message || e));
+  }
+
+  // ── Step 4a-2: Add live CSS import for real-time token sync ─────
+  var dsSlugVal = '${dsSlug}';
+  if (dsSlugVal) {
+    var liveImportUrl = '${CDN}/r/' + dsSlugVal + '/designsync-tokens.css';
+    var liveImportLine = '@import url("' + liveImportUrl + '");';
+    var currentCss = fs.readFileSync(globalsPath, 'utf-8');
+    if (!currentCss.includes(liveImportUrl)) {
+      fs.writeFileSync(globalsPath, liveImportLine + '\\n' + currentCss);
+      console.log('         Added live token import: ' + liveImportUrl);
+    }
   }
 
   // ── Step 4b: Tailwind v3 compatibility ──────────────────────────

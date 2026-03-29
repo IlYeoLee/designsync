@@ -2,13 +2,13 @@
 
 import * as React from "react";
 import { getIconMap } from "@/lib/icon-map";
-import { generateRules } from "@/lib/rules";
 import {
   Header as HeaderRoot,
   HeaderActions,
 } from "@/registry/new-york/ui/header";
 import { SidebarTrigger } from "@/registry/new-york/ui/sidebar";
 import { Button } from "@/registry/new-york/ui/button";
+import { Github, ExternalLink } from "lucide-react";
 
 interface EditorHeaderProps {
   isDark: boolean;
@@ -23,6 +23,9 @@ interface EditorHeaderProps {
   fontFamilyKo: string;
   iconLibrary: string;
   dsSlug: string;
+  prResult?: { url: string; number: number } | null;
+  prError?: string | null;
+  prCreating?: boolean;
 }
 
 export function EditorHeader({
@@ -34,10 +37,11 @@ export function EditorHeader({
   onUndo,
   canUndo,
   onReset,
-  fontFamily,
-  fontFamilyKo,
   iconLibrary,
   dsSlug,
+  prResult,
+  prError,
+  prCreating,
 }: EditorHeaderProps) {
   const icons = getIconMap(iconLibrary);
   const [copyState, setCopyState] = React.useState<"idle" | "saving" | "copied">("idle");
@@ -53,26 +57,12 @@ export function EditorHeader({
       return;
     }
 
-    let fontSansValue = "";
-    if (fontFamilyKo && fontFamily && fontFamily !== "Geist") {
-      fontSansValue = `'${fontFamily}', '${fontFamilyKo}', sans-serif`;
-    } else if (fontFamilyKo) {
-      fontSansValue = `'${fontFamilyKo}', sans-serif`;
-    } else if (fontFamily && fontFamily !== "Geist") {
-      fontSansValue = `'${fontFamily}', sans-serif`;
-    }
-
-    const prompt = generateRules({
-      fontFamily: fontFamily !== "Geist" ? fontFamily : undefined,
-      fontFamilyKo: fontFamilyKo || undefined,
-      fontSansValue: fontSansValue || undefined,
-      iconLibrary: iconLibrary || "lucide",
-      dsSlug: dsSlug || undefined,
-      includeInstall: true,
-    });
+    const installCmd = dsSlug
+      ? `DESIGNSYNC_SLUG=${dsSlug} npm install github:IlYeoLee/designsync-ui`
+      : `npm install github:IlYeoLee/designsync-ui`;
 
     try {
-      await navigator.clipboard.writeText(prompt);
+      await navigator.clipboard.writeText(installCmd);
       setCopyState("copied");
       setTimeout(() => setCopyState("idle"), 3000);
     } catch {
@@ -95,12 +85,12 @@ export function EditorHeader({
       <SidebarTrigger />
 
       <HeaderActions>
-        {/* Copy Prompt (Save + Copy) */}
+        {/* Save + Copy Install Command */}
         <Button
           size="sm"
           onClick={handleCopyPrompt}
           disabled={copyState !== "idle"}
-          title="Save &amp; copy setup prompt for AI tools"
+          title="저장 후 설치 명령어 복사"
         >
           {copyState === "saving" ? (
             <icons.loader className="w-3.5 h-3.5 animate-spin" />
@@ -110,7 +100,7 @@ export function EditorHeader({
             <icons.copy className="w-3.5 h-3.5" />
           )}
           <span className="hidden sm:inline">
-            {copyState === "saving" ? "저장 중..." : copyState === "copied" ? "복사됨!" : "복사"}
+            {copyState === "saving" ? "저장 중..." : copyState === "copied" ? "복사됨!" : "저장 · 복사"}
           </span>
         </Button>
 
@@ -162,6 +152,32 @@ export function EditorHeader({
           )}
           <span>{isSaving ? "저장 중..." : saveSuccess ? "저장됨!" : "저장"}</span>
         </Button>
+
+        {/* PR Status */}
+        {prCreating && (
+          <span className="text-xs text-muted-foreground flex items-center gap-1">
+            <icons.loader className="w-3 h-3 animate-spin" />
+            <span className="hidden sm:inline">PR 생성 중...</span>
+          </span>
+        )}
+        {prResult && (
+          <a
+            href={prResult.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-primary flex items-center gap-1 hover:underline"
+          >
+            <Github className="w-3 h-3" />
+            <span className="hidden sm:inline">PR #{prResult.number}</span>
+            <ExternalLink className="w-2.5 h-2.5" />
+          </a>
+        )}
+        {prError && (
+          <span className="text-xs text-destructive flex items-center gap-1" title={prError}>
+            <Github className="w-3 h-3" />
+            <span className="hidden sm:inline">PR 실패</span>
+          </span>
+        )}
       </HeaderActions>
     </HeaderRoot>
   );

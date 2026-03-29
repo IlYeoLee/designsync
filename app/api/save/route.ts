@@ -209,6 +209,10 @@ export async function POST(req: NextRequest) {
       darkVars["font-sans"] = fontSansValue;
     }
 
+    // Tailwind v4 requires --spacing for gap-*/p-*/m-* utilities
+    lightVars["spacing"] = "0.25rem";
+    darkVars["spacing"] = "0.25rem";
+
     // lang="ko" 오버라이드: 한글 폰트 먼저 → 한글+영문 혼합 문장도 한글 폰트 하나로 통일
     // (Pretendard/Noto Sans KR은 Latin 글리프 포함하므로 영문도 커버 가능)
     // 번역 플러그인이 lang 어트리뷰트 변경 시 자동 전환됨
@@ -243,16 +247,16 @@ export async function POST(req: NextRequest) {
     tokensJson.cssVars = { light: lightVars, dark: darkVars };
     tokensJson.type = "registry:style";
 
-    // lang="ko" 시 한글 폰트 우선 오버라이드
+    // Tailwind v4 border reset + lang="ko" font override
+    const css: Record<string, Record<string, string>> = {
+      "*, ::after, ::before": {
+        "border-color": "var(--color-border, currentColor)",
+      },
+    };
     if (fontSansKoValue && fontSansKoValue !== fontSansValue) {
-      tokensJson.css = {
-        ":root:lang(ko)": {
-          "--font-sans": fontSansKoValue,
-        },
-      };
-    } else {
-      delete tokensJson.css;
+      css[":root:lang(ko)"] = { "--font-sans": fontSansKoValue };
     }
+    tokensJson.css = css;
 
     // Clean up stale squircle/cornerkit artifacts from old saves
     delete tokensJson.files;
@@ -267,9 +271,8 @@ export async function POST(req: NextRequest) {
       const fontSlug = fontFamily.replace(/ /g, '-').toLowerCase();
       registryDependencies.push(`${CDN_BASE}/r/font-${fontSlug}.json`);
     }
-    // 한글 폰트도 (Noto Sans KR, Nanum Gothic 등 Google Fonts에 있는 것)
-    const koIsGoogleFont = KOREAN_FONTS.includes(fontFamilyKo) && fontFamilyKo !== 'Pretendard';
-    if (koIsGoogleFont) {
+    // 한글 폰트 — 모든 KOREAN_FONTS에 대해 registry 파일 있음 (Pretendard 포함)
+    if (fontFamilyKo && KOREAN_FONTS.includes(fontFamilyKo)) {
       const koSlug = fontFamilyKo.replace(/ /g, '-').toLowerCase();
       registryDependencies.push(`${CDN_BASE}/r/font-${koSlug}.json`);
     }

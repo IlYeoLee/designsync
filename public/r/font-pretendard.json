@@ -1,0 +1,9 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "font-pretendard",
+  "type": "registry:style",
+  "description": "Pretendard font — loaded from jsDelivr CDN.",
+  "css": {
+    "@import": "url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css')"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "font-gowun-dodum",
+  "type": "registry:style",
+  "description": "Gowun Dodum font — loaded from Google Fonts CDN.",
+  "css": {
+    "@import": "url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap')"
+  }
+}
