@@ -10,11 +10,33 @@ function getSupabase() {
 
 const STORAGE_BUCKET = "fonts";
 
-// CDN fallback for well-known fonts (no file upload needed)
 const FONT_CDN: Record<string, string> = {
   pretendard: "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css",
   geist: "",
 };
+
+// Shadcn semantic tokens that conflict — prefix with --ds-
+const SHADCN_TOKENS = new Set([
+  "primary", "primary-foreground",
+  "secondary", "secondary-foreground",
+  "background", "foreground",
+  "card", "card-foreground",
+  "muted", "muted-foreground",
+  "accent", "accent-foreground",
+  "destructive", "destructive-foreground",
+  "border", "input", "ring",
+  "popover", "popover-foreground",
+  "radius", "font-sans", "font-mono",
+  "sidebar", "sidebar-foreground",
+  "sidebar-primary", "sidebar-primary-foreground",
+  "sidebar-accent", "sidebar-accent-foreground",
+  "sidebar-border", "sidebar-ring",
+  "chart-1", "chart-2", "chart-3", "chart-4", "chart-5",
+]);
+
+function toVarName(key: string): string {
+  return SHADCN_TOKENS.has(key) ? `ds-${key}` : key;
+}
 
 async function buildFontFaceCSS(fontNames: string[]): Promise<string> {
   const supabase = getSupabase();
@@ -25,14 +47,12 @@ async function buildFontFaceCSS(fontNames: string[]): Promise<string> {
     if (!fontName || fontName === "Geist") continue;
     const fontSlug = fontName.replace(/ /g, "-").toLowerCase();
 
-    // 1. Check CDN fallback first
     const cdnUrl = FONT_CDN[fontSlug];
     if (cdnUrl) {
       css += `@import url("${cdnUrl}");\n`;
       continue;
     }
 
-    // 2. Try Supabase Storage for uploaded fonts (multi-weight)
     const exts = ["woff2", "woff", "ttf", "otf"];
     const weightRanges: [number, number, number][] = [
       [100, 300, 300], [400, 400, 400], [500, 600, 500], [700, 700, 700], [800, 900, 900],
@@ -75,65 +95,72 @@ export async function GET(
     const { lightVars, darkVars, fontSansKoValue, fontFamily, fontFamilyKo } = resolved;
 
     const indent = "  ";
+
+    // Output vars with --ds- prefix for shadcn-conflicting tokens
     function varsBlock(vars: Record<string, string>): string {
       return Object.entries(vars)
         .filter(([, v]) => v)
-        .map(([k, v]) => `${indent}--${k}: ${v};`)
+        .map(([k, v]) => `${indent}--${toVarName(k)}: ${v};`)
         .join("\n");
     }
 
-    // Build @font-face / @import for custom fonts
     const fontNames = [fontFamily, fontFamilyKo].filter(Boolean);
     const fontFaceCSS = await buildFontFaceCSS(fontNames);
 
     let css = `/* DesignSync — Live design tokens for "${slug}" */\n`;
-    css += `/* This file is auto-generated. Edit at https://designsync-omega.vercel.app */\n\n`;
+    css += `/* Edit at https://designsync-omega.vercel.app */\n\n`;
 
-    if (fontFaceCSS) {
-      css += fontFaceCSS + "\n";
-    }
+    if (fontFaceCSS) css += fontFaceCSS + "\n";
 
-    // @theme inline for Tailwind v4
+    // @theme inline for Tailwind v4 font sizes/weights/shadows
     css += `@theme inline {\n`;
-    const fontSizeKeys = ["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl"];
-    for (const k of fontSizeKeys) {
+    for (const k of ["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl"]) {
       if (lightVars[`font-size-${k}`]) {
         css += `${indent}--text-${k}: var(--font-size-${k}, ${lightVars[`font-size-${k}`]});\n`;
       }
     }
-    const fwKeys = ["normal", "medium", "semibold", "bold", "extrabold"];
-    for (const k of fwKeys) {
+    for (const k of ["normal", "medium", "semibold", "bold", "extrabold"]) {
       if (lightVars[`font-weight-${k}`]) {
         css += `${indent}--font-weight-${k}: var(--font-weight-${k});\n`;
       }
     }
-    const lhKeys = ["tight", "normal", "relaxed", "loose"];
-    for (const k of lhKeys) {
+    for (const k of ["tight", "normal", "relaxed", "loose"]) {
       if (lightVars[`line-height-${k}`]) {
         css += `${indent}--leading-${k}: var(--line-height-${k}, ${lightVars[`line-height-${k}`]});\n`;
       }
     }
     for (const level of ["sm", "md", "lg"]) {
-      const key = `ds-shadow-${level}`;
-      if (lightVars[key]) {
-        css += `${indent}--shadow-${level}: var(--${key});\n`;
+      if (lightVars[`ds-shadow-${level}`]) {
+        css += `${indent}--shadow-${level}: var(--ds-shadow-${level});\n`;
       }
     }
+    // Map DS font to Tailwind's --font-sans
+    css += `${indent}--font-sans: var(--ds-font-sans);\n`;
     css += `}\n\n`;
 
-    // :root (light)
+    // :root — DS-prefixed semantic tokens + primitive tokens
     css += `:root {\n${varsBlock(lightVars)}\n}\n\n`;
 
     // .dark
     css += `.dark {\n${varsBlock(darkVars)}\n}\n\n`;
 
-    // Border reset
-    css += `*, ::after, ::before {\n${indent}border-color: var(--color-border, currentColor);\n}\n`;
+    // Shadcn variable mapping — maps --ds-* back to shadcn names
+    // This is injected here for live sync; postinstall also injects at bottom of globals.css
+    css += `/* shadcn variable mapping */\n`;
+    const shadcnKeys = Object.keys(lightVars).filter(k => SHADCN_TOKENS.has(k));
+    css += `:root {\n`;
+    for (const k of shadcnKeys) {
+      css += `${indent}--${k}: var(--ds-${k});\n`;
+    }
+    css += `}\n`;
+    css += `.dark {\n`;
+    for (const k of shadcnKeys) {
+      if (darkVars[k]) css += `${indent}--${k}: var(--ds-${k});\n`;
+    }
+    css += `}\n\n`;
 
-    // Korean font via unicode-range — keeps English font first, Korean glyphs use Ko font
-    // This avoids :root:lang(ko) overriding font-sans entirely (which breaks English font)
+    // Korean font unicode-range
     if (fontFamilyKo && fontSansKoValue && fontFamilyKo !== fontFamily) {
-      css += `\n/* Korean glyphs use ${fontFamilyKo} without overriding English font order */\n`;
       css += `@font-face {\n`;
       css += `${indent}font-family: '${fontFamily}';\n`;
       css += `${indent}src: local('${fontFamilyKo}');\n`;
