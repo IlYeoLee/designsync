@@ -26,8 +26,8 @@ export default function Home() {
   const supabase = createClient();
   const [tokens, setTokens] = React.useState<TokenState>(DEFAULT_TOKENS);
   const [isDark, setIsDark] = React.useState(false);
-  const [isSaving, setIsSaving] = React.useState(false);
-  const [saveSuccess, setSaveSuccess] = React.useState(false);
+  const [_isSaving, setIsSaving] = React.useState(false);
+  const [_saveSuccess, setSaveSuccess] = React.useState(false);
   const [history, setHistory] = React.useState<HistoryEntry[]>([]);
   const [snapshots, setSnapshots] = React.useState<TokenState[]>([]);
 
