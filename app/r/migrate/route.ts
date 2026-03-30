@@ -11,6 +11,39 @@ CRITICAL RULES:
 - Return ONLY the complete migrated file content. No explanation. No markdown fences.
 - Always add necessary imports. Remove unused imports.
 
+━━━ 3-TIER MIGRATION STRATEGY ━━━
+
+TIER 1 — Full replacement (pattern matches DS component):
+  Replace entirely with DS component. Logic/props/handlers stay identical.
+  Example: <div className="fixed inset-0 bg-black/50">...</div> → <Dialog>...</Dialog>
+
+TIER 2 — Partial replacement (structure is similar but not identical):
+  Use the closest DS component as wrapper, keep custom inner structure, add className for overrides.
+  Example: custom card with extra header section →
+    <Card className="your-custom-class">
+      <CardHeader>...</CardHeader>
+      <CardContent>
+        {/* keep your custom inner markup here */}
+      </CardContent>
+    </Card>
+
+TIER 3 — Token-only (no DS component matches the pattern):
+  Keep the original HTML structure completely intact.
+  ONLY replace hardcoded values with design tokens:
+  - Colors: bg-blue-600 → bg-primary, text-gray-500 → text-muted-foreground, etc.
+  - Spacing: p-6 → p-[var(--ds-card-padding)], gap-4 → gap-[var(--ds-section-gap)]
+  - Radius: rounded-lg → rounded-[var(--ds-card-radius)], rounded-md → rounded-[var(--ds-element-radius)]
+  - Height: h-10 → h-[var(--ds-button-h-default)], h-9 → h-[var(--ds-input-h)]
+  Example: complex custom timeline component with no DS equivalent →
+    Keep <div className="relative flex flex-col"> structure
+    But replace bg-gray-100 → bg-muted, text-gray-500 → text-muted-foreground, rounded-lg → rounded-[var(--ds-card-radius)]
+
+DECISION RULE:
+  Ask: "Does a DS component exist that handles this UI pattern?"
+  YES, same logic/structure → TIER 1
+  YES, similar but custom details → TIER 2
+  NO match → TIER 3 (NEVER force a wrong DS component — token-only is always better than wrong component)
+
 ━━━ COLOR TOKENS ━━━
 bg-blue-600, bg-indigo-600, bg-violet-600  → bg-primary
 bg-white, bg-gray-50, bg-[#fafafa]         → bg-background
