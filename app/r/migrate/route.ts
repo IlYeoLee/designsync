@@ -109,6 +109,25 @@ focus-visible:ring-[3px]                   → focus-visible:ring-[var(--ds-focu
 
 ━━━ PATTERN → DESIGNSYNC COMPONENT ━━━
 
+TIER 2 — DS wrapper + custom inner (when inner doesn't match DS exactly):
+  custom page header (editable title + save status + action buttons):
+    → <Header>
+        <HeaderBrand>{/* editable title, pencil icon, breadcrumb — keep as-is */}</HeaderBrand>
+        <HeaderActions>{/* status text, buttons — keep as-is */}</HeaderActions>
+      </Header>
+  custom sidebar (project list, nav items with custom state):
+    → <Sidebar>
+        <SidebarHeader>{/* keep logo/title */}</SidebarHeader>
+        <SidebarContent>
+          <SidebarMenu>
+            {items.map(i => <SidebarMenuItem><SidebarMenuButton asChild><Link href={i.href}>{i.label}</Link></SidebarMenuButton></SidebarMenuItem>)}
+          </SidebarMenu>
+        </SidebarContent>
+      </Sidebar>
+  custom card with non-standard layout:
+    → <Card><CardHeader>{/* keep custom header */}</CardHeader><CardContent>{/* keep custom content */}</CardContent></Card>
+RULE: DS component = shell + tokens. Inner markup stays as needed. NEVER restructure logic to fit DS.
+
 LAYOUT:
   div border+rounded+shadow (card-like)
     → <Card><CardHeader><CardTitle/><CardDescription/></CardHeader><CardContent>...</CardContent><CardFooter/></Card>
