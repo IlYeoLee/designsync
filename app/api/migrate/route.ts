@@ -179,7 +179,43 @@ MISC:
     → <AspectRatio ratio={16/9}>...</AspectRatio>  @/components/ui/aspect-ratio
   resizable panels
     → <ResizablePanelGroup direction="horizontal"><ResizablePanel><ResizableHandle/><ResizablePanel></ResizablePanelGroup>
-      @/components/ui/resizable`;
+      @/components/ui/resizable
+
+COMPLEX PATTERNS (reconstruct structure):
+
+  DataTable — table with sorting/filtering/pagination OR data.map() rendering rows:
+    → Extract column definitions from th/headers, pass data array as prop:
+      const columns = [{ accessorKey: "field", header: "Header" }, ...]
+      <DataTable columns={columns} data={data} pageSize={10} />
+      @/components/ui/data-table
+    Note: identify the data array variable from the existing .map() calls
+
+  Carousel — overflow-hidden slider with prev/next buttons OR swipeable items:
+    → <Carousel><CarouselContent><CarouselItem>...</CarouselItem></CarouselContent><CarouselPrevious /><CarouselNext /></Carousel>
+      @/components/ui/carousel
+    Note: wrap each slide content in <CarouselItem>, remove manual translate/scroll logic
+
+  Command palette — search input + filtered list (often triggered by Cmd+K or button):
+    → <Command><CommandInput placeholder="검색..." /><CommandList><CommandEmpty>결과 없음</CommandEmpty><CommandGroup heading="..."><CommandItem onSelect={...}>...</CommandItem></CommandGroup></CommandList></Command>
+      @/components/ui/command
+    Note: if inside a Dialog/Popover, wrap with that too
+
+  InputOTP — multiple single-digit inputs side by side (OTP/verification code):
+    → <InputOTP maxLength={6}><InputOTPGroup><InputOTPSlot index={0}/><InputOTPSlot index={1}/><InputOTPSlot index={2}/><InputOTPSeparator/><InputOTPSlot index={3}/><InputOTPSlot index={4}/><InputOTPSlot index={5}/></InputOTPGroup></InputOTP>
+      @/components/ui/input-otp
+    Note: adjust maxLength and slot count to match original input count
+
+  Form — <form> element with useForm() from react-hook-form:
+    → Wrap with <Form {...form}>, each field becomes:
+      <FormField control={form.control} name="fieldName" render={({ field }) => (
+        <FormItem><FormLabel>라벨</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+      )} />
+      @/components/ui/form  (also needs: react-hook-form, @hookform/resolvers, zod)
+    Note: preserve existing useForm() setup, validation schema, and onSubmit handler exactly
+
+  Menubar — top menu bar with dropdown menus:
+    → <Menubar><MenubarMenu><MenubarTrigger>파일</MenubarTrigger><MenubarContent><MenubarItem>열기</MenubarItem></MenubarContent></MenubarMenu></Menubar>
+      @/components/ui/menubar`;
 
 export async function POST(req: NextRequest) {
   try {
