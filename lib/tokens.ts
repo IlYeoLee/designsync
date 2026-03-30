@@ -14,7 +14,7 @@ export type TokenState = {
     fontFamily: string;
     fontFamilyKo: string;
     fontSize: Record<'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl', string>;
-    fontWeight: Record<'normal' | 'medium' | 'bold', string>;
+    fontWeight: Record<'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold', string>;
     lineHeight: Record<'tight' | 'normal' | 'loose', string>;
     spacing: Record<'1' | '2' | '3' | '4' | '5' | '6' | '8' | '10' | '12' | '16', string>;
     radius: Record<'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full', string>;
