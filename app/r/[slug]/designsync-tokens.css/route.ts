@@ -63,7 +63,7 @@ export async function GET(
       });
     }
 
-    const { lightVars, darkVars, fontSansKoValue, fontSansValue, fontFamily, fontFamilyKo } = resolved;
+    const { lightVars, darkVars, fontSansKoValue, fontFamily, fontFamilyKo } = resolved;
 
     const indent = "  ";
     function varsBlock(vars: Record<string, string>): string {
