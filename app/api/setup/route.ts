@@ -40,6 +40,13 @@ function fetchText(url) {
 
 function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
 
+function isEbusyError(e) {
+  if (!e) return false;
+  if (e.code === 'EBUSY') return true;
+  var msg = (e.message || '') + (e.stderr ? e.stderr.toString() : '') + (e.stdout ? e.stdout.toString() : '');
+  return msg.includes('EBUSY') || msg.includes('resource busy');
+}
+
 async function writeFileWithRetry(filePath, content, maxRetries) {
   maxRetries = maxRetries || 5;
   for (var i = 0; i < maxRetries; i++) {
@@ -47,7 +54,8 @@ async function writeFileWithRetry(filePath, content, maxRetries) {
       fs.writeFileSync(filePath, content);
       return;
     } catch(e) {
-      if (e.code === 'EBUSY' && i < maxRetries - 1) {
+      if (isEbusyError(e) && i < maxRetries - 1) {
+        console.log('  [RETRY ' + (i+1) + '] EBUSY on ' + filePath + ' — waiting ' + (i+1) + 's...');
         await sleep(1000 * (i + 1));
       } else {
         throw e;
@@ -56,11 +64,46 @@ async function writeFileWithRetry(filePath, content, maxRetries) {
   }
 }
 
+async function execWithRetry(cmd, opts, maxRetries) {
+  maxRetries = maxRetries || 4;
+  for (var i = 0; i < maxRetries; i++) {
+    try {
+      return execSync(cmd, opts);
+    } catch(e) {
+      if (isEbusyError(e) && i < maxRetries - 1) {
+        console.log('  [RETRY ' + (i+1) + '] EBUSY running: ' + cmd.slice(0, 60) + ' — waiting ' + ((i+1)*2) + 's...');
+        await sleep(2000 * (i + 1));
+      } else {
+        throw e;
+      }
+    }
+  }
+}
+
+function detectCloudFolder(dir) {
+  var lower = dir.toLowerCase().replace(/\\\\/g, '/');
+  if (lower.includes('onedrive')) return 'OneDrive';
+  if (lower.includes('dropbox')) return 'Dropbox';
+  if (lower.includes('google drive') || lower.includes('googledrive')) return 'Google Drive';
+  if (lower.includes('icloud')) return 'iCloud';
+  return null;
+}
+
 (async () => {
   console.log('');
   console.log('  DesignSync Setup');
   console.log('  ================');
   console.log('');
+
+  // ── Step 0: Cloud folder warning ────────────────────────────────
+  var cwd = process.cwd();
+  var cloudProvider = detectCloudFolder(cwd);
+  if (cloudProvider) {
+    console.log('  [!] WARNING: Project is inside a ' + cloudProvider + ' folder.');
+    console.log('      File locks may cause intermittent errors during install.');
+    console.log('      If install fails, pause ' + cloudProvider + ' sync and retry.');
+    console.log('');
+  }
 
   // ── Step 1: Validate project ────────────────────────────────────
   if (!fs.existsSync('package.json')) {
@@ -72,7 +115,7 @@ async function writeFileWithRetry(filePath, content, maxRetries) {
   if (!fs.existsSync('components.json')) {
     console.log('  [1/7] shadcn not initialized — running init...');
     try {
-      execSync('npx -y shadcn@latest init -y -d', { stdio: 'inherit' });
+      await execWithRetry('npx -y shadcn@latest init -y -d', { stdio: 'inherit' });
     } catch (e) {
       console.error('  [ERROR] shadcn init failed. Please run "npx shadcn@latest init" manually first.');
       process.exit(1);
@@ -175,7 +218,7 @@ async function writeFileWithRetry(filePath, content, maxRetries) {
   console.log('  [3/7] Installing DesignSync (tokens + components)...');
   console.log('');
   try {
-    execSync(
+    await execWithRetry(
       'npx -y shadcn@latest add -o -y ' + '${tokensUrl}',
       { stdio: 'inherit' }
     );
@@ -201,7 +244,7 @@ async function writeFileWithRetry(filePath, content, maxRetries) {
   try {
     // Detect package manager
     var pm = fs.existsSync('pnpm-lock.yaml') ? 'pnpm add' : fs.existsSync('yarn.lock') ? 'yarn add' : 'npm install --save';
-    execSync(pm + ' framer-motion ' + iconPkg, { stdio: 'pipe' });
+    await execWithRetry(pm + ' framer-motion ' + iconPkg, { stdio: 'pipe' });
     console.log('         Peer dependencies installed');
   } catch (e) {
     console.log('         [WARN] Could not auto-install framer-motion/' + iconPkg + '. Run manually:');
