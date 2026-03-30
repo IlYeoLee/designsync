@@ -42,7 +42,14 @@ gap-2, gap-3 (internal)                    → gap-[var(--ds-internal-gap)]
 focus-visible:ring-[3px]                   → focus-visible:ring-[var(--ds-focus-ring-width)]
 
 ━━━ RAW HTML → DESIGNSYNC (always add import) ━━━
-<button>                → <Button>                           @/components/ui/button
+<button>                → <Button variant="?">              @/components/ui/button
+  ALWAYS specify variant based on context — NEVER leave variant unset (default=primary pill):
+  - Main CTA, form submit, primary action       → variant="default"
+  - Secondary action, bordered button           → variant="outline"
+  - Icon-only button, nav/sidebar button, ghost → variant="ghost" size="icon"
+  - Toolbar/toggle button                       → variant="ghost"
+  - Destructive action                          → variant="destructive"
+  RULE: if unsure → variant="ghost" (never leave blank)
 <input type="text/email/password/search/number/tel/url"> → <Input>  @/components/ui/input
 <input type="checkbox"> → <Checkbox onCheckedChange={...}>  @/components/ui/checkbox
 <input type="radio"> group → <RadioGroup><RadioGroupItem>   @/components/ui/radio-group
