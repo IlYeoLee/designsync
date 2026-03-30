@@ -32,17 +32,26 @@ async function buildFontFaceCSS(fontNames: string[]): Promise<string> {
       continue;
     }
 
-    // 2. Try Supabase Storage for uploaded fonts
+    // 2. Try Supabase Storage for uploaded fonts (multi-weight)
     const exts = ["woff2", "woff", "ttf", "otf"];
+    const weightRanges: [number, number, number][] = [
+      [100, 300, 300], [400, 400, 400], [500, 600, 500], [700, 700, 700], [800, 900, 900],
+    ];
+    let foundAny = false;
     for (const ext of exts) {
-      const filename = `${fontSlug}-400.${ext}`;
-      const { data } = await supabase.storage.from(STORAGE_BUCKET).list("", { search: filename });
-      if (data && data.some((f) => f.name === filename)) {
-        const url = `${supabaseUrl}/storage/v1/object/public/${STORAGE_BUCKET}/${filename}`;
-        const format = ext === "ttf" ? "truetype" : ext === "otf" ? "opentype" : ext;
-        css += `@font-face {\n  font-family: '${fontName}';\n  src: url('${url}') format('${format}');\n  font-weight: 100 900;\n  font-display: swap;\n}\n`;
-        break;
+      const { data: allFiles } = await supabase.storage.from(STORAGE_BUCKET).list("", { search: fontSlug });
+      if (!allFiles || allFiles.length === 0) break;
+      const format = ext === "ttf" ? "truetype" : ext === "otf" ? "opentype" : ext;
+      for (const [wMin, wMax, wFile] of weightRanges) {
+        const filename = `${fontSlug}-${wFile}.${ext}`;
+        if (allFiles.some((f) => f.name === filename)) {
+          const url = `${supabaseUrl}/storage/v1/object/public/${STORAGE_BUCKET}/${filename}`;
+          const weightDesc = wMin === wMax ? `${wMin}` : `${wMin} ${wMax}`;
+          css += `@font-face {\n  font-family: '${fontName}';\n  src: url('${url}') format('${format}');\n  font-weight: ${weightDesc};\n  font-display: swap;\n}\n`;
+          foundAny = true;
+        }
       }
+      if (foundAny) break;
     }
   }
 
