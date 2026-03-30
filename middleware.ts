@@ -33,7 +33,7 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   // 공개 경로
-  const publicPaths = ["/login", "/auth", "/r/", "/api/setup", "/api/rules", "/api/sync", "/api/save"];
+  const publicPaths = ["/login", "/auth", "/r/", "/api/setup", "/api/rules", "/api/sync", "/api/save", "/api/migrate"];
   const isPublic = publicPaths.some((p) => request.nextUrl.pathname.startsWith(p));
   const isAsset = request.nextUrl.pathname.startsWith("/_next") ||
     request.nextUrl.pathname.startsWith("/fonts") ||
