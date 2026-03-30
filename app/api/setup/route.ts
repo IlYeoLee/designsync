@@ -38,6 +38,24 @@ function fetchText(url) {
   });
 }
 
+function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+
+async function writeFileWithRetry(filePath, content, maxRetries) {
+  maxRetries = maxRetries || 5;
+  for (var i = 0; i < maxRetries; i++) {
+    try {
+      fs.writeFileSync(filePath, content);
+      return;
+    } catch(e) {
+      if (e.code === 'EBUSY' && i < maxRetries - 1) {
+        await sleep(1000 * (i + 1));
+      } else {
+        throw e;
+      }
+    }
+  }
+}
+
 (async () => {
   console.log('');
   console.log('  DesignSync Setup');
@@ -111,7 +129,7 @@ function fetchText(url) {
 
   // Backup
   const original = fs.readFileSync(globalsPath, 'utf-8');
-  fs.writeFileSync(globalsPath + '.bak', original);
+  await writeFileWithRetry(globalsPath + '.bak', original);
 
   let css = original;
 
@@ -150,7 +168,7 @@ function fetchText(url) {
   // Clean up excessive blank lines
   css = css.replace(/\\n{3,}/g, '\\n\\n').trim();
 
-  fs.writeFileSync(globalsPath, css + '\\n');
+  await writeFileWithRetry(globalsPath, css + '\\n');
   console.log('         Theme cleaned (backup: ' + globalsPath + '.bak)');
 
   // ── Step 4: Install DesignSync ──────────────────────────────────
@@ -283,7 +301,7 @@ function fetchText(url) {
       }
     }
 
-    fs.writeFileSync(globalsPath, cssAfterShadcn);
+    await writeFileWithRetry(globalsPath, cssAfterShadcn);
     console.log('         Injected ' + lightMissing.length + ' light + ' + darkMissing.length + ' dark variables');
   } catch (e) {
     console.log('         [WARN] Could not inject custom variables: ' + (e.message || e));
@@ -296,7 +314,7 @@ function fetchText(url) {
     var liveImportLine = '@import url("' + liveImportUrl + '");';
     var currentCss = fs.readFileSync(globalsPath, 'utf-8');
     if (!currentCss.includes(liveImportUrl)) {
-      fs.writeFileSync(globalsPath, liveImportLine + '\\n' + currentCss);
+      await writeFileWithRetry(globalsPath, liveImportLine + '\\n' + currentCss);
       console.log('         Added live token import: ' + liveImportUrl);
     }
   }
@@ -356,7 +374,7 @@ function fetchText(url) {
           colorMapping
         );
 
-        fs.writeFileSync(configPath, configContent);
+        await writeFileWithRetry(configPath, configContent);
         console.log('         Patched ' + configPath + ' with DesignSync color mappings');
       }
     }
@@ -484,23 +502,23 @@ function fetchText(url) {
 
   // .cursorrules
   if (fs.existsSync('.cursorrules')) {
-    fs.writeFileSync('.cursorrules.bak', fs.readFileSync('.cursorrules', 'utf-8'));
+    await writeFileWithRetry('.cursorrules.bak', fs.readFileSync('.cursorrules', 'utf-8'));
   }
-  fs.writeFileSync('.cursorrules', rulesText);
+  await writeFileWithRetry('.cursorrules', rulesText);
   console.log('         Created .cursorrules');
 
   // CLAUDE.md
   if (fs.existsSync('CLAUDE.md')) {
-    fs.writeFileSync('CLAUDE.md.bak', fs.readFileSync('CLAUDE.md', 'utf-8'));
+    await writeFileWithRetry('CLAUDE.md.bak', fs.readFileSync('CLAUDE.md', 'utf-8'));
   }
-  fs.writeFileSync('CLAUDE.md', rulesText);
+  await writeFileWithRetry('CLAUDE.md', rulesText);
   console.log('         Created CLAUDE.md');
 
   // .windsurfrules (Windsurf)
   if (fs.existsSync('.windsurfrules')) {
-    fs.writeFileSync('.windsurfrules.bak', fs.readFileSync('.windsurfrules', 'utf-8'));
+    await writeFileWithRetry('.windsurfrules.bak', fs.readFileSync('.windsurfrules', 'utf-8'));
   }
-  fs.writeFileSync('.windsurfrules', rulesText);
+  await writeFileWithRetry('.windsurfrules', rulesText);
   console.log('         Created .windsurfrules');
 
   // ── Step 5b: Install ESLint plugin ─────────────────────────────
@@ -512,7 +530,7 @@ function fetchText(url) {
     var eslintPluginCode = await fetchText(eslintPluginUrl);
 
     if (eslintPluginCode && !eslintPluginCode.trim().startsWith('<')) {
-      fs.writeFileSync('designsync-eslint.js', eslintPluginCode);
+      await writeFileWithRetry('designsync-eslint.js', eslintPluginCode);
       console.log('         Downloaded designsync-eslint.js');
 
       // Try to patch eslint.config.mjs
@@ -546,7 +564,7 @@ function fetchText(url) {
             console.log('         Add manually: import designsync from \\'./designsync-eslint.js\\';');
             console.log('         Then add designsync to your config array.');
           }
-          fs.writeFileSync(eslintConfigPath, eslintConfig);
+          await writeFileWithRetry(eslintConfigPath, eslintConfig);
           console.log('         Patched ' + eslintConfigPath + ' with DesignSync rules');
         } else {
           console.log('         ESLint config already includes DesignSync');
@@ -561,7 +579,7 @@ function fetchText(url) {
           "];",
           "",
         ].join('\\n');
-        fs.writeFileSync('eslint.config.mjs', newEslintConfig);
+        await writeFileWithRetry('eslint.config.mjs', newEslintConfig);
         console.log('         Created eslint.config.mjs with DesignSync rules');
       }
     } else {
@@ -664,7 +682,7 @@ function fetchText(url) {
         return replaced;
       });
       if (changed) {
-        fs.writeFileSync(sourceFiles[fi], newContent);
+        await writeFileWithRetry(sourceFiles[fi], newContent);
         migratedCount++;
       }
     } catch (e) { /* skip unreadable files */ }
@@ -713,7 +731,7 @@ function fetchText(url) {
           content = 'import { ' + imp.to + ' } from "' + imp.importPath + '";\\n' + content;
         }
       }
-      fs.writeFileSync(sourceFiles[fi], content);
+      await writeFileWithRetry(sourceFiles[fi], content);
       elementMigratedCount++;
     }
   }
@@ -749,7 +767,7 @@ function fetchText(url) {
     }
 
     if (changed) {
-      fs.writeFileSync(sourceFiles[fi], lines.join('\\n'));
+      await writeFileWithRetry(sourceFiles[fi], lines.join('\\n'));
       radiusMigratedCount++;
     }
   }
