@@ -76,6 +76,10 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
   const [fontSection, setFontSection] = React.useState<"google" | "local">("google");
   const [fontUploadStatus, setFontUploadStatus] = React.useState<{ loading: boolean; font: string; result: Record<string, unknown> | null } | null>(null);
   const [koFontSearch, setKoFontSearch] = React.useState("");
+  const [koFontSection, setKoFontSection] = React.useState<"google" | "local">("google");
+  const [koLocalFonts, setKoLocalFonts] = React.useState<string[]>([]);
+  const [koLocalFontsLoading, setKoLocalFontsLoading] = React.useState(false);
+  const [koFontUploadStatus, setKoFontUploadStatus] = React.useState<{ loading: boolean; font: string; result: Record<string, unknown> | null } | null>(null);
 
   const filteredGoogleFonts = GOOGLE_FONTS.filter((f) =>
     f.toLowerCase().includes(fontSearch.toLowerCase())
@@ -156,9 +160,66 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
     }
   }
 
-  function handleSelectKoFont(font: string) {
-    injectKoreanFont(font);
+  async function loadKoLocalFonts() {
+    setKoLocalFontsLoading(true);
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const win = window as any;
+      if ("queryLocalFonts" in win) {
+        const fonts: { family: string }[] = await win.queryLocalFonts();
+        setKoLocalFonts([...new Set(fonts.map((f) => f.family))].sort());
+      } else {
+        setKoLocalFonts([]);
+      }
+    } catch { setKoLocalFonts([]); }
+    setKoLocalFontsLoading(false);
+  }
+
+  async function uploadKoLocalFont(fontName: string) {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const win = window as any;
+      if (!("queryLocalFonts" in win)) return;
+      const fonts = await win.queryLocalFonts();
+      const match = fonts.find((f: { family: string }) => f.family === fontName);
+      if (!match) return;
+      const blob: Blob = await match.blob();
+      setKoFontUploadStatus({ loading: true, font: fontName, result: null });
+      const formData = new FormData();
+      formData.append("file", blob, `${fontName}.ttf`);
+      formData.append("fontName", fontName);
+      const res = await fetch("/api/font-upload", { method: "POST", body: formData });
+      const data = await res.json();
+      setKoFontUploadStatus({ loading: false, font: fontName, result: data });
+      if (!data.error && onFontUpload) onFontUpload(fontName);
+      setTimeout(() => setKoFontUploadStatus(null), 5000);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "로컬 폰트 업로드 실패";
+      setKoFontUploadStatus({ loading: false, font: fontName, result: { error: msg } });
+      setTimeout(() => setKoFontUploadStatus(null), 8000);
+    }
+  }
+
+  function handleSelectKoFont(font: string, isGoogle: boolean) {
+    if (isGoogle) injectKoreanFont(font);
     onFontFamilyKoChange(font);
+    if (isGoogle) {
+      setKoFontUploadStatus({ loading: true, font, result: null });
+      fetch('/api/font', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fontName: font }),
+      })
+        .then(r => r.json())
+        .then(data => {
+          setKoFontUploadStatus({ loading: false, font, result: data });
+          if (onFontUpload) onFontUpload(font);
+          setTimeout(() => setKoFontUploadStatus(null), 5000);
+        })
+        .catch(() => setKoFontUploadStatus({ loading: false, font, result: { error: 'Network error' } }));
+    } else {
+      uploadKoLocalFont(font);
+    }
   }
 
   const fontSizeKeys = ["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl"] as const;
@@ -273,6 +334,41 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
             {tokens.primitives.fontFamilyKo || '(없음 — 영문 폰트 사용)'}
           </p>
         </div>
+
+        {koFontUploadStatus && (
+          <div className={`mb-[var(--ds-internal-gap)] px-[var(--ds-card-padding)] py-2 rounded-[var(--ds-element-radius)] text-xs border ${
+            koFontUploadStatus.loading
+              ? "bg-muted/50 border-border text-muted-foreground"
+              : koFontUploadStatus.result?.error
+              ? "bg-destructive/10 border-destructive/30 text-destructive"
+              : "bg-success-50 border-success-200 text-success-700"
+          }`}>
+            {koFontUploadStatus.loading
+              ? `${koFontUploadStatus.font} CDN 업로드 중...`
+              : koFontUploadStatus.result?.error
+              ? `✗ 업로드 실패: ${koFontUploadStatus.result.error as string}`
+              : `✓ ${koFontUploadStatus.font} 폰트 CDN 업로드 완료. Save 클릭 시 자동으로 적용됩니다.`}
+          </div>
+        )}
+
+        <div className="flex border border-border rounded-[var(--ds-element-radius)] overflow-hidden mb-2">
+          {(["google", "local"] as const).map((sec) => (
+            <Button
+              key={sec}
+              variant={koFontSection === sec ? "default" : "ghost"}
+              size="sm"
+              className={`flex-1 rounded-none text-xs py-1.5 transition-colors ${koFontSection !== sec ? "text-muted-foreground" : ""}`}
+              onClick={() => {
+                setKoFontSection(sec);
+                setKoFontSearch("");
+                if (sec === "local" && koLocalFonts.length === 0) loadKoLocalFonts();
+              }}
+            >
+              {sec === "google" ? "Google 폰트" : "로컬 폰트"}
+            </Button>
+          ))}
+        </div>
+
         <Input
           type="text"
           placeholder="한글 폰트 검색..."
@@ -289,12 +385,26 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
           >
             없음 (영문 폰트 사용)
           </Button>
-          {KOREAN_FONTS.filter(f => f.toLowerCase().includes(koFontSearch.toLowerCase())).map(font => (
+          {koFontSection === "google" ? (
+            KOREAN_FONTS.filter(f => f.toLowerCase().includes(koFontSearch.toLowerCase())).map(font => (
+              <Button
+                key={font}
+                variant="ghost"
+                size="sm"
+                onClick={() => handleSelectKoFont(font, true)}
+                className={`w-full justify-start rounded-none px-3 py-1.5 text-xs ${tokens.primitives.fontFamilyKo === font ? 'bg-accent font-medium' : ''}`}
+              >
+                {font}
+              </Button>
+            ))
+          ) : koLocalFontsLoading ? (
+            <p className="text-xs text-muted-foreground p-3">로컬 폰트 로딩 중...</p>
+          ) : koLocalFonts.filter(f => f.toLowerCase().includes(koFontSearch.toLowerCase())).map(font => (
             <Button
               key={font}
               variant="ghost"
               size="sm"
-              onClick={() => handleSelectKoFont(font)}
+              onClick={() => handleSelectKoFont(font, false)}
               className={`w-full justify-start rounded-none px-3 py-1.5 text-xs ${tokens.primitives.fontFamilyKo === font ? 'bg-accent font-medium' : ''}`}
             >
               {font}
