@@ -54,8 +54,8 @@ export function EditorHeader({
     }
 
     const installCmd = dsSlug
-      ? `DESIGNSYNC_SLUG=${dsSlug} npm install github:IlYeoLee/designsync-ui && node node_modules/designsync-ui/designsync-migrate.mjs src`
-      : `npm install github:IlYeoLee/designsync-ui && node node_modules/designsync-ui/designsync-migrate.mjs src`;
+      ? `DESIGNSYNC_SLUG=${dsSlug} npm install github:IlYeoLee/designsync-ui && node node_modules/@ilyeolee/designsync-ui/designsync-migrate.mjs src`
+      : `npm install github:IlYeoLee/designsync-ui && node node_modules/@ilyeolee/designsync-ui/designsync-migrate.mjs src`;
 
     try {
       await navigator.clipboard.writeText(installCmd);

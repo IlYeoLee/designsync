@@ -68,7 +68,7 @@ export function generateRules(params: RulesParams = {}): string {
 아래 명령어를 실행해줘 (한 줄이면 끝):
 
 \`\`\`bash
-${dsSlug ? `DESIGNSYNC_SLUG=${dsSlug} ` : ""}npm install github:IlYeoLee/designsync-ui && node node_modules/designsync-ui/designsync-migrate.mjs src
+${dsSlug ? `DESIGNSYNC_SLUG=${dsSlug} ` : ""}npm install github:IlYeoLee/designsync-ui && node node_modules/@ilyeolee/designsync-ui/designsync-migrate.mjs src
 \`\`\`
 
 이 명령어가 자동으로 하는 일:
