@@ -234,7 +234,7 @@ function detectCloudFolder(dir) {
   try {
     var _iconRules = await fetchText('${rulesUrl}');
     if (_iconRules && !_iconRules.trim().startsWith('<')) {
-      var _pkgMatch = _iconRules.match(/\\(\\s*.([a-z@][a-z0-9\\-/@]*).\\s*\\)\\s*\\u{C544}\\u{C774}\\u{CF58}/u);
+      var _pkgMatch = _iconRules.match(/\\(\\s*.([a-z@][a-z0-9/@-]*).\\s*\\)\\s*\\u{C544}\\u{C774}\\u{CF58}/u);
       if (_pkgMatch) iconPkg = _pkgMatch[1];
     }
   } catch (_e) { /* fallback to lucide-react */ }
