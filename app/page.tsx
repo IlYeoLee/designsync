@@ -476,8 +476,6 @@ export default function Home() {
         isDark={isDark}
         onToggleDark={() => setIsDark(!isDark)}
         onSave={handleSave}
-        isSaving={isSaving}
-        saveSuccess={saveSuccess}
         onUndo={handleUndo}
         canUndo={snapshots.length > 0}
         onReset={handleReset}

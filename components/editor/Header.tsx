@@ -14,8 +14,6 @@ interface EditorHeaderProps {
   isDark: boolean;
   onToggleDark: () => void;
   onSave: () => Promise<boolean>;
-  isSaving: boolean;
-  saveSuccess: boolean;
   onUndo: () => void;
   canUndo: boolean;
   onReset: () => void;
@@ -32,8 +30,6 @@ export function EditorHeader({
   isDark,
   onToggleDark,
   onSave,
-  isSaving,
-  saveSuccess,
   onUndo,
   canUndo,
   onReset,
