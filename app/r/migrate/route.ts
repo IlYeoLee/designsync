@@ -367,22 +367,31 @@ COMPLEX PATTERNS (reconstruct structure):
 
 export async function POST(req: NextRequest) {
   try {
-    const { content, filename } = await req.json();
+    const { content, filename, screenshot } = await req.json();
 
     if (!content || typeof content !== "string") {
       return NextResponse.json({ error: "content required" }, { status: 400 });
     }
 
+    // Build user message — with or without screenshot
+    const userContent: Anthropic.MessageParam["content"] = screenshot
+      ? [
+          {
+            type: "image" as const,
+            source: { type: "base64" as const, media_type: "image/png" as const, data: screenshot },
+          },
+          {
+            type: "text" as const,
+            text: `This is a screenshot of the rendered UI. Use it to identify visual patterns (modals, dropdowns, tabs, cards, etc.) and choose the correct DesignSync components.\n\nMigrate this file${filename ? ` (${filename})` : ""}:\n\n${content}`,
+          },
+        ]
+      : `Migrate this file${filename ? ` (${filename})` : ""}:\n\n${content}`;
+
     const message = await client.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 16000,
       system: SYSTEM_PROMPT,
-      messages: [
-        {
-          role: "user",
-          content: `Migrate this file${filename ? ` (${filename})` : ""}:\n\n${content}`,
-        },
-      ],
+      messages: [{ role: "user", content: userContent }],
     });
 
     const raw = message.content[0].type === "text" ? message.content[0].text : "";
