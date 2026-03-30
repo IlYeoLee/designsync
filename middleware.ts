@@ -2,6 +2,11 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  // Public API routes — skip auth entirely
+  if (request.nextUrl.pathname.startsWith("/api/migrate")) {
+    return NextResponse.next();
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   // Skip auth if Supabase env vars are missing (local dev without Supabase)
