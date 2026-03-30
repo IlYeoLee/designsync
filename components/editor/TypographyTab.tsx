@@ -223,7 +223,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
   }
 
   const fontSizeKeys = ["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl"] as const;
-  const fontWeightKeys = ["normal", "medium", "bold"] as const;
+  const fontWeightKeys = ["normal", "medium", "semibold", "bold", "extrabold"] as const;
   const lineHeightKeys = ["tight", "normal", "loose"] as const;
 
   return (
