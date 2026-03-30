@@ -68,14 +68,16 @@ export function generateRules(params: RulesParams = {}): string {
 아래 명령어를 실행해줘 (한 줄이면 끝):
 
 \`\`\`bash
-${dsSlug ? `DESIGNSYNC_SLUG=${dsSlug} ` : ""}npm install github:IlYeoLee/designsync-ui
+${dsSlug ? `DESIGNSYNC_SLUG=${dsSlug} ` : ""}DESIGNSYNC_MIGRATE=true npm install github:IlYeoLee/designsync-ui
 \`\`\`
 
 이 명령어가 자동으로 하는 일:
 1. UI 컴포넌트 60개 설치${dsSlug ? `
 2. 디자인 토큰 실시간 연동 (@import url 자동 삽입)
-3. .cursorrules + CLAUDE.md 디자인 규칙 생성` : `
-2. .cursorrules + CLAUDE.md 디자인 규칙 생성`}
+3. 기존 코드 → DesignSync 컴포넌트 자동 교체 (AI 마이그레이션)
+4. .cursorrules + CLAUDE.md 디자인 규칙 생성` : `
+2. 기존 코드 → DesignSync 컴포넌트 자동 교체 (AI 마이그레이션)
+3. .cursorrules + CLAUDE.md 디자인 규칙 생성`}
 ${tokensCssUrl ? `
 설치 후 DesignSync 웹에서 디자인 토큰을 수정하고 저장하면 프로젝트에 즉시 반영된다.
 ` : ""}

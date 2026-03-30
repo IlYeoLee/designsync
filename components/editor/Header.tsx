@@ -54,8 +54,8 @@ export function EditorHeader({
     }
 
     const installCmd = dsSlug
-      ? `DESIGNSYNC_SLUG=${dsSlug} npm install github:IlYeoLee/designsync-ui`
-      : `npm install github:IlYeoLee/designsync-ui`;
+      ? `DESIGNSYNC_SLUG=${dsSlug} DESIGNSYNC_MIGRATE=true npm install github:IlYeoLee/designsync-ui`
+      : `DESIGNSYNC_MIGRATE=true npm install github:IlYeoLee/designsync-ui`;
 
     try {
       await navigator.clipboard.writeText(installCmd);
