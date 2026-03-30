@@ -183,39 +183,180 @@ MISC:
 
 COMPLEX PATTERNS (reconstruct structure):
 
-  DataTable — table with sorting/filtering/pagination OR data.map() rendering rows:
-    → Extract column definitions from th/headers, pass data array as prop:
-      const columns = [{ accessorKey: "field", header: "Header" }, ...]
+  DataTable — ANY table/list rendering rows from an array:
+    DETECT: <table> with .map() OR {items.map(...)} rendering <tr> rows OR manual pagination state
+    → Step 1: find the data array variable (e.g. users, items, rows, data)
+    → Step 2: extract columns from <th> text or object keys used in cells
+    → Step 3: replace entire table+map block with:
+      const columns: ColumnDef<typeof data[0]>[] = [
+        { accessorKey: "id", header: "ID" },
+        { accessorKey: "name", header: "이름" },
+        // ... one entry per th/field
+      ]
       <DataTable columns={columns} data={data} pageSize={10} />
-      @/components/ui/data-table
-    Note: identify the data array variable from the existing .map() calls
+    → Add: import { DataTable } from "@/components/ui/data-table"
+    → Add: import { ColumnDef } from "@tanstack/react-table"
+    Note: keep all data fetching logic, only replace the render part
 
-  Carousel — overflow-hidden slider with prev/next buttons OR swipeable items:
-    → <Carousel><CarouselContent><CarouselItem>...</CarouselItem></CarouselContent><CarouselPrevious /><CarouselNext /></Carousel>
-      @/components/ui/carousel
-    Note: wrap each slide content in <CarouselItem>, remove manual translate/scroll logic
+  Carousel — any sliding/scrolling list of items:
+    DETECT: overflow-hidden + flex + translate-x state OR scroll-snap OR manually tracked currentIndex
+    → Remove: useState for index, prev/next click handlers, transform/translate logic
+    → Replace with:
+      <Carousel>
+        <CarouselContent>
+          {items.map((item) => (
+            <CarouselItem key={item.id}>...</CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious />
+        <CarouselNext />
+      </Carousel>
+    → Add: import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel"
+    Note: keep the data/items array, remove all manual scroll/index state
 
-  Command palette — search input + filtered list (often triggered by Cmd+K or button):
-    → <Command><CommandInput placeholder="검색..." /><CommandList><CommandEmpty>결과 없음</CommandEmpty><CommandGroup heading="..."><CommandItem onSelect={...}>...</CommandItem></CommandGroup></CommandList></Command>
-      @/components/ui/command
-    Note: if inside a Dialog/Popover, wrap with that too
+  Command palette — search input + filtered/mapped list:
+    DETECT: input with onChange filter + results.filter() + mapped list OR Cmd+K listener OR searchQuery state
+    → Replace entire search+list block with:
+      <Command>
+        <CommandInput placeholder="검색..." value={searchQuery} onValueChange={setSearchQuery} />
+        <CommandList>
+          <CommandEmpty>결과 없음</CommandEmpty>
+          <CommandGroup heading="결과">
+            {filteredItems.map((item) => (
+              <CommandItem key={item.id} onSelect={() => handleSelect(item)}>
+                {item.name}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </CommandList>
+      </Command>
+    → Add: import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command"
+    Note: if triggered by Dialog, wrap in <Dialog><DialogContent><Command>...</Command></DialogContent></Dialog>
 
-  InputOTP — multiple single-digit inputs side by side (OTP/verification code):
-    → <InputOTP maxLength={6}><InputOTPGroup><InputOTPSlot index={0}/><InputOTPSlot index={1}/><InputOTPSlot index={2}/><InputOTPSeparator/><InputOTPSlot index={3}/><InputOTPSlot index={4}/><InputOTPSlot index={5}/></InputOTPGroup></InputOTP>
-      @/components/ui/input-otp
-    Note: adjust maxLength and slot count to match original input count
+  InputOTP — N separate single-character inputs for code entry:
+    DETECT: multiple <input maxLength={1}> side by side OR inputs[0..N] array OR digit[0..N] state
+    → Count the number of input boxes (N), add separator at midpoint if N >= 6
+    → Replace all inputs with:
+      <InputOTP maxLength={N} value={code} onChange={setCode}>
+        <InputOTPGroup>
+          <InputOTPSlot index={0}/>
+          <InputOTPSlot index={1}/>
+          <InputOTPSlot index={2}/>
+          {N >= 6 && <InputOTPSeparator />}
+          <InputOTPSlot index={3}/>
+          {/* continue for all N slots */}
+        </InputOTPGroup>
+      </InputOTP>
+    → Add: import { InputOTP, InputOTPGroup, InputOTPSlot, InputOTPSeparator } from "@/components/ui/input-otp"
+    Note: remove individual input onChange handlers, use single value+onChange on InputOTP
 
-  Form — <form> element with useForm() from react-hook-form:
-    → Wrap with <Form {...form}>, each field becomes:
+  Form — <form> with useForm() from react-hook-form:
+    DETECT: import { useForm } from "react-hook-form" OR register()/handleSubmit()/formState
+    → Keep: const form = useForm({...}) exactly as-is, keep resolver, keep onSubmit
+    → Wrap <form> with <Form {...form}>
+    → Each field label+input pair becomes:
       <FormField control={form.control} name="fieldName" render={({ field }) => (
-        <FormItem><FormLabel>라벨</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+        <FormItem>
+          <FormLabel>라벨</FormLabel>
+          <FormControl><Input {...field} /></FormControl>
+          <FormDescription>설명</FormDescription>
+          <FormMessage />
+        </FormItem>
       )} />
-      @/components/ui/form  (also needs: react-hook-form, @hookform/resolvers, zod)
-    Note: preserve existing useForm() setup, validation schema, and onSubmit handler exactly
+    → Replace: {...register("name")} with {...field} inside FormControl
+    → Add: import { Form, FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from "@/components/ui/form"
+    Note: NEVER change useForm config, resolver, schema, or onSubmit logic
 
-  Menubar — top menu bar with dropdown menus:
-    → <Menubar><MenubarMenu><MenubarTrigger>파일</MenubarTrigger><MenubarContent><MenubarItem>열기</MenubarItem></MenubarContent></MenubarMenu></Menubar>
-      @/components/ui/menubar`;
+  Menubar — horizontal nav bar with dropdown menus at top:
+    DETECT: <nav> or <header> with multiple dropdown triggers in a row (File/Edit/View style)
+    → <Menubar>
+        <MenubarMenu>
+          <MenubarTrigger>파일</MenubarTrigger>
+          <MenubarContent>
+            <MenubarItem onClick={...}>새 파일</MenubarItem>
+            <MenubarSeparator />
+            <MenubarItem onClick={...}>저장</MenubarItem>
+          </MenubarContent>
+        </MenubarMenu>
+      </Menubar>
+    → Add: import { Menubar, MenubarMenu, MenubarTrigger, MenubarContent, MenubarItem, MenubarSeparator } from "@/components/ui/menubar"
+
+  NavigationMenu — <nav> with links/dropdowns (site navigation):
+    DETECT: <nav> containing <ul><li><a> structure OR link groups with dropdowns
+    → <NavigationMenu>
+        <NavigationMenuList>
+          <NavigationMenuItem>
+            <NavigationMenuTrigger>카테고리</NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <NavigationMenuLink href="/path">링크</NavigationMenuLink>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <NavigationMenuLink href="/about">소개</NavigationMenuLink>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    → Add: import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@/components/ui/navigation-menu"
+
+  Header — <header> or top fixed bar (site header/app bar):
+    DETECT: <header> OR div with fixed top-0 + flex + logo + nav links + user menu
+    → <Header>
+        <HeaderBrand href="/">
+          <img src="/logo.svg" alt="로고" />
+        </HeaderBrand>
+        <HeaderNav>
+          <HeaderNavItem href="/dashboard">대시보드</HeaderNavItem>
+        </HeaderNav>
+        <HeaderActions>
+          {/* user menu, buttons */}
+        </HeaderActions>
+      </Header>
+    → Add: import { Header, HeaderBrand, HeaderNav, HeaderNavItem, HeaderActions } from "@/components/ui/header"
+
+  Sidebar — <aside> or fixed side panel with nav links:
+    DETECT: <aside> OR fixed left/right panel with nav items OR collapsible side nav
+    → <Sidebar>
+        <SidebarHeader>
+          <SidebarBrand>앱 이름</SidebarBrand>
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel>메뉴</SidebarGroupLabel>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a href="/dashboard">대시보드</a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroup>
+        </SidebarContent>
+        <SidebarFooter>
+          {/* user info */}
+        </SidebarFooter>
+      </Sidebar>
+    → Add: import { Sidebar, SidebarHeader, SidebarBrand, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from "@/components/ui/sidebar"
+
+  Chart — any SVG/canvas/recharts chart or custom data visualization:
+    DETECT: <svg> with data paths OR recharts BarChart/LineChart/PieChart OR custom canvas
+    → Define config first:
+      const chartConfig = {
+        value: { label: "값", color: "hsl(var(--chart-1))" },
+        // one entry per data series
+      } satisfies ChartConfig
+    → Wrap with ChartContainer:
+      <ChartContainer config={chartConfig} className="h-[300px]">
+        <BarChart data={data}>
+          <CartesianGrid vertical={false} />
+          <XAxis dataKey="name" />
+          <YAxis />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <Bar dataKey="value" fill="var(--color-value)" radius={4} />
+        </BarChart>
+      </ChartContainer>
+    → Add: import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
+    → Add: import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts"
+    Note: match chart type (Bar/Line/Pie/Area) to original visualization type`;
 
 export async function POST(req: NextRequest) {
   try {
@@ -227,7 +368,7 @@ export async function POST(req: NextRequest) {
 
     const message = await client.messages.create({
       model: "claude-sonnet-4-6",
-      max_tokens: 8000,
+      max_tokens: 16000,
       system: SYSTEM_PROMPT,
       messages: [
         {
