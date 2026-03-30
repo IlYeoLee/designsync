@@ -121,9 +121,15 @@ export async function GET(
     // Border reset
     css += `*, ::after, ::before {\n${indent}border-color: var(--color-border, currentColor);\n}\n`;
 
-    // lang="ko" override
-    if (fontSansKoValue && fontSansKoValue !== fontSansValue) {
-      css += `\n:root:lang(ko) {\n${indent}--font-sans: ${fontSansKoValue};\n}\n`;
+    // Korean font via unicode-range — keeps English font first, Korean glyphs use Ko font
+    // This avoids :root:lang(ko) overriding font-sans entirely (which breaks English font)
+    if (fontFamilyKo && fontSansKoValue && fontFamilyKo !== fontFamily) {
+      css += `\n/* Korean glyphs use ${fontFamilyKo} without overriding English font order */\n`;
+      css += `@font-face {\n`;
+      css += `${indent}font-family: '${fontFamily}';\n`;
+      css += `${indent}src: local('${fontFamilyKo}');\n`;
+      css += `${indent}unicode-range: U+AC00-D7A3, U+1100-11FF, U+3130-318F, U+A960-A97F, U+D7B0-D7FF;\n`;
+      css += `}\n`;
     }
 
     return new Response(css, {
