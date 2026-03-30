@@ -26,8 +26,6 @@ export default function Home() {
   const supabase = createClient();
   const [tokens, setTokens] = React.useState<TokenState>(DEFAULT_TOKENS);
   const [isDark, setIsDark] = React.useState(false);
-  const [_isSaving, setIsSaving] = React.useState(false);
-  const [_saveSuccess, setSaveSuccess] = React.useState(false);
   const [history, setHistory] = React.useState<HistoryEntry[]>([]);
   const [snapshots, setSnapshots] = React.useState<TokenState[]>([]);
 
@@ -336,8 +334,6 @@ export default function Home() {
   // ── Save to Supabase ────────────────────────────────────────────
   async function handleSave(): Promise<boolean> {
     if (!activeDs) return false;
-    setIsSaving(true);
-    setSaveSuccess(false);
     setPrResult(null);
     setPrError(null);
     try {
@@ -353,7 +349,6 @@ export default function Home() {
 
       if (error) {
         alert(`저장 실패: ${error.message}`);
-        setIsSaving(false);
         return false;
       }
 
@@ -363,10 +358,6 @@ export default function Home() {
       );
       setActiveDs((prev) => prev ? { ...prev, tokens } : prev);
 
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-      setIsSaving(false);
-
       // Auto-PR: if GitHub repo is connected, create PR in background
       if (activeDs.github_repo && activeDs.github_token) {
         triggerAutoPR(activeDs.id, activeDs.slug);
@@ -375,7 +366,6 @@ export default function Home() {
       return true;
     } catch {
       alert("저장 실패: network error");
-      setIsSaving(false);
       return false;
     }
   }
