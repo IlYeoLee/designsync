@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+const client = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY!,
+  defaultHeaders: { "anthropic-beta": "prompt-caching-2024-07-31" },
+});
 
 const SYSTEM_PROMPT = `You are a DesignSync migration assistant.
 Rewrite the given React/Next.js JSX/TSX file to use DesignSync design tokens and components.
@@ -442,7 +445,7 @@ export async function POST(req: NextRequest) {
     const message = await client.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 16000,
-      system: SYSTEM_PROMPT,
+      system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
       messages: [{ role: "user", content: userContent }],
     });
 
