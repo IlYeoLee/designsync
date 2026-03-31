@@ -136,7 +136,7 @@ export default function Home() {
     setTokens((prev) => {
       const next = JSON.parse(JSON.stringify(prev)) as TokenState;
 
-      const colorMatch = variable.match(/^--(brand|neutral|error|success|warning)-(\d+)$/);
+      const colorMatch = variable.match(/^--(brand|neutral|error|success|warning|info)-(\d+)$/);
       if (colorMatch) {
         const [, scale, step] = colorMatch;
         type ScaleKey = keyof typeof next.primitives;
@@ -201,7 +201,7 @@ export default function Home() {
     setTokens((prev) => {
       const next = JSON.parse(JSON.stringify(prev)) as TokenState;
       changes.forEach(({ variable, value }) => {
-        const colorMatch = variable.match(/^--(brand|neutral|error|success|warning)-(\d+)$/);
+        const colorMatch = variable.match(/^--(brand|neutral|error|success|warning|info)-(\d+)$/);
         if (colorMatch) {
           const [, scale, step] = colorMatch;
           type ScaleKey = keyof typeof next.primitives;

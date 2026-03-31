@@ -402,7 +402,11 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
     return () => document.removeEventListener("mousedown", handleClick);
   }, [activeColor]);
 
-  // Compute initial scale picker hex after mount
+  // Sync scale picker hex on mount AND when tokens change (e.g. DS switch)
+  const tokensId = React.useMemo(
+    () => COLOR_SCALES.filter((s) => s !== "neutral").map((s) => tokens.primitives[s]?.["600" as Step] ?? "").join("|"),
+    [tokens],
+  );
   React.useEffect(() => {
     if (!mounted) return;
     const next = { ...scalePicker };
@@ -413,7 +417,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
     }
     setScalePicker(next);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mounted]);
+  }, [mounted, tokensId]);
 
   function handleSwatchClick(scale: ColorScaleName, step: string) {
     const isActive = activeColor?.scale === scale && activeColor?.step === step;
