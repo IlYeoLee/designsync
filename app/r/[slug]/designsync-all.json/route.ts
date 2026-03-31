@@ -29,10 +29,12 @@ const ALL_COMPONENTS = [
 
 // Components that contain lucide-react imports and need icon rewriting
 const ICON_COMPONENTS = new Set([
-  "accordion", "breadcrumb", "calendar", "checkbox", "collapsible",
-  "combobox", "command", "data-table", "date-picker", "dialog",
-  "dropdown-menu", "header", "navigation-menu", "radio-group",
-  "resizable", "scroll-area", "select", "sheet", "sidebar",
+  "accordion", "breadcrumb", "calendar", "carousel", "checkbox",
+  "collapsible", "combobox", "command", "context-menu", "data-table",
+  "date-picker", "dialog", "dropdown-menu", "header", "input-otp",
+  "menubar", "native-select", "navigation-menu", "pagination",
+  "radio-group", "resizable", "scroll-area", "select", "sheet",
+  "sidebar", "sonner",
 ]);
 
 export async function GET(
