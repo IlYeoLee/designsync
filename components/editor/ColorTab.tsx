@@ -7,8 +7,8 @@ import { getIconMap } from "@/lib/icon-map";
 import { Button } from "@/registry/new-york/ui/button";
 import { Input } from "@/registry/new-york/ui/input";
 
-type ColorScaleName = "brand" | "neutral" | "error" | "success" | "warning";
-const COLOR_SCALES: ColorScaleName[] = ["brand", "neutral", "error", "success", "warning"];
+type ColorScaleName = "brand" | "neutral" | "error" | "success" | "info";
+const COLOR_SCALES: ColorScaleName[] = ["brand", "neutral", "error", "success", "info"];
 const STEPS = ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900"] as const;
 type Step = typeof STEPS[number];
 
@@ -102,7 +102,7 @@ const NEUTRAL_PRESETS: Record<string, Record<Step, string>> = {
 };
 
 const SCALE_LABELS: Record<ColorScaleName, string> = {
-  brand: "브랜드 컬러", neutral: "뉴트럴 컬러", error: "오류 컬러", success: "성공 컬러", warning: "경고 컬러",
+  brand: "브랜드 컬러", neutral: "뉴트럴 컬러", error: "오류/경고 컬러", success: "성공 컬러", info: "정보 컬러",
 };
 
 // All primitive color var options for semantic dropdowns
@@ -377,7 +377,7 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
   const [pickerHex, setPickerHex] = React.useState("#000000");
   // Per-scale one-click picker hex
   const [scalePicker, setScalePicker] = React.useState<Record<ColorScaleName, string>>({
-    brand: "#000000", neutral: "#808080", error: "#e03030", success: "#20a020", warning: "#e08000",
+    brand: "#000000", neutral: "#808080", error: "#e03030", success: "#20a020", info: "#0080d0",
   });
   const [openScalePicker, setOpenScalePicker] = React.useState<ColorScaleName | null>(null);
   const [semanticMode, setSemanticMode] = React.useState<"light" | "dark">(isDark ? "dark" : "light");

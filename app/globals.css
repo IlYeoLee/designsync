@@ -289,17 +289,28 @@
   --success-800: oklch(0.28 0.11 145);
   --success-900: oklch(0.20 0.08 145);
 
-  /* Warning scale */
-  --warning-50: oklch(0.98 0.03 85);
-  --warning-100: oklch(0.95 0.07 85);
-  --warning-200: oklch(0.90 0.12 85);
-  --warning-300: oklch(0.83 0.17 85);
-  --warning-400: oklch(0.75 0.20 85);
-  --warning-500: oklch(0.67 0.22 85);
-  --warning-600: oklch(0.58 0.21 85);
-  --warning-700: oklch(0.46 0.18 85);
-  --warning-800: oklch(0.34 0.14 85);
-  --warning-900: oklch(0.24 0.10 85);
+  /* Info scale */
+  --info-50: oklch(0.97 0.02 210);
+  --info-100: oklch(0.93 0.06 210);
+  --info-200: oklch(0.87 0.10 210);
+  --info-300: oklch(0.78 0.15 210);
+  --info-400: oklch(0.67 0.19 210);
+  --info-500: oklch(0.57 0.22 210);
+  --info-600: oklch(0.48 0.22 210);
+  --info-700: oklch(0.38 0.19 210);
+  --info-800: oklch(0.28 0.14 210);
+  --info-900: oklch(0.20 0.10 210);
+  /* Backward compat: warning-* aliases error scale */
+  --warning-50: var(--error-50);
+  --warning-100: var(--error-100);
+  --warning-200: var(--error-200);
+  --warning-300: var(--error-300);
+  --warning-400: var(--error-400);
+  --warning-500: var(--error-500);
+  --warning-600: var(--error-600);
+  --warning-700: var(--error-700);
+  --warning-800: var(--error-800);
+  --warning-900: var(--error-900);
 
   /* Typography */
   --font-size-xs: 0.75rem;
@@ -389,7 +400,7 @@
   --ring: var(--brand-400);
   --chart-1: var(--brand-500);
   --chart-2: var(--success-500);
-  --chart-3: var(--warning-500);
+  --chart-3: var(--info-500);
   --chart-4: var(--error-500);
   --chart-5: var(--neutral-500);
   --sidebar: var(--neutral-100);

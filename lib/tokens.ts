@@ -10,7 +10,7 @@ export type TokenState = {
     neutral: ColorScale;
     error: ColorScale;
     success: ColorScale;
-    warning: ColorScale;
+    info: ColorScale;
     fontFamily: string;
     fontFamilyKo: string;
     /** Uploaded font face URLs: weight (as string) → CDN URL, e.g. {"500": "https://..."} */
@@ -88,17 +88,17 @@ export const DEFAULT_TOKENS: TokenState = {
       '800': 'oklch(0.28 0.11 145)',
       '900': 'oklch(0.20 0.08 145)',
     },
-    warning: {
-      '50': 'oklch(0.98 0.03 85)',
-      '100': 'oklch(0.95 0.07 85)',
-      '200': 'oklch(0.90 0.12 85)',
-      '300': 'oklch(0.83 0.17 85)',
-      '400': 'oklch(0.75 0.20 85)',
-      '500': 'oklch(0.67 0.22 85)',
-      '600': 'oklch(0.58 0.21 85)',
-      '700': 'oklch(0.46 0.18 85)',
-      '800': 'oklch(0.34 0.14 85)',
-      '900': 'oklch(0.24 0.10 85)',
+    info: {
+      '50': 'oklch(0.97 0.02 210)',
+      '100': 'oklch(0.93 0.06 210)',
+      '200': 'oklch(0.87 0.10 210)',
+      '300': 'oklch(0.78 0.15 210)',
+      '400': 'oklch(0.67 0.19 210)',
+      '500': 'oklch(0.57 0.22 210)',
+      '600': 'oklch(0.48 0.22 210)',
+      '700': 'oklch(0.38 0.19 210)',
+      '800': 'oklch(0.28 0.14 210)',
+      '900': 'oklch(0.20 0.10 210)',
     },
     fontFamily: 'Geist',
     fontFamilyKo: '',
@@ -185,12 +185,12 @@ export const DEFAULT_TOKENS: TokenState = {
       'success': 'var(--success-100)',
       'success-foreground': 'var(--success-700)',
       'success-border': 'var(--success-300)',
-      'warning': 'var(--warning-100)',
-      'warning-foreground': 'var(--warning-700)',
-      'warning-border': 'var(--warning-300)',
+      'warning': 'var(--error-100)',
+      'warning-foreground': 'var(--error-700)',
+      'warning-border': 'var(--error-300)',
       'error-border': 'var(--error-300)',
-      'info': 'var(--brand-50)',
-      'info-foreground': 'var(--brand-700)',
+      'info': 'var(--info-100)',
+      'info-foreground': 'var(--info-700)',
     },
     dark: {
       'background': 'var(--neutral-900)',
@@ -221,12 +221,12 @@ export const DEFAULT_TOKENS: TokenState = {
       'success': 'var(--success-900)',
       'success-foreground': 'var(--success-100)',
       'success-border': 'var(--success-700)',
-      'warning': 'var(--warning-900)',
-      'warning-foreground': 'var(--warning-100)',
-      'warning-border': 'var(--warning-700)',
+      'warning': 'var(--error-900)',
+      'warning-foreground': 'var(--error-100)',
+      'warning-border': 'var(--error-700)',
       'error-border': 'var(--error-700)',
-      'info': 'var(--brand-900)',
-      'info-foreground': 'var(--brand-100)',
+      'info': 'var(--info-900)',
+      'info-foreground': 'var(--info-100)',
     },
   },
 };
@@ -302,7 +302,7 @@ export function applyTokensToDocument(tokens: TokenState): void {
     ['neutral', 'neutral'],
     ['error', 'error'],
     ['success', 'success'],
-    ['warning', 'warning'],
+    ['info', 'info'],
   ];
 
   for (const [key, prefix] of colorScales) {
@@ -310,6 +310,10 @@ export function applyTokensToDocument(tokens: TokenState): void {
     for (const [step, value] of Object.entries(scale)) {
       root.style.setProperty(`--${prefix}-${step}`, value);
     }
+  }
+  // Backward compat: --warning-* aliases → error scale (warning merged into error)
+  for (const [step, value] of Object.entries(tokens.primitives.error)) {
+    root.style.setProperty(`--warning-${step}`, value);
   }
 
   // Apply typography

@@ -54,7 +54,7 @@ export async function fetchAndResolveTokens(
 
   // Flatten primitives
   const flatPrimitives: Record<string, string> = {};
-  const { brand, neutral, error: errorScale, success, warning, radius } =
+  const { brand, neutral, error: errorScale, success, info: infoScale, radius } =
     tokens.primitives || {};
 
   for (const [step, val] of Object.entries((brand || {}) as Record<string, string>)) {
@@ -65,12 +65,14 @@ export async function fetchAndResolveTokens(
   }
   for (const [step, val] of Object.entries((errorScale || {}) as Record<string, string>)) {
     flatPrimitives[`--error-${step}`] = val;
+    // Backward compat: --warning-* aliases error (warning palette merged into error)
+    flatPrimitives[`--warning-${step}`] = val;
   }
   for (const [step, val] of Object.entries((success || {}) as Record<string, string>)) {
     flatPrimitives[`--success-${step}`] = val;
   }
-  for (const [step, val] of Object.entries((warning || {}) as Record<string, string>)) {
-    flatPrimitives[`--warning-${step}`] = val;
+  for (const [step, val] of Object.entries((infoScale || {}) as Record<string, string>)) {
+    flatPrimitives[`--info-${step}`] = val;
   }
   if (radius) {
     flatPrimitives["--radius-none"] = radius.none;
@@ -85,13 +87,20 @@ export async function fetchAndResolveTokens(
   const darkVars: Record<string, string> = {};
 
   // Primitive color scales
-  const colorScales = ["brand", "neutral", "error", "success", "warning"] as const;
+  const colorScales = ["brand", "neutral", "error", "success", "info"] as const;
   for (const scale of colorScales) {
     if (tokens.primitives?.[scale]) {
       for (const [step, val] of Object.entries(tokens.primitives[scale] as Record<string, string>)) {
         lightVars[`${scale}-${step}`] = val;
         darkVars[`${scale}-${step}`] = val;
       }
+    }
+  }
+  // Backward compat: emit warning-* as aliases of error (merged palette)
+  if (tokens.primitives?.error) {
+    for (const [step, val] of Object.entries(tokens.primitives.error as Record<string, string>)) {
+      lightVars[`warning-${step}`] = val;
+      darkVars[`warning-${step}`] = val;
     }
   }
 
@@ -148,7 +157,7 @@ export async function fetchAndResolveTokens(
   // Chart colors
   lightVars["chart-1"] = flatPrimitives["--brand-500"] || lightVars["chart-1"] || "";
   lightVars["chart-2"] = flatPrimitives["--success-500"] || lightVars["chart-2"] || "";
-  lightVars["chart-3"] = flatPrimitives["--warning-500"] || lightVars["chart-3"] || "";
+  lightVars["chart-3"] = flatPrimitives["--info-500"] || lightVars["chart-3"] || "";
   lightVars["chart-4"] = flatPrimitives["--error-500"] || lightVars["chart-4"] || "";
   lightVars["chart-5"] = flatPrimitives["--neutral-500"] || lightVars["chart-5"] || "";
   darkVars["chart-1"] = flatPrimitives["--brand-500"] || darkVars["chart-1"] || "";
