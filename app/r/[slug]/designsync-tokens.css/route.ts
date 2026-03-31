@@ -154,6 +154,18 @@ export async function GET(
     }
     css += `}\n\n`;
 
+    // Shadcn radius calc() override — neutralizes +4px/+8px offset formulas
+    // shadcn globals.css uses calc(var(--radius) + 4px) which breaks DS "square" presets.
+    // These unlayered :root vars beat @layer base shadcn definitions.
+    css += `/* Shadcn radius tier override */\n`;
+    css += `:root {\n`;
+    css += `${indent}--radius-sm: var(--radius-sm-prim);\n`;
+    css += `${indent}--radius-md: var(--radius-md-prim);\n`;
+    css += `${indent}--radius-lg: var(--radius-lg-prim);\n`;
+    css += `${indent}--radius-xl: var(--radius-xl-prim);\n`;
+    css += `${indent}--radius-2xl: var(--radius-xl-prim);\n`;
+    css += `}\n\n`;
+
     // Korean font unicode-range
     if (fontFamilyKo && fontSansKoValue && fontFamilyKo !== fontFamily) {
       css += `@font-face {\n`;

@@ -59,6 +59,34 @@ text-red-600, text-red-500                 → text-destructive
 border-gray-200, border-gray-100           → border-border
 border-gray-300, border-[#ddd]             → border-input
 
+━━━ STATE / FEEDBACK COLORS (CRITICAL — map by SEMANTIC meaning, not hue) ━━━
+RULE: When you see amber/yellow/green/red colors used together on the same element (e.g. bg-amber-100 + text-amber-800), identify the INTENT and map to DS state tokens:
+
+WARNING state (caution banners, alerts, badges):
+  bg-amber-50, bg-amber-100, bg-yellow-50, bg-yellow-100  → bg-[color:var(--warning)]
+  text-amber-700, text-amber-800, text-yellow-700          → text-[color:var(--warning-foreground)]
+  border-amber-200, border-amber-300, border-yellow-200    → border-[color:var(--warning-border)]
+  → Use <Alert variant="warning"> if it's an alert component
+
+SUCCESS state (confirmation, done, saved banners):
+  bg-green-50, bg-green-100, bg-emerald-50, bg-teal-50    → bg-[color:var(--success)]
+  text-green-700, text-green-800, text-emerald-700         → text-[color:var(--success-foreground)]
+  border-green-200, border-green-300, border-emerald-200   → border-[color:var(--success-border)]
+  → Use <Alert variant="success"> if it's an alert component
+
+ERROR state (error banners, form errors, destructive notices):
+  bg-red-50, bg-red-100, bg-rose-50, bg-rose-100           → bg-destructive/10
+  text-red-700, text-red-800, text-rose-700                → text-destructive
+  border-red-200, border-red-300, border-rose-200           → border-[color:var(--error-border)]
+  → Use <Alert variant="destructive"> if it's an alert component
+
+INFO state (informational notices, help banners):
+  bg-blue-50, bg-blue-100, bg-sky-50, bg-cyan-50           → bg-[color:var(--info)]
+  text-blue-700, text-blue-800, text-sky-700                → text-[color:var(--info-foreground)]
+  → Use <Alert variant="info"> if it's an alert component
+
+NEVER leave amber/green/red hardcoded — always map to state tokens.
+
 ━━━ SPACING / RADIUS / HEIGHT TOKENS ━━━
 rounded-xl, rounded-lg (card/panel)        → rounded-[var(--ds-card-radius)]
 rounded-md (button)                        → rounded-[var(--ds-button-radius)]

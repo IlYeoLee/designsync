@@ -115,7 +115,19 @@ function generateTokenCSS(
   // Border reset for Tailwind v4
   css += `*, ::after, ::before {\n`;
   css += `${indent}border-color: var(--color-border, currentColor);\n`;
-  css += `}\n`;
+  css += `}\n\n`;
+
+  // Shadcn radius calc() override — neutralizes +4px/+8px offset formulas
+  // shadcn globals.css uses calc(var(--radius) + 4px) which breaks DS "square" presets.
+  // Unlayered :root beats @layer base, so this wins even when @imported at top of globals.css.
+  css += `/* Shadcn radius tier override */\n`;
+  css += `:root {\n`;
+  css += `${indent}--radius-sm: var(--radius-sm-prim);\n`;
+  css += `${indent}--radius-md: var(--radius-md-prim);\n`;
+  css += `${indent}--radius-lg: var(--radius-lg-prim);\n`;
+  css += `${indent}--radius-xl: var(--radius-xl-prim);\n`;
+  css += `${indent}--radius-2xl: var(--radius-xl-prim);\n`;
+  css += `}`;
 
   // lang="ko" font override
   if (fontSansKoValue && fontSansKoValue !== fontSansValue) {
