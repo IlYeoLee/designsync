@@ -18,6 +18,7 @@ interface EditorPanelProps {
   onSemanticChange: (mode: "light" | "dark", key: string, value: string) => void;
   onFontFamilyChange: (font: string) => void;
   onFontFamilyKoChange: (font: string) => void;
+  onFontFaceAdded: (weight: number, url: string, isKo: boolean) => void;
   onIconLibraryChange: (library: string) => void;
   onStylePresetChange: (preset: string) => void;
   iconLibrary: string;
@@ -32,6 +33,7 @@ export function EditorPanel({
   onSemanticChange,
   onFontFamilyChange,
   onFontFamilyKoChange,
+  onFontFaceAdded,
   onIconLibraryChange,
   onStylePresetChange,
   iconLibrary,
@@ -85,6 +87,7 @@ export function EditorPanel({
               onTokenChange={onTokenChange}
               onFontFamilyChange={onFontFamilyChange}
               onFontFamilyKoChange={onFontFamilyKoChange}
+              onFontFaceAdded={onFontFaceAdded}
             />
           </TabsContent>
           <TabsContent value="layout">

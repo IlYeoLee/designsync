@@ -13,6 +13,9 @@ export type TokenState = {
     warning: ColorScale;
     fontFamily: string;
     fontFamilyKo: string;
+    /** Uploaded font face URLs: weight (as string) → CDN URL, e.g. {"500": "https://..."} */
+    fontFaceUrls: Record<string, string>;
+    fontFaceUrlsKo: Record<string, string>;
     fontSize: Record<'xs' | 'sm' | 'base' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl', string>;
     fontWeight: Record<'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold', string>;
     lineHeight: Record<'tight' | 'normal' | 'loose', string>;
@@ -99,6 +102,8 @@ export const DEFAULT_TOKENS: TokenState = {
     },
     fontFamily: 'Geist',
     fontFamilyKo: '',
+    fontFaceUrls: {},
+    fontFaceUrlsKo: {},
     fontSize: {
       'xs': '0.75rem',
       'sm': '0.875rem',
@@ -246,6 +251,46 @@ export function normalizeTokens(tokens: TokenState): TokenState {
   return t;
 }
 
+/**
+ * Generate @font-face CSS for a custom uploaded font, including bridge rules
+ * so missing intermediate weights fall back to the next LOWER available weight
+ * rather than letting the browser pick the next higher one.
+ *
+ * Principle: 600 (semibold) → 500 (medium) if 600 not uploaded
+ *            800 (extrabold) → 700 (bold)   if 800 not uploaded
+ */
+export function generateFontFaceCSS(
+  family: string,
+  faceUrls: Record<string, string>,
+): string {
+  const weights = Object.keys(faceUrls).map(Number).sort((a, b) => a - b);
+  if (weights.length === 0) return '';
+
+  const lines: string[] = [];
+
+  // Regular @font-face for every uploaded weight
+  for (const w of weights) {
+    lines.push(
+      `@font-face {\n  font-family: '${family}';\n  font-style: normal;\n  font-weight: ${w};\n  font-display: swap;\n  src: url('${faceUrls[String(w)]}') format('woff2');\n}`,
+    );
+  }
+
+  // Bridge rules: "step-down fallback" for missing weights
+  const BRIDGES: Array<[number, number]> = [
+    [600, 500], // semibold  → medium (if 600 not uploaded)
+    [800, 700], // extrabold → bold   (if 800 not uploaded)
+  ];
+  for (const [missing, fallback] of BRIDGES) {
+    if (!weights.includes(missing) && weights.includes(fallback)) {
+      lines.push(
+        `/* DS: weight ${missing} → ${fallback} step-down fallback */\n@font-face {\n  font-family: '${family}';\n  font-style: normal;\n  font-weight: ${missing};\n  font-display: swap;\n  src: url('${faceUrls[String(fallback)]}') format('woff2');\n}`,
+      );
+    }
+  }
+
+  return lines.join('\n');
+}
+
 /** Apply all tokens to the document CSS variables */
 export function applyTokensToDocument(tokens: TokenState): void {
   if (typeof document === 'undefined') return;
@@ -344,4 +389,21 @@ export function applyTokensToDocument(tokens: TokenState): void {
 
   // 기존 --custom-font-family도 유지
   root.style.setProperty('--custom-font-family', fontEn || 'Geist');
+
+  // Inject @font-face for custom uploaded fonts (with step-down bridge rules)
+  const faceParts: string[] = [];
+  if (fontEn && Object.keys(tokens.primitives.fontFaceUrls ?? {}).length > 0) {
+    faceParts.push(generateFontFaceCSS(fontEn, tokens.primitives.fontFaceUrls));
+  }
+  if (fontKo && Object.keys(tokens.primitives.fontFaceUrlsKo ?? {}).length > 0) {
+    faceParts.push(generateFontFaceCSS(fontKo, tokens.primitives.fontFaceUrlsKo));
+  }
+  const prevFaceStyle = document.getElementById('ds-font-faces');
+  if (prevFaceStyle) prevFaceStyle.remove();
+  if (faceParts.length > 0) {
+    const styleEl = document.createElement('style');
+    styleEl.id = 'ds-font-faces';
+    styleEl.textContent = faceParts.join('\n');
+    document.head.appendChild(styleEl);
+  }
 }

@@ -1,4 +1,5 @@
 import { fetchAndResolveTokens } from "@/lib/resolve-tokens";
+import { generateFontFaceCSS } from "@/lib/tokens";
 import { createClient } from "@supabase/supabase-js";
 
 function getSupabase() {
@@ -87,7 +88,7 @@ export async function GET(
       });
     }
 
-    const { lightVars, darkVars, fontSansKoValue, fontFamily, fontFamilyKo } = resolved;
+    const { lightVars, darkVars, fontSansKoValue, fontFamily, fontFamilyKo, fontFaceUrls, fontFaceUrlsKo } = resolved;
 
     const indent = "  ";
 
@@ -106,6 +107,14 @@ export async function GET(
     css += `/* Edit at https://designsync-omega.vercel.app */\n\n`;
 
     if (fontFaceCSS) css += fontFaceCSS + "\n";
+
+    // Custom uploaded font @font-face with step-down bridge rules
+    if (fontFamily && Object.keys(fontFaceUrls).length > 0) {
+      css += generateFontFaceCSS(fontFamily, fontFaceUrls) + "\n";
+    }
+    if (fontFamilyKo && Object.keys(fontFaceUrlsKo).length > 0) {
+      css += generateFontFaceCSS(fontFamilyKo, fontFaceUrlsKo) + "\n";
+    }
 
     // @theme inline for Tailwind v4 font sizes/weights/shadows
     css += `@theme inline {\n`;

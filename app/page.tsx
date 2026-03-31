@@ -238,7 +238,22 @@ export default function Home() {
   // ── Font family ─────────────────────────────────────────────────
   // Set --custom-font-family (used by @theme inline --font-sans fallback chain)
   // AND set body.style.fontFamily directly for immediate effect on all children.
+  function handleFontFaceAdded(weight: number, url: string, isKo: boolean) {
+    setTokens((prev) => {
+      const key = isKo ? 'fontFaceUrlsKo' : 'fontFaceUrls';
+      return {
+        ...prev,
+        primitives: {
+          ...prev.primitives,
+          [key]: { ...(prev.primitives[key] ?? {}), [String(weight)]: url },
+        },
+      };
+    });
+  }
+
   function handleFontFamilyChange(font: string) {
+    // Clear uploaded face URLs when font family changes
+    setTokens((prev) => ({ ...prev, primitives: { ...prev.primitives, fontFaceUrls: {} } }));
     setSnapshots((prev) => [...prev.slice(-19), tokens]);
     const ko = tokens.primitives.fontFamilyKo;
     let stack = '';
@@ -264,7 +279,8 @@ export default function Home() {
   }
 
   function handleFontFamilyKoChange(font: string) {
-    setTokens((prev) => ({ ...prev, primitives: { ...prev.primitives, fontFamilyKo: font } }));
+    // Clear uploaded Ko face URLs when font family changes
+    setTokens((prev) => ({ ...prev, primitives: { ...prev.primitives, fontFamilyKo: font, fontFaceUrlsKo: {} } }));
     // 즉시 CSS 반영
     const en = tokens.primitives.fontFamily;
     let stack = '';
@@ -486,6 +502,7 @@ export default function Home() {
           onSemanticChange={handleSemanticChange}
           onFontFamilyChange={handleFontFamilyChange}
           onFontFamilyKoChange={handleFontFamilyKoChange}
+          onFontFaceAdded={handleFontFaceAdded}
           onIconLibraryChange={(lib: string) => setTokens((prev) => ({ ...prev, primitives: { ...prev.primitives, iconLibrary: lib } }))}
           onStylePresetChange={(preset: string) => setTokens((prev) => ({ ...prev, primitives: { ...prev.primitives, stylePreset: preset } }))}
           iconLibrary={tokens.primitives.iconLibrary}

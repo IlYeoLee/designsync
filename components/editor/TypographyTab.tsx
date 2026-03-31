@@ -14,6 +14,8 @@ interface TypographyTabProps {
   onFontFamilyChange: (font: string) => void;
   onFontFamilyKoChange: (font: string) => void;
   onFontUpload?: (fontName: string) => void;
+  /** Called each time a font weight file is uploaded; used to build @font-face bridge rules */
+  onFontFaceAdded?: (weight: number, url: string, isKo: boolean) => void;
 }
 
 /** Input that displays px value but stores/emits rem values */
@@ -89,7 +91,7 @@ function weightFromFilename(name: string): number {
   return m ? styleToWeight(m[1]) : 400;
 }
 
-export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFontFamilyKoChange, onFontUpload }: TypographyTabProps) {
+export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFontFamilyKoChange, onFontUpload, onFontFaceAdded }: TypographyTabProps) {
   const [fontSearch, setFontSearch] = React.useState("");
   const [localFonts, setLocalFonts] = React.useState<string[]>([]);
   const [localFontsLoading, setLocalFontsLoading] = React.useState(false);
@@ -167,7 +169,9 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
         formData.append("file", blob, `${fontName}.ttf`);
         formData.append("fontName", fontName);
         formData.append("fontWeight", String(weight));
-        await fetch("/api/font-upload", { method: "POST", body: formData });
+        const res = await fetch("/api/font-upload", { method: "POST", body: formData });
+        const data = await res.json().catch(() => null);
+        if (data?.cdnFontUrl && onFontFaceAdded) onFontFaceAdded(weight, data.cdnFontUrl, false);
       }
 
       setFontUploadStatus({ loading: false, font: fontName, result: { success: true } });
@@ -192,13 +196,16 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
     setStatus({ loading: true, font: fontName, result: null });
     fontChangeFn(fontName);
 
+    const isKoUpload = setStatus === setKoFontUploadStatus;
     for (const f of Array.from(files)) {
       const weight = weightFromFilename(f.name);
       const formData = new FormData();
       formData.append("file", f, f.name);
       formData.append("fontName", fontName);
       formData.append("fontWeight", String(weight));
-      await fetch("/api/font-upload", { method: "POST", body: formData });
+      const res = await fetch("/api/font-upload", { method: "POST", body: formData });
+      const data = await res.json().catch(() => null);
+      if (data?.cdnFontUrl && onFontFaceAdded) onFontFaceAdded(weight, data.cdnFontUrl, isKoUpload);
     }
 
     setStatus({ loading: false, font: fontName, result: { success: true } });
@@ -231,7 +238,9 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
         formData.append("file", blob, `${fontName}.ttf`);
         formData.append("fontName", fontName);
         formData.append("fontWeight", String(weight));
-        await fetch("/api/font-upload", { method: "POST", body: formData });
+        const res = await fetch("/api/font-upload", { method: "POST", body: formData });
+        const data = await res.json().catch(() => null);
+        if (data?.cdnFontUrl && onFontFaceAdded) onFontFaceAdded(weight, data.cdnFontUrl, true);
       }
       setKoFontUploadStatus({ loading: false, font: fontName, result: { success: true } });
       if (onFontUpload) onFontUpload(fontName);

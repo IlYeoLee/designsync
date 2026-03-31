@@ -33,6 +33,9 @@ export type ResolvedTokens = {
   fontSansKoValue: string;
   iconLibrary: string;
   stylePreset: string;
+  /** Uploaded custom font face URLs: weight → CDN URL */
+  fontFaceUrls: Record<string, string>;
+  fontFaceUrlsKo: Record<string, string>;
 };
 
 export async function fetchAndResolveTokens(
@@ -261,5 +264,7 @@ export async function fetchAndResolveTokens(
     fontSansKoValue,
     iconLibrary: data.icon_library || "lucide",
     stylePreset: presetId,
+    fontFaceUrls: (tokens.primitives?.fontFaceUrls ?? {}) as Record<string, string>,
+    fontFaceUrlsKo: (tokens.primitives?.fontFaceUrlsKo ?? {}) as Record<string, string>,
   };
 }
