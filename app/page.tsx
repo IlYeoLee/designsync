@@ -306,10 +306,11 @@ export default function Home() {
     const snapshot = snapshots[snapshots.length - 1];
     if (!snapshot) return;
     setSnapshots((prev) => prev.slice(0, -1));
-    setTokens(snapshot);
+    const normalized = normalizeTokens(snapshot);
+    setTokens(normalized);
 
     // Re-apply primitive tokens
-    applyTokensToDocument(snapshot);
+    applyTokensToDocument(normalized);
 
     // Re-apply font family
     document.documentElement.style.setProperty("--custom-font-family", snapshot.primitives.fontFamily);
