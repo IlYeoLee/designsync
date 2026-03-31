@@ -39,10 +39,11 @@ function toVarName(key: string): string {
   return SHADCN_TOKENS.has(key) ? `ds-${key}` : key;
 }
 
-async function buildFontFaceCSS(fontNames: string[]): Promise<string> {
+async function buildFontFaceCSS(fontNames: string[]): Promise<{ imports: string; fontFaces: string }> {
   const supabase = getSupabase();
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  let css = "";
+  let imports = "";
+  let fontFaces = "";
 
   for (const fontName of fontNames) {
     if (!fontName || fontName === "Geist") continue;
@@ -50,14 +51,13 @@ async function buildFontFaceCSS(fontNames: string[]): Promise<string> {
 
     const cdnUrl = FONT_CDN[fontSlug];
     if (cdnUrl) {
-      css += `@import url("${cdnUrl}");\n`;
+      imports += `@import url("${cdnUrl}");\n`;
       continue;
     }
 
     // List all files matching this font slug
     const { data: allFiles } = await supabase.storage.from(STORAGE_BUCKET).list("", { search: fontSlug });
     if (allFiles && allFiles.length > 0) {
-      // Match files like: fontslug-400.ttf, fontslug-700.woff2, etc.
       const weightFileRe = new RegExp(`^${fontSlug}-(\\d+)\\.(woff2|woff|ttf|otf)$`);
       const matched = allFiles
         .map((f) => { const m = f.name.match(weightFileRe); return m ? { name: f.name, weight: parseInt(m[1], 10), ext: m[2] } : null; })
@@ -67,18 +67,15 @@ async function buildFontFaceCSS(fontNames: string[]): Promise<string> {
         const { name, weight, ext } = matched[i];
         const format = ext === "ttf" ? "truetype" : ext === "otf" ? "opentype" : ext;
         const url = `${supabaseUrl}/storage/v1/object/public/${STORAGE_BUCKET}/${name}`;
-        // Use a weight range so the browser uses this file for weights between
-        // the previous upload and this one (avoids synthetic bold when CSS requests
-        // a weight like 300 that wasn't uploaded but 400 was).
         const lower = i === 0 ? 1 : matched[i - 1].weight + 1;
         const upper = i === matched.length - 1 ? 1000 : weight;
         const weightDescriptor = lower === upper ? `${weight}` : `${lower} ${upper}`;
-        css += `@font-face {\n  font-family: '${fontName}';\n  src: url('${url}') format('${format}');\n  font-weight: ${weightDescriptor};\n  font-display: swap;\n}\n`;
+        fontFaces += `@font-face {\n  font-family: '${fontName}';\n  src: url('${url}') format('${format}');\n  font-weight: ${weightDescriptor};\n  font-display: swap;\n}\n`;
       }
     }
   }
 
-  return css;
+  return { imports, fontFaces };
 }
 
 export async function GET(
@@ -108,12 +105,16 @@ export async function GET(
     }
 
     const fontNames = [fontFamily, fontFamilyKo].filter(Boolean);
-    const fontFaceCSS = await buildFontFaceCSS(fontNames);
+    const { imports, fontFaces } = await buildFontFaceCSS(fontNames);
 
-    let css = `/* DesignSync — Live design tokens for "${slug}" */\n`;
+    // @import must come first per CSS spec
+    let css = "";
+    if (imports) css += imports + "\n";
+
+    css += `/* DesignSync — Live design tokens for "${slug}" */\n`;
     css += `/* Edit at https://designsync-omega.vercel.app */\n\n`;
 
-    if (fontFaceCSS) css += fontFaceCSS + "\n";
+    if (fontFaces) css += fontFaces + "\n";
 
     // Custom uploaded font @font-face with step-down bridge rules
     if (fontFamily && Object.keys(fontFaceUrls).length > 0) {
@@ -122,32 +123,6 @@ export async function GET(
     if (fontFamilyKo && Object.keys(fontFaceUrlsKo).length > 0) {
       css += generateFontFaceCSS(fontFamilyKo, fontFaceUrlsKo) + "\n";
     }
-
-    // @theme inline for Tailwind v4 font sizes/weights/shadows
-    css += `@theme inline {\n`;
-    for (const k of ["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl"]) {
-      if (lightVars[`font-size-${k}`]) {
-        css += `${indent}--text-${k}: var(--font-size-${k}, ${lightVars[`font-size-${k}`]});\n`;
-      }
-    }
-    for (const k of ["normal", "medium", "semibold", "bold", "extrabold"]) {
-      if (lightVars[`font-weight-${k}`]) {
-        css += `${indent}--font-weight-${k}: var(--font-weight-${k});\n`;
-      }
-    }
-    for (const k of ["tight", "normal", "relaxed", "loose"]) {
-      if (lightVars[`line-height-${k}`]) {
-        css += `${indent}--leading-${k}: var(--line-height-${k}, ${lightVars[`line-height-${k}`]});\n`;
-      }
-    }
-    for (const level of ["sm", "md", "lg"]) {
-      if (lightVars[`ds-shadow-${level}`]) {
-        css += `${indent}--shadow-${level}: var(--ds-shadow-${level});\n`;
-      }
-    }
-    // Map DS font to Tailwind's --font-sans
-    css += `${indent}--font-sans: var(--ds-font-sans);\n`;
-    css += `}\n\n`;
 
     // :root — DS-prefixed semantic tokens + primitive tokens
     css += `:root {\n${varsBlock(lightVars)}\n}\n\n`;
