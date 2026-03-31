@@ -234,8 +234,12 @@ export const DEFAULT_TOKENS: TokenState = {
 /** Normalize tokens loaded from Supabase — Supabase may return numeric fontWeight values */
 export function normalizeTokens(tokens: TokenState): TokenState {
   const t = JSON.parse(JSON.stringify(tokens)) as TokenState;
-  for (const key of Object.keys(t.primitives.fontWeight) as Array<keyof typeof t.primitives.fontWeight>) {
+  for (const key of Object.keys(t.primitives.fontWeight ?? {}) as Array<keyof typeof t.primitives.fontWeight>) {
     t.primitives.fontWeight[key] = String(t.primitives.fontWeight[key]);
+  }
+  // Backfill primitive scales missing from older snapshots (e.g. info added after warning merge)
+  if (!t.primitives.info) {
+    t.primitives.info = { ...DEFAULT_TOKENS.primitives.info };
   }
   // Backfill semantic keys missing from older Supabase snapshots
   for (const key of Object.keys(DEFAULT_TOKENS.semantic.light)) {
@@ -306,7 +310,8 @@ export function applyTokensToDocument(tokens: TokenState): void {
   ];
 
   for (const [key, prefix] of colorScales) {
-    const scale = tokens.primitives[key] as ColorScale;
+    const scale = tokens.primitives[key] as ColorScale | undefined;
+    if (!scale) continue;
     for (const [step, value] of Object.entries(scale)) {
       root.style.setProperty(`--${prefix}-${step}`, value);
     }
