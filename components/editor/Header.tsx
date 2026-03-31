@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { getIconMap } from "@/lib/icon-map";
+import { generateRules } from "@/lib/rules";
 import {
   Header as HeaderRoot,
   HeaderActions,
@@ -53,12 +54,23 @@ export function EditorHeader({
       return;
     }
 
-    const installCmd = dsSlug
-      ? `DESIGNSYNC_SLUG=${dsSlug} npm install github:IlYeoLee/designsync-ui && node node_modules/@ilyeolee/designsync-ui/designsync-migrate.mjs src`
-      : `npm install github:IlYeoLee/designsync-ui && node node_modules/@ilyeolee/designsync-ui/designsync-migrate.mjs src`;
+    const fontSansValue = fontFamilyKo && fontFamily && fontFamily !== "Geist"
+      ? `'${fontFamily}', '${fontFamilyKo}', sans-serif`
+      : fontFamilyKo ? `'${fontFamilyKo}', sans-serif`
+      : fontFamily && fontFamily !== "Geist" ? `'${fontFamily}', sans-serif`
+      : "";
+
+    const prompt = generateRules({
+      fontFamily,
+      fontFamilyKo,
+      fontSansValue,
+      iconLibrary,
+      dsSlug,
+      includeInstall: true,
+    });
 
     try {
-      await navigator.clipboard.writeText(installCmd);
+      await navigator.clipboard.writeText(prompt);
       setCopyState("copied");
       setTimeout(() => setCopyState("idle"), 3000);
     } catch {
