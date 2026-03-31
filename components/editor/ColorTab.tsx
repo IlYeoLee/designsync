@@ -150,6 +150,7 @@ interface ColorTabProps {
   onBatchChange: (changes: { variable: string; value: string }[]) => void;
   onSemanticChange: (mode: "light" | "dark", key: string, value: string) => void;
   iconLibrary: string;
+  isDark: boolean;
 }
 
 /** Custom dropdown for semantic token with color swatches */
@@ -340,7 +341,7 @@ function NeutralPresetSelector({
   );
 }
 
-export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChange, iconLibrary }: ColorTabProps) {
+export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChange, iconLibrary, isDark }: ColorTabProps) {
   const icons = getIconMap(iconLibrary);
   const [mounted, setMounted] = React.useState(false);
   const [activeColor, setActiveColor] = React.useState<{ scale: ColorScaleName; step: string } | null>(null);
@@ -351,12 +352,17 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
     brand: "#000000", neutral: "#808080", error: "#e03030", success: "#20a020", warning: "#e08000",
   });
   const [openScalePicker, setOpenScalePicker] = React.useState<ColorScaleName | null>(null);
-  const [semanticMode, setSemanticMode] = React.useState<"light" | "dark">("light");
+  const [semanticMode, setSemanticMode] = React.useState<"light" | "dark">(isDark ? "dark" : "light");
   const [semanticOpen, setSemanticOpen] = React.useState(false);
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
+
+  // 헤더 다크모드 토글과 시맨틱 편집 모드 동기화
+  React.useEffect(() => {
+    setSemanticMode(isDark ? "dark" : "light");
+  }, [isDark]);
 
   // Close color picker popup when clicking outside the color grid area
   React.useEffect(() => {

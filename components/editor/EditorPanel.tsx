@@ -22,6 +22,7 @@ interface EditorPanelProps {
   onStylePresetChange: (preset: string) => void;
   iconLibrary: string;
   history: HistoryEntry[];
+  isDark: boolean;
 }
 
 export function EditorPanel({
@@ -35,6 +36,7 @@ export function EditorPanel({
   onStylePresetChange,
   iconLibrary,
   history,
+  isDark,
 }: EditorPanelProps) {
   const icons = getIconMap(iconLibrary);
   const [activeTab, setActiveTab] = React.useState<Tab>("colors");
@@ -74,6 +76,7 @@ export function EditorPanel({
               onBatchChange={onBatchChange}
               onSemanticChange={onSemanticChange}
               iconLibrary={iconLibrary}
+              isDark={isDark}
             />
           </TabsContent>
           <TabsContent value="typography">

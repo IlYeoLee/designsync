@@ -490,6 +490,7 @@ export default function Home() {
           onStylePresetChange={(preset: string) => setTokens((prev) => ({ ...prev, primitives: { ...prev.primitives, stylePreset: preset } }))}
           iconLibrary={tokens.primitives.iconLibrary}
           history={history.slice(0, 3)}
+          isDark={isDark}
         />
         <PreviewPanel iconLibrary={tokens.primitives.iconLibrary} />
       </div>
