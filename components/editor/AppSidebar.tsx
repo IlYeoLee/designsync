@@ -115,6 +115,17 @@ export function AppSidebar({
       .slice(0, 40) + "-" + Date.now().toString(36);
   }
 
+  /** 기존 이름 목록에서 충돌 없는 복제 이름 생성 */
+  function deduplicateName(base: string): string {
+    const existing = new Set(designSystems.map((ds) => ds.name));
+    if (!existing.has(base)) return base;
+    for (let i = 2; i <= 100; i++) {
+      const candidate = `${base} ${i}`;
+      if (!existing.has(candidate)) return candidate;
+    }
+    return `${base} ${Date.now().toString(36)}`;
+  }
+
   async function handleCreate() {
     if (!newName.trim()) return;
     setCreating(true);
@@ -122,21 +133,23 @@ export function AppSidebar({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setCreating(false); return; }
 
-    const sourceTokens = cloneFrom
-      ? designSystems.find((ds) => ds.id === cloneFrom)?.tokens ?? DEFAULT_TOKENS
-      : DEFAULT_TOKENS;
+    const source = cloneFrom
+      ? designSystems.find((ds) => ds.id === cloneFrom)
+      : null;
 
     const slug = generateSlug(newName);
+    const finalName = deduplicateName(newName.trim());
 
     const { data, error } = await supabase
       .from("design_systems")
       .insert({
         user_id: user.id,
-        name: newName.trim(),
+        name: finalName,
         slug,
-        tokens: sourceTokens,
-        icon_library: "lucide",
-        style_preset: "vega",
+        tokens: source?.tokens ?? DEFAULT_TOKENS,
+        icon_library: source?.icon_library ?? "lucide",
+        style_preset: source?.style_preset ?? "vega",
+        default_mode: source?.default_mode ?? null,
       })
       .select()
       .single();
@@ -296,7 +309,7 @@ export function AppSidebar({
                           <DropdownMenuItem onClick={() => { setRenameTarget(ds); setRenameName(ds.name); }}>
                             <icons.edit className="w-3.5 h-3.5 mr-2" /> 이름 변경
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => { setCloneFrom(ds.id); setNewName(`${ds.name} (사본)`); setCreateOpen(true); }}>
+                          <DropdownMenuItem onClick={() => { setCloneFrom(ds.id); setNewName(deduplicateName(`${ds.name} (사본)`)); setCreateOpen(true); }}>
                             <icons.copy className="w-3.5 h-3.5 mr-2" /> 복제
                           </DropdownMenuItem>
                           {ds.github_repo ? (
