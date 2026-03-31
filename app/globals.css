@@ -173,7 +173,21 @@
   /* --custom-font-family is set by JS; falls back to Geist */
   --font-sans: var(--custom-font-family, var(--font-geist-sans));
   --font-mono: var(--font-geist-mono);
-  /* font-size, line-height, font-weight are in a separate @theme block below */
+  /* Font sizes — var() refs preserved in utility classes so runtime overrides propagate */
+  --text-xs: var(--font-size-xs);
+  --text-sm: var(--font-size-sm);
+  --text-base: var(--font-size-base);
+  --text-lg: var(--font-size-lg);
+  --text-xl: var(--font-size-xl);
+  --text-2xl: var(--font-size-2xl);
+  --text-3xl: var(--font-size-3xl);
+  --text-4xl: var(--font-size-4xl);
+  /* Leading */
+  --leading-tight: var(--line-height-tight);
+  --leading-snug: var(--line-height-snug, 1.375);
+  --leading-normal: var(--line-height-normal);
+  --leading-relaxed: var(--line-height-relaxed, 1.625);
+  --leading-loose: var(--line-height-loose);
   --shadow-sm: var(--ds-shadow-sm);
   --shadow-md: var(--ds-shadow-md);
   --shadow-lg: var(--ds-shadow-lg);
@@ -214,28 +228,6 @@
   --spacing: var(--spacing-1);
 }
 
-/* ── Typography: @theme (non-inline) so utilities use var() references ──────
-   @theme inline bakes values at build time; non-inline keeps them as
-   var() references → runtime applyTokensToDocument changes propagate.       */
-@theme {
-  --text-xs: var(--font-size-xs);
-  --text-sm: var(--font-size-sm);
-  --text-base: var(--font-size-base);
-  --text-lg: var(--font-size-lg);
-  --text-xl: var(--font-size-xl);
-  --text-2xl: var(--font-size-2xl);
-  --text-3xl: var(--font-size-3xl);
-  --text-4xl: var(--font-size-4xl);
-  --text-5xl: var(--font-size-5xl);
-  --leading-tight: var(--line-height-tight);
-  --leading-snug: var(--line-height-snug, 1.375);
-  --leading-normal: var(--line-height-normal);
-  --leading-relaxed: var(--line-height-relaxed, 1.625);
-  --leading-loose: var(--line-height-loose);
-  /* font-weight: Tailwind's built-in --font-weight-* vars are already correct
-     (400/500/600/700/800). applyTokensToDocument overrides them at runtime.
-     No mapping needed here — avoids circular self-reference. */
-}
 
 /* ============================================================
    LAYER 1: PRIMITIVE TOKENS
