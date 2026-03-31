@@ -94,10 +94,39 @@ ${tokensCssUrl ? `
 
 ${installSection}## ${n}. 디자인 토큰
 
+### 테두리·선 토큰 (자주 혼동 — 반드시 구분해서 사용)
+| 토큰 | 용도 | 사용 클래스 예시 |
+|---|---|---|
+| border | 일반 UI 테두리 (chip, toggle, table, card 외곽 등) | border-border |
+| card-border | 카드·패널 전용 테두리 (transparent 설정으로 테두리 없애고 면으로만 구분 가능) | border-[color:var(--card-border)] |
+| input | 폼 요소 테두리 (Input, Select, Textarea, Checkbox 등) | border-input |
+| divider | 섹션 구분선 (Separator 컴포넌트) | bg-[color:var(--divider)] |
+| ring | 포커스 링 색 (focus-visible 상태) | focus-visible:ring-ring/50 |
+| error-border | 오류 상태 테두리 | border-[color:var(--error-border)] |
+| success-border | 성공 상태 테두리 | border-[color:var(--success-border)] |
+| warning-border | 경고 상태 테두리 | border-[color:var(--warning-border)] |
+
+❌ 절대 금지: border-gray-200, border-zinc-300 등 하드코딩 색상으로 테두리 → 반드시 위 토큰 사용
+
 ### 색상
-${fontSection}- 시맨틱 색상: var(--primary), var(--secondary), var(--accent), var(--destructive), var(--muted), var(--background), var(--foreground), var(--border), var(--input), var(--ring), var(--card), var(--popover) 및 각 -foreground
-- 사이드바 색상: var(--sidebar), var(--sidebar-foreground), var(--sidebar-primary), var(--sidebar-accent), var(--sidebar-border), var(--sidebar-ring) 및 각 -foreground
+${fontSection}- **surface 위계 (반드시 지킴)**: background(페이지 배경) < card(카드·컴포넌트) < popover(드롭다운·모달·시트)
+  - 페이지 배경: bg-background
+  - 카드·패널·인풋영역: bg-card
+  - 드롭다운·팝오버·다이얼로그·시트·드로어: bg-popover
+- 주요 시맨틱 색상:
+  - primary/primary-foreground — 주 액션 버튼, 브랜드 강조
+  - secondary/secondary-foreground — 2차 액션, 흐린 배경 영역
+  - accent/accent-foreground — hover 상태 하이라이트
+  - selected/selected-foreground — 선택된 항목 배경 (nav active, list selection)
+  - muted/muted-foreground — 비활성·설명 텍스트, 흐린 배경
+  - destructive/destructive-foreground — 삭제·오류 액션 버튼
+  - success/success-foreground — 성공 상태 배경·텍스트
+  - warning/warning-foreground — 경고 상태 배경·텍스트
+  - info/info-foreground — 정보 상태 배경·텍스트
+  - icon/icon-muted — 아이콘 색 (기본/비활성)
+  - divider — 섹션 구분선
 - 차트 색상: var(--chart-1) ~ var(--chart-5) — 차트/그래프에서 사용
+- 사이드바 색상 (⚠️ 수동 적용 필요): var(--sidebar), var(--sidebar-foreground), var(--sidebar-primary), var(--sidebar-accent), var(--sidebar-border), var(--sidebar-ring)
 - 프리미티브 색상 스케일: --{brand|neutral|error|success|warning}-{50|100|200|300|400|500|600|700|800|900}
   - 시맨틱 토큰으로 부족할 때만 프리미티브 참조 (예: bg-[var(--success-100)], text-[var(--error-600)])
 
@@ -270,12 +299,28 @@ const chartConfig = { revenue: { label: "매출", color: "var(--chart-1)" }, use
 - ❌ \`text-2xl font-bold\`, \`text-xl font-semibold\` 등 직접 조합 금지 → Typography 컴포넌트 사용
 
 **레이아웃 — 반드시 DesignSync 컴포넌트:**
-- ❌ 커스텀 \`<aside>\` 금지 → 반드시 \`<Sidebar>\` + \`<SidebarHeader>\` + \`<SidebarContent>\` + \`<SidebarMenu>\` + \`<SidebarMenuItem>\` + \`<SidebarMenuButton>\` + \`<SidebarFooter>\` 사용
 - ❌ 커스텀 \`<header>\` 금지 → 반드시 \`<Header>\`(또는 동일한 \`<NavBar>\`) + \`<HeaderLogo>\` + \`<HeaderNav>\` + \`<HeaderNavLink>\` + \`<HeaderActions>\` 사용 (Header=NavBar, HeaderLogo=NavBarLogo 등 두 이름 모두 동일)
 - ❌ 커스텀 \`<nav>\` 금지 → \`<NavigationMenu>\` 또는 \`<Menubar>\` 사용
 - ❌ 커스텀 모달 div 금지 → \`<Dialog>\` 또는 \`<Sheet>\` 사용
 - ❌ 커스텀 드롭다운 div 금지 → \`<DropdownMenu>\` 사용
 - ❌ 커스텀 스크롤 영역 금지 → \`<ScrollArea>\` 사용
+- ⚠️ \`<Sidebar>\` 관련 토큰(sidebar-*)은 자동 마이그레이션되지 않으므로 수동으로 적용할 것
+
+**카드/패널 — 자주 틀리는 부분:**
+- 카드 컴포넌트: 반드시 \`<Card>\`+\`<CardHeader>\`+\`<CardContent>\`+\`<CardFooter>\` 사용 — 배경은 bg-card 자동 적용
+- ❌ 카드를 div + bg-white/bg-gray-50/bg-zinc-900으로 구현 금지
+- 카드 테두리 색은 card-border 토큰으로 제어됨 (border 토큰과 별개) — 직접 지정 금지
+
+**알림 상태 표시 — variant 필수:**
+- 에러 알림: \`<Alert variant="destructive">\` — 빨간 배경, error-border 테두리
+- 성공 알림: \`<Alert variant="success">\` — 초록 배경, success-border 테두리
+- 경고 알림: \`<Alert variant="warning">\` — 노란 배경, warning-border 테두리
+- 정보 알림: \`<Alert variant="info">\` — 브랜드 배경
+- ❌ 알림에 bg-red-50, bg-green-100 등 하드코딩 색상 금지 → 반드시 variant 사용
+
+**내비게이션 active 상태:**
+- active 링크: \`active\` prop 전달 → selected/selected-foreground 토큰 자동 적용
+- ❌ active 상태에 bg-blue-100, text-blue-700 등 직접 지정 금지
 
 **기타 필수 규칙:**
 - Button 크기는 반드시 size prop ("sm" | "default" | "lg" | "icon") — className으로 h-12, px-8 등 금지
@@ -287,13 +332,16 @@ const chartConfig = { revenue: { label: "매출", color: "var(--chart-1)" }, use
 
 ### 커스텀 UI 만들 때 (DesignSync에 없는 컴포넌트)
 DesignSync에 해당 컴포넌트가 없더라도 아래 파운데이션 토큰은 **절대적으로** 지켜야 한다:
-- 배경색: bg-background, bg-card, bg-muted, bg-primary, bg-secondary, bg-accent 중 선택
+- 배경색: surface 위계에 맞게 — bg-background(페이지), bg-card(패널), bg-popover(드롭다운/오버레이) 중 선택
 - 텍스트색: text-foreground, text-muted-foreground 등 시맨틱 색상만
-- 테두리: border-border
-- 둥글기: rounded-sm ~ rounded-xl (토큰 radius)
-- 폰트 크기/굵기/줄간격: 반드시 토큰 값 사용
+- 테두리: border-border (일반), border-input (폼), border-[color:var(--card-border)] (카드), border-[color:var(--error-border)] (오류) 등 목적별 구분
+- 구분선: bg-[color:var(--divider)] (border-t 직접 사용 금지)
+- 선택 상태: bg-[color:var(--selected)] text-[color:var(--selected-foreground)]
+- 아이콘: text-[color:var(--icon)] (기본), text-[color:var(--icon-muted)] (비활성)
+- 둥글기: rounded-[var(--ds-button-radius)] / rounded-[var(--ds-element-radius)] / rounded-[var(--ds-input-radius)] / rounded-[var(--ds-card-radius)] 중 용도에 맞게
 - 그림자: shadow-sm, shadow-md, shadow-lg
-- 호버/포커스 상태: hover:bg-accent, focus-visible:ring-ring/50 등 토큰 기반
+- 호버 상태: hover:bg-accent hover:text-accent-foreground
+- 포커스 상태: focus-visible:border-ring focus-visible:ring-ring/50
 - 색상이 정말 필요하면 CSS 변수 참조: bg-[var(--brand-500)], text-[var(--success-600)] 등 프리미티브 토큰 (Tailwind arbitrary value 허용)
 
 ### 다크 모드
