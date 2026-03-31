@@ -269,6 +269,29 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
   const fontWeightKeys = ["normal", "medium", "semibold", "bold", "extrabold"] as const;
   const lineHeightKeys = ["tight", "normal", "loose"] as const;
 
+  const FONT_SIZE_ROLE: Record<string, string> = {
+    xs:   "캡션",
+    sm:   "설명",
+    base: "본문",
+    lg:   "소본문",
+    xl:   "소제목",
+    "2xl": "제목",
+    "3xl": "대제목",
+    "4xl": "디스플레이",
+  };
+  const FONT_WEIGHT_ROLE: Record<string, string> = {
+    normal:    "본문",
+    medium:    "강조본문",
+    semibold:  "소제목",
+    bold:      "제목",
+    extrabold: "강한강조",
+  };
+  const LINE_HEIGHT_ROLE: Record<string, string> = {
+    tight:  "제목",
+    normal: "본문",
+    loose:  "긴 글",
+  };
+
   return (
     <div className="flex flex-col gap-[var(--ds-section-gap)] p-[var(--ds-card-padding)]">
       {/* English Font */}
@@ -490,80 +513,117 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
       <div>
         <p className="text-xs font-medium text-foreground mb-1">글자 크기</p>
         <p className="text-[10px] text-muted-foreground mb-[var(--ds-internal-gap)]">px 단위로 표시 (rem으로 저장)</p>
-        <div className="flex flex-col gap-[var(--ds-internal-gap)]">
-          {fontSizeKeys.map((key) => (
-            <div key={key} className="flex items-center gap-[var(--ds-section-gap)]">
-              <span className="text-xs text-muted-foreground w-8 font-mono">{key}</span>
-              <Slider
-                min={8}
-                max={48}
-                step={1}
-                value={[Math.round(parseFloat(tokens.primitives.fontSize[key]) * 16)]}
-                onValueChange={(vals) => onTokenChange(`--font-size-${key}`, `${(vals[0] / 16).toFixed(4)}rem`)}
-                className="flex-1"
-              />
-              <RemPxInput
-                value={tokens.primitives.fontSize[key]}
-                onChange={(v) => onTokenChange(`--font-size-${key}`, v)}
-                min={0.5}
-                max={3}
-              />
-            </div>
-          ))}
+        <div className="flex flex-col gap-2">
+          {fontSizeKeys.map((key) => {
+            const pxVal = Math.round(parseFloat(tokens.primitives.fontSize[key]) * 16);
+            return (
+              <div key={key} className="flex flex-col gap-0.5">
+                {/* preview text — renders at actual token size */}
+                <div className="flex items-baseline gap-1.5 overflow-hidden">
+                  <span
+                    className="text-foreground font-medium leading-none truncate"
+                    style={{ fontSize: tokens.primitives.fontSize[key] }}
+                  >
+                    가나다 Aa
+                  </span>
+                  <span className="text-[10px] text-muted-foreground shrink-0 font-mono">
+                    {key} · {FONT_SIZE_ROLE[key]} · {pxVal}px
+                  </span>
+                </div>
+                <div className="flex items-center gap-[var(--ds-section-gap)]">
+                  <Slider
+                    min={8}
+                    max={72}
+                    step={1}
+                    value={[pxVal]}
+                    onValueChange={(vals) => onTokenChange(`--font-size-${key}`, `${(vals[0] / 16).toFixed(4)}rem`)}
+                    className="flex-1"
+                  />
+                  <RemPxInput
+                    value={tokens.primitives.fontSize[key]}
+                    onChange={(v) => onTokenChange(`--font-size-${key}`, v)}
+                    min={0.5}
+                    max={4.5}
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
       {/* Font Weight */}
       <div>
         <p className="text-xs font-medium text-foreground mb-[var(--ds-internal-gap)]">글자 굵기</p>
-        <div className="flex flex-col gap-[var(--ds-internal-gap)]">
-          {fontWeightKeys.map((key) => (
-            <div key={key} className="flex items-center gap-[var(--ds-section-gap)]">
-              <span className="text-xs text-muted-foreground w-12">{key}</span>
-              <NativeSelect
-                size="sm"
-                value={tokens.primitives.fontWeight[key]}
-                onChange={(e) => onTokenChange(`--font-weight-${key}`, e.target.value)}
-                className="flex-1"
-              >
-                {[100, 200, 300, 400, 500, 600, 700, 800, 900].map((w) => (
-                  <option key={w} value={String(w)}>{w}</option>
-                ))}
-              </NativeSelect>
-            </div>
-          ))}
+        <div className="flex flex-col gap-2">
+          {fontWeightKeys.map((key) => {
+            const w = parseInt(tokens.primitives.fontWeight[key]);
+            return (
+              <div key={key} className="flex flex-col gap-0.5">
+                <div className="flex items-baseline gap-1.5">
+                  <span
+                    className="text-foreground leading-none"
+                    style={{ fontSize: tokens.primitives.fontSize.base, fontWeight: w }}
+                  >
+                    가나다 Aa
+                  </span>
+                  <span className="text-[10px] text-muted-foreground font-mono">
+                    {key} · {FONT_WEIGHT_ROLE[key]} · {w}
+                  </span>
+                </div>
+                <NativeSelect
+                  size="sm"
+                  value={tokens.primitives.fontWeight[key]}
+                  onChange={(e) => onTokenChange(`--font-weight-${key}`, e.target.value)}
+                  className="w-full"
+                >
+                  {[100, 200, 300, 400, 500, 600, 700, 800, 900].map((wv) => (
+                    <option key={wv} value={String(wv)}>{wv}</option>
+                  ))}
+                </NativeSelect>
+              </div>
+            );
+          })}
         </div>
       </div>
 
       {/* Line Height */}
       <div>
         <p className="text-xs font-medium text-foreground mb-[var(--ds-internal-gap)]">줄 간격</p>
-        <div className="flex flex-col gap-[var(--ds-internal-gap)]">
-          {lineHeightKeys.map((key) => (
-            <div key={key} className="flex items-center gap-[var(--ds-section-gap)]">
-              <span className="text-xs text-muted-foreground w-12">{key}</span>
-              <Slider
-                min={100}
-                max={250}
-                step={5}
-                value={[Math.round(parseFloat(tokens.primitives.lineHeight[key]) * 100)]}
-                onValueChange={(vals) => onTokenChange(`--line-height-${key}`, String(vals[0] / 100))}
-                className="flex-1"
-              />
-              {/* Line height is unitless — show as plain number, fixed 2 decimals */}
-              <div className="flex items-center h-7 rounded-[var(--ds-element-radius)] border border-input bg-background overflow-hidden focus-within:ring-1 focus-within:ring-ring">
-                <input
-                  type="number"
-                  min={1}
-                  max={2.5}
-                  step={0.05}
-                  value={parseFloat(tokens.primitives.lineHeight[key])}
-                  onChange={(e) => onTokenChange(`--line-height-${key}`, e.target.value)}
-                  className="w-12 h-full text-xs px-1.5 bg-transparent font-mono text-right focus:outline-none"
-                />
+        <div className="flex flex-col gap-2">
+          {lineHeightKeys.map((key) => {
+            const lh = parseFloat(tokens.primitives.lineHeight[key]);
+            return (
+              <div key={key} className="flex flex-col gap-0.5">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-[10px] text-muted-foreground font-mono">
+                    {key} · {LINE_HEIGHT_ROLE[key]} · {lh.toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-[var(--ds-section-gap)]">
+                  <Slider
+                    min={100}
+                    max={250}
+                    step={5}
+                    value={[Math.round(lh * 100)]}
+                    onValueChange={(vals) => onTokenChange(`--line-height-${key}`, String(vals[0] / 100))}
+                    className="flex-1"
+                  />
+                  <div className="flex items-center h-7 rounded-[var(--ds-element-radius)] border border-input bg-background overflow-hidden focus-within:ring-1 focus-within:ring-ring">
+                    <input
+                      type="number"
+                      min={1}
+                      max={2.5}
+                      step={0.05}
+                      value={lh}
+                      onChange={(e) => onTokenChange(`--line-height-${key}`, e.target.value)}
+                      className="w-12 h-full text-xs px-1.5 bg-transparent font-mono text-right focus:outline-none"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
