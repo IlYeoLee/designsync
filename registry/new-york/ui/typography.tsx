@@ -24,7 +24,7 @@ function TypographyH2({
   return (
     <h2
       className={cn(
-        "scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0",
+        "scroll-m-20 border-b border-border pb-2 text-3xl font-semibold tracking-tight first:mt-0",
         className
       )}
       {...props}
@@ -80,7 +80,7 @@ function TypographyBlockquote({
 }: React.ComponentProps<"blockquote">) {
   return (
     <blockquote
-      className={cn("mt-6 border-l-2 pl-6 italic", className)}
+      className={cn("mt-6 border-l-2 border-border pl-6 italic", className)}
       {...props}
     />
   )
@@ -169,7 +169,7 @@ function TypographyTr({
 }: React.ComponentProps<"tr">) {
   return (
     <tr
-      className={cn("m-0 border-t p-0 even:bg-muted", className)}
+      className={cn("m-0 border-t border-border p-0 even:bg-muted", className)}
       {...props}
     />
   )
@@ -182,7 +182,7 @@ function TypographyTh({
   return (
     <th
       className={cn(
-        "border px-[var(--ds-card-padding)] py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right",
+        "border border-border px-[var(--ds-card-padding)] py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right",
         className
       )}
       {...props}
@@ -197,7 +197,7 @@ function TypographyTd({
   return (
     <td
       className={cn(
-        "border px-[var(--ds-card-padding)] py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right",
+        "border border-border px-[var(--ds-card-padding)] py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right",
         className
       )}
       {...props}

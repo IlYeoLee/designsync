@@ -4,9 +4,13 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const spinnerVariants = cva(
-  "animate-spin text-muted-foreground",
+  "animate-spin",
   {
     variants: {
+      variant: {
+        default: "text-primary",
+        muted: "text-muted-foreground",
+      },
       size: {
         default: "size-4",
         sm: "size-3",
@@ -15,6 +19,7 @@ const spinnerVariants = cva(
       },
     },
     defaultVariants: {
+      variant: "default",
       size: "default",
     },
   }
@@ -22,6 +27,7 @@ const spinnerVariants = cva(
 
 function Spinner({
   className,
+  variant,
   size,
   ...props
 }: React.ComponentProps<"svg"> & VariantProps<typeof spinnerVariants>) {
@@ -31,7 +37,7 @@ function Spinner({
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
-      className={cn(spinnerVariants({ size, className }))}
+      className={cn(spinnerVariants({ variant, size, className }))}
       {...props}
     >
       <circle
