@@ -55,6 +55,7 @@ export interface DesignSystem {
   tokens: TokenState;
   icon_library: string;
   style_preset: string;
+  default_mode: "light" | "dark" | null;
   github_repo: string | null;
   github_branch: string | null;
   github_token: string | null;

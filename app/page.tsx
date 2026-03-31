@@ -56,6 +56,7 @@ export default function Home() {
         setActiveDs(first);
         const normalized = normalizeTokens(first.tokens);
         setTokens(normalized);
+        setIsDark(first.default_mode === "dark");
         applyTokensToDocument(normalized);
         applyStylePreset(first.style_preset || "vega");
       } else {
@@ -360,6 +361,7 @@ export default function Home() {
           tokens,
           icon_library: tokens.primitives.iconLibrary,
           style_preset: tokens.primitives.stylePreset,
+          default_mode: isDark ? "dark" : "light",
           updated_at: new Date().toISOString(),
         })
         .eq("id", activeDs.id);
@@ -371,9 +373,9 @@ export default function Home() {
 
       // 로컬 상태도 업데이트
       setDesignSystems((prev) =>
-        prev.map((ds) => ds.id === activeDs.id ? { ...ds, tokens, icon_library: tokens.primitives.iconLibrary, style_preset: tokens.primitives.stylePreset } : ds)
+        prev.map((ds) => ds.id === activeDs.id ? { ...ds, tokens, icon_library: tokens.primitives.iconLibrary, style_preset: tokens.primitives.stylePreset, default_mode: isDark ? "dark" : "light" } : ds)
       );
-      setActiveDs((prev) => prev ? { ...prev, tokens } : prev);
+      setActiveDs((prev) => prev ? { ...prev, tokens, default_mode: isDark ? "dark" : "light" } : prev);
 
       // Auto-PR: if GitHub repo is connected, create PR in background
       if (activeDs.github_repo && activeDs.github_token) {
@@ -412,6 +414,7 @@ export default function Home() {
   function handleSelectDs(ds: DesignSystem) {
     setActiveDs(ds);
     setTokens(ds.tokens);
+    setIsDark(ds.default_mode === "dark");
     applyTokensToDocument(ds.tokens);
     applyStylePreset(ds.style_preset || "vega");
     setHistory([]);
