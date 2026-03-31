@@ -366,6 +366,10 @@ export async function POST(req: NextRequest) {
       path: ".designsync.json",
       content: JSON.stringify(dsConfig, null, 2) + "\n",
     });
+    files.push({
+      path: "eslint.config.designsync.mjs",
+      content: generateEslintConfig(),
+    });
 
     // Create blobs
     const blobShas: { path: string; sha: string }[] = [];

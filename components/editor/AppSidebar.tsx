@@ -32,6 +32,7 @@ import {
 } from "@/registry/new-york/ui/alert-dialog";
 import { Input } from "@/registry/new-york/ui/input";
 import { Label } from "@/registry/new-york/ui/label";
+import { NativeSelect } from "@/registry/new-york/ui/native-select";
 import {
   Sidebar,
   SidebarContent,
@@ -465,7 +466,7 @@ export function AppSidebar({
             {githubTarget?.github_installation_id ? (
               <>
                 <div className="flex items-center gap-2 p-3 rounded-[var(--ds-card-radius)] bg-muted/50">
-                  <icons.check className="w-4 h-4 text-[var(--success-500)] shrink-0" />
+                  <icons.check className="w-4 h-4 text-[color:var(--success-foreground)] shrink-0" />
                   <p className="text-xs text-muted-foreground">GitHub 연결됨</p>
                 </div>
                 <div className="space-y-1.5">
@@ -475,8 +476,7 @@ export function AppSidebar({
                       <icons.loader className="w-4 h-4 animate-spin" /> 프로젝트 목록 불러오는 중...
                     </div>
                   ) : ghRepos.length > 0 ? (
-                    <select
-                      className="w-full h-[var(--ds-input-h)] rounded-[var(--ds-input-radius)] border border-input bg-background px-3 text-sm"
+                    <NativeSelect
                       value={ghRepo}
                       onChange={(e) => {
                         const selected = ghRepos.find(r => r.full_name === e.target.value);
@@ -488,7 +488,7 @@ export function AppSidebar({
                       {ghRepos.map((r) => (
                         <option key={r.full_name} value={r.full_name}>{r.full_name}</option>
                       ))}
-                    </select>
+                    </NativeSelect>
                   ) : (
                     <div className="space-y-2">
                       <Input

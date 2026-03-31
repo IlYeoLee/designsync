@@ -52,7 +52,7 @@ export default function LoginPage() {
           <div className="w-12 h-12 rounded-[var(--ds-element-radius)] bg-primary flex items-center justify-center mx-auto">
             <span className="text-primary-foreground text-lg font-bold">DS</span>
           </div>
-          <h1 className="text-2xl font-bold text-foreground">DesignSync</h1>
+          <p className="text-2xl font-bold text-foreground">DesignSync</p>
           <p className="text-sm text-muted-foreground">
             디자인 시스템을 만들고 관리하세요.
           </p>

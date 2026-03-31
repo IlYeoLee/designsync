@@ -99,7 +99,7 @@ function FormPreview({ icons }: { icons: IconMap }) {
     <div className="flex flex-col gap-[var(--ds-section-gap)]">
       {/* Buttons */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Buttons</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Buttons</p>
         <div className="flex flex-wrap gap-2">
           <Button>기본</Button>
           <Button variant="secondary">보조</Button>
@@ -127,7 +127,7 @@ function FormPreview({ icons }: { icons: IconMap }) {
 
       {/* Input + Label */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Input</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Input</p>
         <div className="flex flex-col gap-[var(--ds-internal-gap)] max-w-sm">
           <div className="space-y-1.5">
             <Label htmlFor="email-preview">이메일 주소</Label>
@@ -144,7 +144,7 @@ function FormPreview({ icons }: { icons: IconMap }) {
 
       {/* OTP Input */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Input OTP</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Input OTP</p>
         <div className="flex flex-col gap-[var(--ds-internal-gap)]">
           <Label>인증 코드</Label>
           <InputOTP maxLength={6} value={otpValue} onChange={setOtpValue}>
@@ -170,7 +170,7 @@ function FormPreview({ icons }: { icons: IconMap }) {
 
       {/* Checkbox & Switch */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Controls</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Controls</p>
         <div className="flex flex-col gap-[var(--ds-internal-gap)]">
           <div className="flex items-center gap-2">
             <Checkbox
@@ -195,7 +195,7 @@ function FormPreview({ icons }: { icons: IconMap }) {
 
       {/* Slider */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Slider</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Slider</p>
         <div className="max-w-sm">
           <Slider
             value={sliderVal}
@@ -213,7 +213,7 @@ function FormPreview({ icons }: { icons: IconMap }) {
 
       {/* Calendar */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">캘린더</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">캘린더</p>
         <Calendar
           mode="single"
           locale={ko}
@@ -227,7 +227,7 @@ function FormPreview({ icons }: { icons: IconMap }) {
 
       {/* DatePicker */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Date Picker</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Date Picker</p>
         <div className="flex flex-col max-w-sm gap-[var(--ds-internal-gap)]">
           <Label>날짜 선택</Label>
           <DatePicker
@@ -247,7 +247,7 @@ function FormPreview({ icons }: { icons: IconMap }) {
 
       {/* Combobox */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Combobox</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Combobox</p>
         <div className="flex flex-col gap-[var(--ds-section-gap)] max-w-sm">
           <div className="space-y-1.5">
             <Label>프레임워크 선택</Label>
@@ -289,7 +289,7 @@ function FormPreview({ icons }: { icons: IconMap }) {
 
       {/* ButtonGroup */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Button Group</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Button Group</p>
         <ButtonGroup>
           <Button variant="outline">왼쪽</Button>
           <Button variant="outline">가운데</Button>
@@ -301,7 +301,7 @@ function FormPreview({ icons }: { icons: IconMap }) {
 
       {/* Field */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Field</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Field</p>
         <div className="max-w-sm">
           <Field>
             <Label htmlFor="field-email">이메일</Label>
@@ -315,7 +315,7 @@ function FormPreview({ icons }: { icons: IconMap }) {
 
       {/* InputGroup */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Input Group</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Input Group</p>
         <div className="max-w-sm">
           <InputGroup>
             <InputGroupAddon>https://</InputGroupAddon>
@@ -329,7 +329,7 @@ function FormPreview({ icons }: { icons: IconMap }) {
 
       {/* Spinner */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Spinner</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Spinner</p>
         <div className="flex items-center gap-[var(--ds-section-gap)]">
           <Spinner size="sm" />
           <Spinner />
@@ -342,7 +342,7 @@ function FormPreview({ icons }: { icons: IconMap }) {
 
       {/* NativeSelect */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Native Select</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Native Select</p>
         <div className="max-w-sm">
           <NativeSelect defaultValue="">
             <option value="" disabled>선택하세요</option>
@@ -357,7 +357,7 @@ function FormPreview({ icons }: { icons: IconMap }) {
 
       {/* Kbd */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Kbd</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Kbd</p>
         <div className="flex items-center gap-[var(--ds-section-gap)]">
           <div className="flex items-center gap-1">
             <Kbd>⌘</Kbd><Kbd>K</Kbd>
@@ -378,7 +378,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
     <div className="flex flex-col gap-[var(--ds-section-gap)]">
       {/* Drawer */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Drawer</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Drawer</p>
         <Drawer>
           <DrawerTrigger asChild>
             <Button variant="outline">열기</Button>
@@ -416,7 +416,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
 
       {/* Command */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Command</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Command</p>
         <Command className="rounded-[var(--ds-card-radius)] border border-border shadow-md max-w-sm">
           <CommandInput placeholder="명령어 또는 검색..." />
           <CommandList>
@@ -456,7 +456,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
 
       {/* Context Menu */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Context Menu</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Context Menu</p>
         <ContextMenu>
           <ContextMenuTrigger>
             <div className="flex h-20 w-full max-w-sm items-center justify-center rounded-[var(--ds-element-radius)] border border-dashed border-border text-sm text-muted-foreground cursor-default select-none">
@@ -488,7 +488,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
 
       {/* Dialog */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Dialog</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Dialog</p>
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="outline">열기</Button>
@@ -520,7 +520,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
 
       {/* AlertDialog */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Alert Dialog</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Alert Dialog</p>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="destructive">계정 삭제</Button>
@@ -544,7 +544,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
 
       {/* Sheet */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Sheet</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Sheet</p>
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline">열기</Button>
@@ -575,7 +575,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
 
       {/* Dropdown Menu */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Dropdown Menu</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Dropdown Menu</p>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">메뉴 <icons.chevronDown className="ml-2 h-4 w-4" /></Button>
@@ -599,14 +599,14 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
 
       {/* Popover */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Popover</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Popover</p>
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline">열기</Button>
           </PopoverTrigger>
           <PopoverContent className="w-72">
             <div className="flex flex-col gap-[var(--ds-internal-gap)]">
-              <h4 className="text-sm font-medium">크기</h4>
+              <p className="text-sm font-medium">크기</p>
               <p className="text-xs text-muted-foreground">레이어 크기를 설정하세요.</p>
               <div className="grid grid-cols-3 items-center gap-[var(--ds-section-gap)]">
                 <Label className="text-right text-xs">너비</Label>
@@ -625,7 +625,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
 
       {/* Tooltip */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Tooltip</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Tooltip</p>
         <TooltipProvider>
           <div className="flex gap-[var(--ds-section-gap)]">
             <Tooltip>
@@ -654,7 +654,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
 
       {/* HoverCard */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Hover Card</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Hover Card</p>
         <HoverCard>
           <HoverCardTrigger asChild>
             <Button variant="link" className="text-sm p-0 h-auto">@designsync</Button>
@@ -665,7 +665,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
                 <AvatarFallback>DS</AvatarFallback>
               </Avatar>
               <div>
-                <h4 className="text-sm font-medium">DesignSync</h4>
+                <p className="text-sm font-medium">DesignSync</p>
                 <p className="text-xs text-muted-foreground mt-0.5">shadcn/ui 기반 디자인 토큰 에디터.</p>
                 <p className="text-xs text-muted-foreground mt-1">2024년 3월 가입</p>
               </div>
@@ -678,7 +678,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
 
       {/* Collapsible */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Collapsible</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Collapsible</p>
         <CollapsibleDemo icons={icons} />
       </div>
 
@@ -686,7 +686,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
 
       {/* Select */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Select</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Select</p>
         <div className="flex flex-wrap gap-[var(--ds-section-gap)]">
           <Select>
             <SelectTrigger className="w-44">
@@ -716,7 +716,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
 
       {/* RadioGroup */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Radio Group</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Radio Group</p>
         <RadioGroup defaultValue="comfortable">
           <div className="flex items-center space-x-2">
             <RadioGroupItem value="default" id="r1" />
@@ -737,7 +737,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
 
       {/* Toggle & ToggleGroup */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Toggle & Toggle Group</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Toggle & Toggle Group</p>
         <div className="flex flex-col gap-[var(--ds-internal-gap)]">
           <div className="flex gap-2">
             <Toggle variant="outline" aria-label="Bold"><icons.bold className="h-4 w-4" /></Toggle>
@@ -756,7 +756,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
 
       {/* ScrollArea */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Scroll Area</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Scroll Area</p>
         <ScrollArea className="h-36 w-64 rounded-[var(--ds-card-radius)] border border-border p-3">
           <div className="flex flex-col gap-[var(--ds-internal-gap)]">
             {Array.from({ length: 12 }, (_, i) => (
@@ -772,7 +772,7 @@ function OverlayPreview({ icons }: { icons: IconMap }) {
 
       {/* AspectRatio */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Aspect Ratio</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Aspect Ratio</p>
         <div className="w-64">
           <AspectRatio ratio={16 / 9} className="rounded-[var(--ds-element-radius)] overflow-hidden bg-muted border border-border">
             <div className="flex items-center justify-center h-full text-xs text-muted-foreground">
@@ -790,7 +790,7 @@ function CollapsibleDemo({ icons }: { icons: IconMap }) {
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="w-72 flex flex-col gap-[var(--ds-internal-gap)]">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium">즐겨찾기</h4>
+        <p className="text-sm font-medium">즐겨찾기</p>
         <CollapsibleTrigger asChild>
           <Button variant="ghost" size="sm" className="w-8 h-8 p-0">
             <icons.chevronsUpDown className="h-4 w-4" />
@@ -812,7 +812,7 @@ function SidebarPreview({ icons }: { icons: IconMap }) {
   const [open, setOpen] = React.useState(true);
   return (
     <div>
-      <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Sidebar</h3>
+      <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Sidebar</p>
       <div className="flex rounded-[var(--ds-card-radius)] border border-border overflow-hidden h-72">
         <div className={`bg-sidebar border-r border-sidebar-border flex flex-col transition-all duration-300 ${open ? "w-52" : "w-0 border-r-0 overflow-hidden"}`}>
           {/* Logo + Close */}
@@ -823,9 +823,9 @@ function SidebarPreview({ icons }: { icons: IconMap }) {
               </div>
               <span className="text-sm font-semibold text-sidebar-foreground whitespace-nowrap">DesignSync</span>
             </div>
-            <button onClick={() => setOpen(false)} className="p-1 rounded-[var(--ds-element-radius)] hover:bg-sidebar-accent text-sidebar-foreground/50 hover:text-sidebar-foreground transition-colors">
+            <Button variant="ghost" size="icon" onClick={() => setOpen(false)} className="h-6 w-6 rounded-[var(--ds-element-radius)] hover:bg-sidebar-accent text-sidebar-foreground/50 hover:text-sidebar-foreground">
               <icons.panelLeftClose className="w-4 h-4" />
-            </button>
+            </Button>
           </div>
 
           {/* Menu */}
@@ -874,9 +874,9 @@ function SidebarPreview({ icons }: { icons: IconMap }) {
 
         <div className="flex-1 bg-background p-4">
           {!open && (
-            <button onClick={() => setOpen(true)} className="mb-3 p-1.5 rounded-[var(--ds-card-radius)] border border-border hover:bg-accent transition-colors">
+            <Button variant="outline" size="icon" onClick={() => setOpen(true)} className="mb-3 h-7 w-7 rounded-[var(--ds-card-radius)]">
               <icons.panelLeft className="w-4 h-4" />
-            </button>
+            </Button>
           )}
           <p className="text-xs font-medium text-foreground mb-1">메인 콘텐츠</p>
           <p className="text-xs text-muted-foreground">사이드바를 닫고 열어보세요.</p>
@@ -891,7 +891,7 @@ function NavigationPreview({ icons }: { icons: IconMap }) {
     <div className="flex flex-col gap-[var(--ds-section-gap)]">
       {/* Header */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Header</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Header</p>
         <div className="rounded-[var(--ds-card-radius)] border border-border overflow-hidden">
           <Header>
             <HeaderLogo href="#">
@@ -922,7 +922,7 @@ function NavigationPreview({ icons }: { icons: IconMap }) {
 
       {/* Menubar */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Menubar</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Menubar</p>
         <Menubar>
           <MenubarMenu>
             <MenubarTrigger>파일</MenubarTrigger>
@@ -958,7 +958,7 @@ function NavigationPreview({ icons }: { icons: IconMap }) {
 
       {/* Navigation Menu */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Navigation Menu</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Navigation Menu</p>
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
@@ -1011,7 +1011,7 @@ function NavigationPreview({ icons }: { icons: IconMap }) {
 
       {/* Breadcrumb */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Breadcrumb</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Breadcrumb</p>
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -1033,7 +1033,7 @@ function NavigationPreview({ icons }: { icons: IconMap }) {
 
       {/* Tabs — Pill variant */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Tabs (Pill)</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Tabs (Pill)</p>
         <Tabs defaultValue="account">
           <TabsList variant="pill">
             <TabsTrigger value="account">계정</TabsTrigger>
@@ -1056,7 +1056,7 @@ function NavigationPreview({ icons }: { icons: IconMap }) {
 
       {/* Tabs — Underline variant */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Tabs (Underline)</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Tabs (Underline)</p>
         <Tabs defaultValue="overview">
           <TabsList variant="underline">
             <TabsTrigger value="overview">개요</TabsTrigger>
@@ -1084,7 +1084,7 @@ function NavigationPreview({ icons }: { icons: IconMap }) {
 
       {/* Pagination */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Pagination</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Pagination</p>
         <div className="flex items-center gap-1">
           <Button size="sm" variant="outline">이전</Button>
           {[1, 2, 3, 4, 5].map((page) => (
@@ -1205,7 +1205,7 @@ function ProgressSkeletonPreview() {
   }, []);
   return (
     <div>
-      <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Progress & Skeleton</h3>
+      <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Progress & Skeleton</p>
       <div className="flex flex-col gap-[var(--ds-internal-gap)] max-w-sm">
         <div className="space-y-1">
           <div className="flex justify-between text-xs text-muted-foreground mb-1">
@@ -1228,7 +1228,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
     <div className="flex flex-col gap-[var(--ds-section-gap)]">
       {/* Typography */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Typography</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Typography</p>
         <div className="flex flex-col gap-[var(--ds-internal-gap)] max-w-lg">
           <TypographyH1 style={{ fontSize: 'var(--font-size-4xl)', fontWeight: 'var(--font-weight-extrabold)' }}>Heading 1</TypographyH1>
           <TypographyH2 style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 'var(--font-weight-semibold)' }}>Heading 2</TypographyH2>
@@ -1257,14 +1257,14 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
           </TypographyList>
 
           <TypographyTable>
-            <thead>
+            <TableHeader>
               <TypographyTr>
                 <TypographyTh>항목</TypographyTh>
                 <TypographyTh>설명</TypographyTh>
                 <TypographyTh className="text-right">값</TypographyTh>
               </TypographyTr>
-            </thead>
-            <tbody>
+            </TableHeader>
+            <TableBody>
               <TypographyTr>
                 <TypographyTd>Primary</TypographyTd>
                 <TypographyTd>메인 브랜드 색상</TypographyTd>
@@ -1280,7 +1280,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
                 <TypographyTd>삭제/위험 액션</TypographyTd>
                 <TypographyTd className="text-right">error-600</TypographyTd>
               </TypographyTr>
-            </tbody>
+            </TableBody>
           </TypographyTable>
         </div>
       </div>
@@ -1289,7 +1289,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* Empty */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Empty</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Empty</p>
         <Empty>
           <EmptyIcon><icons.fileText /></EmptyIcon>
           <EmptyTitle>데이터가 없습니다</EmptyTitle>
@@ -1304,7 +1304,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* Item */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Item</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Item</p>
         <div className="rounded-[var(--ds-card-radius)] border border-border divide-y divide-border">
           <Item>
             <ItemMedia>
@@ -1349,7 +1349,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* Chart — Bar */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Chart — Bar</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Chart — Bar</p>
         <Card>
           <CardHeader>
             <CardTitle className="text-sm">월간 매출</CardTitle>
@@ -1372,7 +1372,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* Chart — Line */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Chart — Line</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Chart — Line</p>
         <Card className="shadow-sm">
           <CardHeader>
             <CardTitle className="text-sm">사용자 증가</CardTitle>
@@ -1395,7 +1395,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* Chart — Pie */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Chart — Pie</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Chart — Pie</p>
         <Card>
           <CardHeader>
             <CardTitle className="text-sm">팀 구성 비율</CardTitle>
@@ -1428,7 +1428,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* Chart — Area */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Chart — Area</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Chart — Area</p>
         <Card>
           <CardHeader>
             <CardTitle className="text-sm">월간 방문자</CardTitle>
@@ -1457,7 +1457,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* Chart — Radar */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Chart — Radar</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Chart — Radar</p>
         <Card>
           <CardHeader>
             <CardTitle className="text-sm">팀 역량 분석</CardTitle>
@@ -1480,7 +1480,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* Chart — Radial */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Chart — Radial</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Chart — Radial</p>
         <Card>
           <CardHeader>
             <CardTitle className="text-sm">프로젝트 진행률</CardTitle>
@@ -1514,7 +1514,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* Carousel */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Carousel</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Carousel</p>
         <Carousel className="w-full max-w-sm mx-auto">
           <CarouselContent>
             {[
@@ -1543,7 +1543,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* Resizable */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Resizable</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Resizable</p>
         <ResizablePanelGroup direction="horizontal" className="rounded-[var(--ds-card-radius)] border border-border h-56 max-w-lg">
           <ResizablePanel defaultSize={50} minSize={20}>
             <div className="flex h-full items-center justify-center p-4">
@@ -1573,7 +1573,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* Avatar */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Avatar</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Avatar</p>
         <div className="flex items-center gap-[var(--ds-section-gap)]">
           <Avatar className="w-8 h-8">
             <AvatarFallback className="text-xs">김</AvatarFallback>
@@ -1594,7 +1594,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* Badge */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Badge</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Badge</p>
         <div className="flex flex-wrap gap-2">
           <Badge>기본</Badge>
           <Badge variant="secondary">보조</Badge>
@@ -1607,7 +1607,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* Separator */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Separator</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Separator</p>
         <div className="flex flex-col gap-[var(--ds-internal-gap)]">
           <div>
             <p className="text-xs text-muted-foreground mb-2">가로 구분선</p>
@@ -1627,7 +1627,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* Cards & Badges */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Card & Badges</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Card & Badges</p>
         <Card className="max-w-sm shadow-md">
           <CardHeader>
             <div className="flex items-start justify-between">
@@ -1662,7 +1662,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* Table */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Table</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Table</p>
         <Table>
           <TableHeader>
             <TableRow>
@@ -1693,7 +1693,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* DataTable */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Data Table</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Data Table</p>
         <DataTable
           columns={[
             { key: "name", header: "이름", sortable: true },
@@ -1726,7 +1726,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* Accordion */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Accordion</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Accordion</p>
         <Accordion type="single" collapsible className="max-w-sm">
           <AccordionItem value="item-1">
             <AccordionTrigger>DesignSync가 뭔가요?</AccordionTrigger>
@@ -1752,7 +1752,7 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
 
       {/* Icons */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Icons</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Icons</p>
         <div className="grid grid-cols-6 gap-[var(--ds-section-gap)]">
           {ICON_SHOWCASE_KEYS.map((key) => {
             const Icon = icons[key];
@@ -1776,7 +1776,7 @@ function FeedbackPreview({ icons }: { icons: IconMap }) {
     <div className="flex flex-col gap-[var(--ds-section-gap)]">
       {/* Sonner */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Sonner Toast</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Sonner Toast</p>
         <Toaster />
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={() => toast("이벤트가 생성되었습니다")}>
@@ -1809,7 +1809,7 @@ function FeedbackPreview({ icons }: { icons: IconMap }) {
 
       {/* Alerts */}
       <div>
-        <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Alert</h3>
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Alert</p>
         <div className="flex flex-col gap-[var(--ds-internal-gap)]">
           <Alert>
             <icons.info className="h-4 w-4" />
@@ -1855,17 +1855,18 @@ export function PreviewPanel({ iconLibrary = "lucide" }: { iconLibrary?: string 
       <div className="border-b border-[color:var(--divider)] bg-background flex-shrink-0 overflow-x-auto">
         <div className="flex items-center gap-0 px-[var(--ds-card-padding)]">
           {PREVIEW_CATEGORIES.map((cat) => (
-            <button
+            <Button
               key={cat.id}
+              variant="ghost"
               onClick={() => setCategory(cat.id)}
-              className={`px-4 py-2.5 text-xs font-medium whitespace-nowrap border-b-2 transition-colors ${
+              className={`px-4 py-2.5 h-auto rounded-none text-xs font-medium whitespace-nowrap border-b-2 transition-colors ${
                 category === cat.id
                   ? "border-primary text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:bg-transparent"
               }`}
             >
               {cat.label}
-            </button>
+            </Button>
           ))}
         </div>
       </div>
