@@ -1828,6 +1828,16 @@ function FeedbackPreview({ icons }: { icons: IconMap }) {
             <AlertTitle>오류</AlertTitle>
             <AlertDescription>서버에 연결할 수 없습니다. 네트워크 연결을 확인해주세요.</AlertDescription>
           </Alert>
+          <Alert variant="warning">
+            <icons.alertCircle className="h-4 w-4" />
+            <AlertTitle>경고</AlertTitle>
+            <AlertDescription>저장하지 않은 변경사항이 있습니다. 계속하면 사라집니다.</AlertDescription>
+          </Alert>
+          <Alert variant="info">
+            <icons.info className="h-4 w-4" />
+            <AlertTitle>정보</AlertTitle>
+            <AlertDescription>새 버전이 출시되었습니다. 업데이트 후 이용해주세요.</AlertDescription>
+          </Alert>
         </div>
       </div>
     </div>
@@ -1842,7 +1852,7 @@ export function PreviewPanel({ iconLibrary = "lucide" }: { iconLibrary?: string 
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-background">
-      <div className="border-b border-border bg-background flex-shrink-0 overflow-x-auto">
+      <div className="border-b border-[color:var(--divider)] bg-background flex-shrink-0 overflow-x-auto">
         <div className="flex items-center gap-0 px-[var(--ds-card-padding)]">
           {PREVIEW_CATEGORIES.map((cat) => (
             <button

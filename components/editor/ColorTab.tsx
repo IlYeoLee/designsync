@@ -143,7 +143,7 @@ const SEMANTIC_INFO: Record<string, { label: string; desc: string }> = {
   border:                  { label: "선",             desc: "일반 UI 테두리" },
   "card-border":           { label: "카드 선",        desc: "카드·패널 테두리" },
   input:                   { label: "입력선",         desc: "폼 요소 테두리" },
-  divider:                 { label: "구분선",         desc: "섹션 구분 선" },
+  divider:                 { label: "구분선",         desc: "구분선 | 사이드바 선 | 라인탭 하단선" },
   ring:                    { label: "포커스",         desc: "포커스 링 색" },
   selected:                { label: "선택됨",         desc: "선택 항목 배경" },
   "selected-foreground":   { label: "선택 텍스트",   desc: "선택 항목 글자" },
@@ -163,7 +163,7 @@ const SEMANTIC_GROUPS: { title: string; keys: string[] }[] = [
   { title: "텍스트", keys: ["foreground", "muted-foreground", "accent-foreground"] },
   { title: "아이콘", keys: ["icon", "icon-muted"] },
   { title: "액션",   keys: ["primary", "primary-foreground"] },
-  { title: "테두리", keys: ["border", "card-border", "input", "divider", "ring"] },
+  { title: "테두리", keys: ["card-border", "input", "divider", "ring"] },
   { title: "상태",   keys: ["selected", "selected-foreground"] },
   { title: "피드백", keys: ["destructive", "destructive-foreground", "error-border", "success", "success-foreground", "success-border", "warning", "warning-foreground", "warning-border", "info", "info-foreground"] },
 ];

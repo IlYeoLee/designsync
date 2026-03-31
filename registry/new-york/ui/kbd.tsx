@@ -11,7 +11,7 @@ function Kbd({
     <kbd
       data-slot="kbd"
       className={cn(
-        "inline-flex h-5 items-center gap-1 rounded border border-border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground select-none",
+        "inline-flex h-5 items-center gap-1 rounded-[var(--ds-element-radius)] border border-[color:var(--divider)] bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground select-none",
         className
       )}
       {...props}
