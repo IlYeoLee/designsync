@@ -34,6 +34,8 @@ export function EditorHeader({
   onUndo,
   canUndo,
   onReset,
+  fontFamily,
+  fontFamilyKo,
   iconLibrary,
   dsSlug,
   prResult,
