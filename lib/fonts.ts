@@ -56,7 +56,7 @@ export const GOOGLE_FONTS: string[] = [
 
 export function getGoogleFontUrl(fontFamily: string): string {
   const encoded = fontFamily.replace(/ /g, '+');
-  return `https://fonts.googleapis.com/css2?family=${encoded}:wght@400;500;700&display=swap`;
+  return `https://fonts.googleapis.com/css2?family=${encoded}:wght@400;500;600;700&display=swap`;
 }
 
 export function injectGoogleFont(fontFamily: string): void {
@@ -73,7 +73,7 @@ export function injectGoogleFont(fontFamily: string): void {
 /** Korean font CDN URLs (not available on standard Google Fonts API) */
 export const KOREAN_FONT_URLS: Record<string, string> = {
   'Pretendard': 'https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css',
-  'Noto Sans KR': 'https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap',
+  'Noto Sans KR': 'https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap',
   'Nanum Gothic': 'https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap',
 };
 
@@ -109,7 +109,7 @@ export function injectKoreanFont(fontFamily: string): void {
   } else {
     // 나머지는 Google Fonts (한글 폰트들)
     const encoded = fontFamily.replace(/ /g, '+');
-    link.href = `https://fonts.googleapis.com/css2?family=${encoded}:wght@400;700&display=swap&subset=korean`;
+    link.href = `https://fonts.googleapis.com/css2?family=${encoded}:wght@400;500;600;700&display=swap&subset=korean`;
   }
   document.head.appendChild(link);
 }
