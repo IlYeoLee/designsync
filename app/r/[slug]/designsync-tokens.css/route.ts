@@ -200,6 +200,11 @@ export async function GET(
         css += `${indent}--leading-${k}: ${lightVars[`line-height-${k}`]};\n`;
       }
     }
+    for (const level of ["sm", "md", "lg"]) {
+      if (lightVars[`ds-shadow-${level}`]) {
+        css += `${indent}--shadow-${level}: ${lightVars[`ds-shadow-${level}`]};\n`;
+      }
+    }
     css += `}\n\n`;
 
     // Korean font unicode-range
