@@ -167,6 +167,7 @@ export const DEFAULT_TOKENS: TokenState = {
       'accent': 'var(--brand-100)',
       'accent-foreground': 'var(--brand-900)',
       'destructive': 'var(--error-600)',
+      'destructive-foreground': 'var(--neutral-50)',
       'border': 'var(--neutral-200)',
       'input': 'var(--neutral-200)',
       'ring': 'var(--brand-400)',
@@ -178,8 +179,11 @@ export const DEFAULT_TOKENS: TokenState = {
       'selected-foreground': 'var(--brand-700)',
       'success': 'var(--success-100)',
       'success-foreground': 'var(--success-700)',
+      'success-border': 'var(--success-300)',
       'warning': 'var(--warning-100)',
       'warning-foreground': 'var(--warning-700)',
+      'warning-border': 'var(--warning-300)',
+      'error-border': 'var(--error-300)',
       'info': 'var(--brand-50)',
       'info-foreground': 'var(--brand-700)',
     },
@@ -199,6 +203,7 @@ export const DEFAULT_TOKENS: TokenState = {
       'accent': 'var(--brand-900)',
       'accent-foreground': 'var(--brand-100)',
       'destructive': 'var(--error-400)',
+      'destructive-foreground': 'var(--neutral-900)',
       'border': 'var(--neutral-700)',
       'input': 'var(--neutral-700)',
       'ring': 'var(--brand-500)',
@@ -210,8 +215,11 @@ export const DEFAULT_TOKENS: TokenState = {
       'selected-foreground': 'var(--brand-100)',
       'success': 'var(--success-900)',
       'success-foreground': 'var(--success-100)',
+      'success-border': 'var(--success-700)',
       'warning': 'var(--warning-900)',
       'warning-foreground': 'var(--warning-100)',
+      'warning-border': 'var(--warning-700)',
+      'error-border': 'var(--error-700)',
       'info': 'var(--brand-900)',
       'info-foreground': 'var(--brand-100)',
     },
@@ -223,6 +231,17 @@ export function normalizeTokens(tokens: TokenState): TokenState {
   const t = JSON.parse(JSON.stringify(tokens)) as TokenState;
   for (const key of Object.keys(t.primitives.fontWeight) as Array<keyof typeof t.primitives.fontWeight>) {
     t.primitives.fontWeight[key] = String(t.primitives.fontWeight[key]);
+  }
+  // Backfill semantic keys missing from older Supabase snapshots
+  for (const key of Object.keys(DEFAULT_TOKENS.semantic.light)) {
+    if (!(key in t.semantic.light)) {
+      t.semantic.light[key] = DEFAULT_TOKENS.semantic.light[key];
+    }
+  }
+  for (const key of Object.keys(DEFAULT_TOKENS.semantic.dark)) {
+    if (!(key in t.semantic.dark)) {
+      t.semantic.dark[key] = DEFAULT_TOKENS.semantic.dark[key];
+    }
   }
   return t;
 }

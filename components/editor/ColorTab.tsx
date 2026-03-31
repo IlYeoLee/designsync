@@ -135,7 +135,9 @@ const SEMANTIC_INFO: Record<string, { label: string; desc: string }> = {
   "accent-foreground":     { label: "강조 텍스트",   desc: "강조 배경 위 글자" },
   primary:                 { label: "주 색상",        desc: "브랜드 메인 색상" },
   "primary-foreground":    { label: "주 색 위 텍스트", desc: "주 색상 위 글자" },
-  destructive:             { label: "위험",           desc: "삭제·오류 색상" },
+  destructive:             { label: "오류 배경",       desc: "오류·삭제 상태 배경" },
+  "destructive-foreground":{ label: "오류 텍스트",    desc: "오류 배경 위 글자" },
+  "error-border":          { label: "오류 선",        desc: "오류 상태 테두리" },
   icon:                    { label: "아이콘",          desc: "기본 아이콘 색" },
   "icon-muted":            { label: "흐린 아이콘",    desc: "비활성 아이콘 색" },
   border:                  { label: "선",             desc: "일반 UI 테두리" },
@@ -145,11 +147,13 @@ const SEMANTIC_INFO: Record<string, { label: string; desc: string }> = {
   ring:                    { label: "포커스",         desc: "포커스 링 색" },
   selected:                { label: "선택됨",         desc: "선택 항목 배경" },
   "selected-foreground":   { label: "선택 텍스트",   desc: "선택 항목 글자" },
-  success:                 { label: "성공",           desc: "성공 상태 배경" },
+  success:                 { label: "성공 배경",      desc: "성공 상태 배경" },
   "success-foreground":    { label: "성공 텍스트",   desc: "성공 배경 위 글자" },
-  warning:                 { label: "경고",           desc: "경고 상태 배경" },
+  "success-border":        { label: "성공 선",        desc: "성공 상태 테두리" },
+  warning:                 { label: "경고 배경",      desc: "경고 상태 배경" },
   "warning-foreground":    { label: "경고 텍스트",   desc: "경고 배경 위 글자" },
-  info:                    { label: "정보",           desc: "정보 상태 배경" },
+  "warning-border":        { label: "경고 선",        desc: "경고 상태 테두리" },
+  info:                    { label: "정보 배경",      desc: "정보 상태 배경" },
   "info-foreground":       { label: "정보 텍스트",   desc: "정보 배경 위 글자" },
 };
 
@@ -158,10 +162,10 @@ const SEMANTIC_GROUPS: { title: string; keys: string[] }[] = [
   { title: "배경",   keys: ["background", "card", "card-foreground", "popover", "popover-foreground", "secondary", "secondary-foreground", "muted", "accent"] },
   { title: "텍스트", keys: ["foreground", "muted-foreground", "accent-foreground"] },
   { title: "아이콘", keys: ["icon", "icon-muted"] },
-  { title: "액션",   keys: ["primary", "primary-foreground", "destructive"] },
+  { title: "액션",   keys: ["primary", "primary-foreground"] },
   { title: "테두리", keys: ["border", "card-border", "input", "divider", "ring"] },
   { title: "상태",   keys: ["selected", "selected-foreground"] },
-  { title: "피드백", keys: ["success", "success-foreground", "warning", "warning-foreground", "info", "info-foreground"] },
+  { title: "피드백", keys: ["destructive", "destructive-foreground", "error-border", "success", "success-foreground", "success-border", "warning", "warning-foreground", "warning-border", "info", "info-foreground"] },
 ];
 
 // Non-color semantic tokens to hide from the color editor
