@@ -138,7 +138,6 @@ const SEMANTIC_INFO: Record<string, { label: string; desc: string }> = {
   destructive:             { label: "오류 배경",       desc: "오류·삭제 상태 배경" },
   "destructive-foreground":{ label: "오류 텍스트",    desc: "오류 배경 위 글자" },
   "error-border":          { label: "오류 선",        desc: "오류 상태 테두리" },
-  border:                  { label: "선",             desc: "일반 UI 테두리" },
   "card-border":           { label: "카드 선",        desc: "카드·패널 테두리" },
   input:                   { label: "입력선",         desc: "폼 요소 테두리" },
   divider:                 { label: "구분선",         desc: "구분선 | 사이드바 선 | 라인탭 하단선" },
@@ -166,7 +165,9 @@ const SEMANTIC_GROUPS: { title: string; keys: string[] }[] = [
 ];
 
 // Non-color semantic tokens to hide from the color editor
-const SEMANTIC_SKIP = new Set(["radius"]);
+// border = alias of divider (auto-derived, not user-editable)
+// icon/icon-muted = removed (not emitted to CSS, not used in components)
+const SEMANTIC_SKIP = new Set(["radius", "border", "icon", "icon-muted"]);
 
 interface ColorTabProps {
   tokens: TokenState;
