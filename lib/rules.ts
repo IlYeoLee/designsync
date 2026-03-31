@@ -137,6 +137,10 @@ DesignSync에 해당 컴포넌트가 없다고 해서 하드코딩 색상/크기
 - 사이드바 레이아웃 내 모든 flex/grid 컨테이너에 \`min-w-0\` 추가
 - 페이지 내부 음수 마진(\`-mx-*\`) 스티키 header 금지
 
+**[알려진 함정 — 반드시 숙지]**
+- **Turbopack 빌드 에러**: \`shadcn/dist/tailwind.css\` 로컬 import는 Turbopack에서 빌드 실패. CSS 파일 상단의 \`@import\`가 로컬 shadcn dist를 바라보면 즉시 DesignSync 토큰 URL import로 교체: \`@import url("${CDN}/r/[slug]/designsync-tokens.css");\`
+- **radius 0 시 4px로 렌더링**: shadcn 내부 \`calc(var(--radius) + Npx)\` offset 때문에 radius=0 설정해도 4–8px로 보임. 코드로 고치는 게 아니라 **DesignSync 대시보드에서 radius 값을 직접 조정**해야 함 — Claude가 임의로 \`rounded-none\` 추가 금지.
+
 아래는 DesignSync 규칙 상세 레퍼런스다. 위 lint 규칙과 함께 적용된다.
 
 ${installSection}## ${n}. 디자인 토큰
