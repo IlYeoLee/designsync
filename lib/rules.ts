@@ -42,7 +42,7 @@ export function generateRules(params: RulesParams = {}): string {
     includeInstall = false,
   } = params;
 
-  const setupParam = dsSlug ? `?ds=${dsSlug}` : "";
+
 
   const iconInfo = ICON_LIBRARY_INFO[iconLibrary] || ICON_LIBRARY_INFO.lucide;
   const otherIconLibs = Object.values(ICON_LIBRARY_INFO)
