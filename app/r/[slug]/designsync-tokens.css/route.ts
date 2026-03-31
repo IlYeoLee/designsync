@@ -182,6 +182,26 @@ export async function GET(
     css += `${indent}--radius-2xl: var(--radius-xl-prim);\n`;
     css += `}\n\n`;
 
+    // Typography override — higher specificity to beat Tailwind default @theme :root
+    css += `/* Typography override */\n`;
+    css += `:root:root {\n`;
+    for (const k of ["xs", "sm", "base", "lg", "xl", "2xl", "3xl", "4xl"]) {
+      if (lightVars[`font-size-${k}`]) {
+        css += `${indent}--text-${k}: ${lightVars[`font-size-${k}`]};\n`;
+      }
+    }
+    for (const k of ["normal", "medium", "semibold", "bold", "extrabold"]) {
+      if (lightVars[`font-weight-${k}`]) {
+        css += `${indent}--font-weight-${k}: ${lightVars[`font-weight-${k}`]};\n`;
+      }
+    }
+    for (const k of ["tight", "snug", "normal", "relaxed", "loose"]) {
+      if (lightVars[`line-height-${k}`]) {
+        css += `${indent}--leading-${k}: ${lightVars[`line-height-${k}`]};\n`;
+      }
+    }
+    css += `}\n\n`;
+
     // Korean font unicode-range
     if (fontFamilyKo && fontSansKoValue && fontFamilyKo !== fontFamily) {
       css += `@font-face {\n`;
