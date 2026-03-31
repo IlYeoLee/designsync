@@ -217,6 +217,12 @@ export async function fetchAndResolveTokens(
   if (fontSansValue) {
     lightVars["font-sans"] = fontSansValue;
     darkVars["font-sans"] = fontSansValue;
+    // Also set --custom-font-family: @theme inline in globals.css inlines the utility as
+    // font-family: var(--custom-font-family, ...) — so this var must be set in the token CSS
+    // for the font to apply in the target project (JS-based applyTokensToDocument handles
+    // the DesignSync preview side separately).
+    lightVars["custom-font-family"] = fontSansValue;
+    darkVars["custom-font-family"] = fontSansValue;
   }
 
   lightVars["spacing"] = "0.25rem";

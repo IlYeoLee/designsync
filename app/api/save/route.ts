@@ -207,6 +207,8 @@ export async function POST(req: NextRequest) {
     if (fontSansValue) {
       lightVars["font-sans"] = fontSansValue;
       darkVars["font-sans"] = fontSansValue;
+      lightVars["custom-font-family"] = fontSansValue;
+      darkVars["custom-font-family"] = fontSansValue;
     }
 
     // Tailwind v4 requires --spacing for gap-*/p-*/m-* utilities

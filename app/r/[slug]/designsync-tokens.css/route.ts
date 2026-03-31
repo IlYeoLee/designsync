@@ -63,10 +63,17 @@ async function buildFontFaceCSS(fontNames: string[]): Promise<string> {
         .map((f) => { const m = f.name.match(weightFileRe); return m ? { name: f.name, weight: parseInt(m[1], 10), ext: m[2] } : null; })
         .filter((x): x is { name: string; weight: number; ext: string } => x !== null)
         .sort((a, b) => a.weight - b.weight);
-      for (const { name, weight, ext } of matched) {
+      for (let i = 0; i < matched.length; i++) {
+        const { name, weight, ext } = matched[i];
         const format = ext === "ttf" ? "truetype" : ext === "otf" ? "opentype" : ext;
         const url = `${supabaseUrl}/storage/v1/object/public/${STORAGE_BUCKET}/${name}`;
-        css += `@font-face {\n  font-family: '${fontName}';\n  src: url('${url}') format('${format}');\n  font-weight: ${weight};\n  font-display: swap;\n}\n`;
+        // Use a weight range so the browser uses this file for weights between
+        // the previous upload and this one (avoids synthetic bold when CSS requests
+        // a weight like 300 that wasn't uploaded but 400 was).
+        const lower = i === 0 ? 1 : matched[i - 1].weight + 1;
+        const upper = i === matched.length - 1 ? 1000 : weight;
+        const weightDescriptor = lower === upper ? `${weight}` : `${lower} ${upper}`;
+        css += `@font-face {\n  font-family: '${fontName}';\n  src: url('${url}') format('${format}');\n  font-weight: ${weightDescriptor};\n  font-display: swap;\n}\n`;
       }
     }
   }

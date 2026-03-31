@@ -138,8 +138,6 @@ const SEMANTIC_INFO: Record<string, { label: string; desc: string }> = {
   destructive:             { label: "오류 배경",       desc: "오류·삭제 상태 배경" },
   "destructive-foreground":{ label: "오류 텍스트",    desc: "오류 배경 위 글자" },
   "error-border":          { label: "오류 선",        desc: "오류 상태 테두리" },
-  icon:                    { label: "아이콘",          desc: "기본 아이콘 색" },
-  "icon-muted":            { label: "흐린 아이콘",    desc: "비활성 아이콘 색" },
   border:                  { label: "선",             desc: "일반 UI 테두리" },
   "card-border":           { label: "카드 선",        desc: "카드·패널 테두리" },
   input:                   { label: "입력선",         desc: "폼 요소 테두리" },
@@ -161,7 +159,6 @@ const SEMANTIC_INFO: Record<string, { label: string; desc: string }> = {
 const SEMANTIC_GROUPS: { title: string; keys: string[] }[] = [
   { title: "배경",   keys: ["background", "card", "card-foreground", "popover", "popover-foreground", "secondary", "secondary-foreground", "muted", "accent"] },
   { title: "텍스트", keys: ["foreground", "muted-foreground", "accent-foreground"] },
-  { title: "아이콘", keys: ["icon", "icon-muted"] },
   { title: "액션",   keys: ["primary", "primary-foreground"] },
   { title: "테두리", keys: ["card-border", "input", "divider", "ring"] },
   { title: "상태",   keys: ["selected", "selected-foreground"] },

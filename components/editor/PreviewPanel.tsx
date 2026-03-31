@@ -889,10 +889,10 @@ function SidebarPreview({ icons }: { icons: IconMap }) {
 function NavigationPreview({ icons }: { icons: IconMap }) {
   return (
     <div className="flex flex-col gap-[var(--ds-section-gap)]">
-      {/* Header */}
+      {/* NavBar */}
       <div>
-        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Header</p>
-        <div className="rounded-[var(--ds-card-radius)] border border-border overflow-hidden">
+        <p className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">NavBar</p>
+        <div className="overflow-hidden">
           <Header>
             <HeaderLogo href="#">
               <div className="w-6 h-6 rounded-[var(--ds-element-radius)] bg-primary flex items-center justify-center">
