@@ -69,6 +69,7 @@ export function EditorHeader({
       iconLibrary,
       dsSlug,
       includeInstall: true,
+      defaultMode: isDark ? "dark" : "light",
     });
 
     try {

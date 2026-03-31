@@ -30,6 +30,8 @@ export interface RulesParams {
   dsSlug?: string;
   /** Include the install command section (for clipboard prompt) */
   includeInstall?: boolean;
+  /** Default color mode — copied from DS dashboard toggle at save time */
+  defaultMode?: "light" | "dark";
 }
 
 export function generateRules(params: RulesParams = {}): string {
@@ -40,6 +42,7 @@ export function generateRules(params: RulesParams = {}): string {
     iconLibrary = "lucide",
     dsSlug,
     includeInstall = false,
+    defaultMode = "light",
   } = params;
 
 
@@ -62,19 +65,21 @@ export function generateRules(params: RulesParams = {}): string {
 
   // -- Install section (only in clipboard prompt) --
   const tokensCssUrl = dsSlug ? `${CDN}/r/${dsSlug}/designsync-tokens.css` : "";
+  const modeParam = defaultMode === "dark" ? "&mode=dark" : "";
   const installSection = includeInstall
     ? `## 1. 설치
 
 아래 명령어를 실행해줘 (한 줄이면 끝):
 
 \`\`\`bash
-${dsSlug ? `DESIGNSYNC_SLUG=${dsSlug} ` : ""}npm install github:IlYeoLee/designsync-ui && node node_modules/@ilyeolee/designsync-ui/designsync-migrate.mjs src
+${dsSlug ? `DESIGNSYNC_SLUG=${dsSlug} ` : ""}${defaultMode === "dark" ? "DESIGNSYNC_MODE=dark " : ""}npm install github:IlYeoLee/designsync-ui && node node_modules/@ilyeolee/designsync-ui/designsync-migrate.mjs src
 \`\`\`
 
 이 명령어가 자동으로 하는 일:
 1. UI 컴포넌트 60개 설치${dsSlug ? `
 2. 디자인 토큰 실시간 연동 (@import url 자동 삽입)` : ``}
-3. .cursorrules + CLAUDE.md 디자인 규칙 생성
+3. .cursorrules + CLAUDE.md 디자인 규칙 생성${defaultMode === "dark" ? `
+4. 기본 색상 모드 다크로 설정 (layout.tsx의 <html> 태그에 className="dark" 자동 추가)` : ""}
 ${tokensCssUrl ? `
 설치 후 DesignSync 웹에서 디자인 토큰을 수정하고 저장하면 프로젝트에 즉시 반영된다.
 ` : ""}

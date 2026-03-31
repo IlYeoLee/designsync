@@ -17,6 +17,7 @@ function getSupabase() {
  */
 export async function GET(request: NextRequest) {
   const dsSlug = request.nextUrl.searchParams.get("ds") || "";
+  const defaultMode = request.nextUrl.searchParams.get("mode") === "dark" ? "dark" as const : "light" as const;
 
   let fontFamily = "";
   let fontFamilyKo = "";
@@ -77,6 +78,7 @@ export async function GET(request: NextRequest) {
     fontSansValue,
     iconLibrary,
     includeInstall: false,
+    defaultMode,
   });
 
   const header = `# DesignSync — AI Coding Rules

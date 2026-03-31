@@ -5,6 +5,7 @@ const CDN = "https://designsync-omega.vercel.app";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const dsSlug = searchParams.get("ds") || "";
+  const defaultMode = searchParams.get("mode") === "dark" ? "dark" : "light";
 
   // If slug provided, use dynamic URLs; otherwise fallback to static
   const tokensUrl = dsSlug
@@ -359,6 +360,33 @@ function detectCloudFolder(dir) {
     if (!currentCss.includes(liveImportUrl)) {
       await writeFileWithRetry(globalsPath, liveImportLine + '\\n' + currentCss);
       console.log('         Added live token import: ' + liveImportUrl);
+    }
+  }
+
+  // ── Step 4a-3: Apply default color mode to layout.tsx ───────────
+  var defaultModeVal = process.env.DESIGNSYNC_MODE || '${defaultMode}';
+  if (defaultModeVal === 'dark') {
+    var layoutCandidates = ['src/app/layout.tsx', 'app/layout.tsx', 'src/app/layout.jsx', 'app/layout.jsx'];
+    var layoutPath = layoutCandidates.find(function(f) { return fs.existsSync(f); });
+    if (layoutPath) {
+      var layoutContent = fs.readFileSync(layoutPath, 'utf-8');
+      var alreadyDark = layoutContent.includes('className="dark') || layoutContent.includes("className='dark");
+      if (!alreadyDark) {
+        // <html> 태그에 className="dark" 추가 (suppressHydrationWarning 등 기존 props 보존)
+        layoutContent = layoutContent.replace(
+          /(<html)([^>]*)(>)/,
+          function(match, open, attrs, close) {
+            if (attrs.includes('className=')) {
+              return open + attrs.replace(/className="([^"]*)"/, 'className="dark $1"') + close;
+            }
+            return open + attrs + ' className="dark"' + close;
+          }
+        );
+        await writeFileWithRetry(layoutPath, layoutContent);
+        console.log('         Set default mode: dark (patched ' + layoutPath + ')');
+      } else {
+        console.log('         Default mode: dark (already set)');
+      }
     }
   }
 
