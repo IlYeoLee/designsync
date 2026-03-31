@@ -47,11 +47,21 @@ const BANNED_COLOR_PATTERNS = [
   { pat: "border-amber-",fix: "border-[color:var(--warning-border)]" },
   { pat: "border-green-",fix: "border-[color:var(--success-border)]" },
   { pat: "border-rose-", fix: "border-[color:var(--error-border)]" },
-  { pat: "success-50",   fix: "use semantic token: bg-[color:var(--success)]" },
+  // Primitive scale direct refs — use semantic tokens instead
   { pat: "success-100",  fix: "use semantic token: bg-[color:var(--success)]" },
   { pat: "success-200",  fix: "use semantic token: border-[color:var(--success-border)]" },
+  { pat: "success-300",  fix: "use semantic token: border-[color:var(--success-border)]" },
+  { pat: "success-600",  fix: "use semantic token: text-[color:var(--success-foreground)]" },
   { pat: "success-700",  fix: "use semantic token: text-[color:var(--success-foreground)]" },
+  { pat: "success-800",  fix: "use semantic token: text-[color:var(--success-foreground)]" },
   { pat: "success-900",  fix: "use semantic token: bg-[color:var(--success)]" },
+  { pat: "error-100",    fix: "use semantic token: bg-destructive/10" },
+  { pat: "error-300",    fix: "use semantic token: border-[color:var(--error-border)]" },
+  { pat: "error-600",    fix: "use semantic token: bg-destructive or text-destructive" },
+  { pat: "error-700",    fix: "use semantic token: text-destructive" },
+  { pat: "info-100",     fix: "use semantic token: bg-[color:var(--info)]" },
+  { pat: "info-700",     fix: "use semantic token: text-[color:var(--info-foreground)]" },
+  { pat: "info-900",     fix: "use semantic token: bg-[color:var(--info)]" },
 ];
 
 const noRestrictedSyntaxRules = [

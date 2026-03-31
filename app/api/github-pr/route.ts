@@ -169,10 +169,21 @@ const BANNED_COLORS = [
   { pat: "border-amber-", fix: "border-[color:var(--warning-border)]" },
   { pat: "border-green-", fix: "border-[color:var(--success-border)]" },
   { pat: "border-rose-", fix: "border-[color:var(--error-border)]" },
-  { pat: "success-50", fix: "bg-[color:var(--success)]" },
+  // Primitive scale direct refs — use semantic tokens instead
   { pat: "success-100", fix: "bg-[color:var(--success)]" },
   { pat: "success-200", fix: "border-[color:var(--success-border)]" },
+  { pat: "success-300", fix: "border-[color:var(--success-border)]" },
+  { pat: "success-600", fix: "text-[color:var(--success-foreground)]" },
   { pat: "success-700", fix: "text-[color:var(--success-foreground)]" },
+  { pat: "success-800", fix: "text-[color:var(--success-foreground)]" },
+  { pat: "success-900", fix: "bg-[color:var(--success)]" },
+  { pat: "error-100",   fix: "bg-destructive/10" },
+  { pat: "error-300",   fix: "border-[color:var(--error-border)]" },
+  { pat: "error-600",   fix: "bg-destructive or text-destructive" },
+  { pat: "error-700",   fix: "text-destructive" },
+  { pat: "info-100",    fix: "bg-[color:var(--info)]" },
+  { pat: "info-700",    fix: "text-[color:var(--info-foreground)]" },
+  { pat: "info-900",    fix: "bg-[color:var(--info)]" },
 ];
 
 export const designsyncRules = [
