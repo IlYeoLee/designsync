@@ -183,7 +183,7 @@ function Combobox({
                   {option.label}
                   <CheckIcon
                     className={cn(
-                      "ml-auto size-4",
+                      "ml-auto size-4 text-primary",
                       selectedValues.includes(option.value)
                         ? "opacity-100"
                         : "opacity-0"

@@ -165,7 +165,7 @@ function SelectSeparator({
   return (
     <SelectPrimitive.Separator
       data-slot="select-separator"
-      className={cn("bg-muted -mx-1 my-1 h-px", className)}
+      className={cn("bg-[color:var(--divider)] -mx-1 my-1 h-px", className)}
       {...props}
     />
   )

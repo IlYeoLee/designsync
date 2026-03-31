@@ -66,7 +66,7 @@ function CommandInput({
       data-slot="command-input-wrapper"
       className="flex h-[var(--ds-input-h)] items-center gap-2 border-b px-3"
     >
-      <SearchIcon className="size-4 shrink-0 opacity-50" />
+      <SearchIcon className="size-4 shrink-0 text-muted-foreground" />
       <CommandPrimitive.Input
         data-slot="command-input"
         className={cn(
@@ -101,7 +101,7 @@ function CommandEmpty({
   return (
     <CommandPrimitive.Empty
       data-slot="command-empty"
-      className="py-[var(--ds-section-gap)] text-center text-sm"
+      className="py-[var(--ds-section-gap)] text-center text-sm text-muted-foreground"
       {...props}
     />
   )
@@ -130,7 +130,7 @@ function CommandSeparator({
   return (
     <CommandPrimitive.Separator
       data-slot="command-separator"
-      className={cn("-mx-1 h-px bg-border", className)}
+      className={cn("-mx-1 h-px bg-[color:var(--divider)]", className)}
       {...props}
     />
   )

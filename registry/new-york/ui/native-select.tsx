@@ -5,7 +5,7 @@ import { ChevronDownIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const nativeSelectVariants = cva(
-  "flex w-full appearance-none rounded-[var(--ds-input-radius)] border border-input bg-card text-foreground shadow-xs transition-colors focus-visible:border-ring focus-visible:ring-[var(--ds-focus-ring-width)] focus-visible:ring-ring/50 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+  "flex w-full appearance-none rounded-[var(--ds-input-radius)] border border-input bg-background text-foreground shadow-xs transition-colors focus-visible:border-ring focus-visible:ring-[var(--ds-focus-ring-width)] focus-visible:ring-ring/50 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
   {
     variants: {
       size: {
