@@ -39,8 +39,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Upload to Supabase Storage (original format, no conversion)
+    const fontWeight = (formData.get("fontWeight") as string | null) || "400";
     const fontSlug = fontName.replace(/ /g, "-").toLowerCase();
-    const uploadFilename = `${fontSlug}-400.${ext}`;
+    const uploadFilename = `${fontSlug}-${fontWeight}.${ext}`;
 
     const { error: uploadError } = await getSupabase().storage
       .from(STORAGE_BUCKET)

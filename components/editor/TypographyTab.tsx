@@ -70,6 +70,19 @@ function RemPxInput({
   );
 }
 
+function styleToWeight(style: string): number {
+  const s = style.toLowerCase();
+  if (s.includes("thin") || s.includes("hairline")) return 100;
+  if (s.includes("extralight") || s.includes("extra light") || s.includes("ultralight")) return 200;
+  if (s.includes("light")) return 300;
+  if (s.includes("medium")) return 500;
+  if (s.includes("semibold") || s.includes("semi bold") || s.includes("demibold")) return 600;
+  if (s.includes("extrabold") || s.includes("extra bold") || s.includes("ultrabold")) return 800;
+  if (s.includes("black") || s.includes("heavy")) return 900;
+  if (s.includes("bold")) return 700;
+  return 400; // regular / normal
+}
+
 export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFontFamilyKoChange, onFontUpload }: TypographyTabProps) {
   const [fontSearch, setFontSearch] = React.useState("");
   const [localFonts, setLocalFonts] = React.useState<string[]>([]);
@@ -165,23 +178,26 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
       if (!("queryLocalFonts" in win)) return;
 
       const fonts = await win.queryLocalFonts();
-      const match = fonts.find((f: { family: string }) => f.family === fontName);
-      if (!match) return;
-
-      // Get font blob
-      const blob: Blob = await match.blob();
+      const matches = fonts.filter((f: { family: string }) => f.family === fontName);
+      if (!matches.length) return;
 
       setFontUploadStatus({ loading: true, font: fontName, result: null });
 
-      const formData = new FormData();
-      formData.append("file", blob, `${fontName}.ttf`);
-      formData.append("fontName", fontName);
+      let lastData: Record<string, unknown> = {};
+      for (const face of matches) {
+        const weight = styleToWeight(face.style || "");
+        const blob: Blob = await face.blob();
+        const formData = new FormData();
+        formData.append("file", blob, `${fontName}-${weight}.ttf`);
+        formData.append("fontName", fontName);
+        formData.append("fontWeight", String(weight));
+        const res = await fetch("/api/font-upload", { method: "POST", body: formData });
+        lastData = await res.json();
+        if (lastData.error) break;
+      }
 
-      const res = await fetch("/api/font-upload", { method: "POST", body: formData });
-      const data = await res.json();
-
-      setFontUploadStatus({ loading: false, font: fontName, result: data });
-      if (!data.error && onFontUpload) onFontUpload(fontName);
+      setFontUploadStatus({ loading: false, font: fontName, result: lastData });
+      if (!lastData.error && onFontUpload) onFontUpload(fontName);
       setTimeout(() => setFontUploadStatus(null), 5000);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "로컬 폰트 업로드 실패";
@@ -211,17 +227,23 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
       const win = window as any;
       if (!("queryLocalFonts" in win)) return;
       const fonts = await win.queryLocalFonts();
-      const match = fonts.find((f: { family: string }) => f.family === fontName);
-      if (!match) return;
-      const blob: Blob = await match.blob();
+      const matches = fonts.filter((f: { family: string }) => f.family === fontName);
+      if (!matches.length) return;
       setKoFontUploadStatus({ loading: true, font: fontName, result: null });
-      const formData = new FormData();
-      formData.append("file", blob, `${fontName}.ttf`);
-      formData.append("fontName", fontName);
-      const res = await fetch("/api/font-upload", { method: "POST", body: formData });
-      const data = await res.json();
-      setKoFontUploadStatus({ loading: false, font: fontName, result: data });
-      if (!data.error && onFontUpload) onFontUpload(fontName);
+      let lastData: Record<string, unknown> = {};
+      for (const face of matches) {
+        const weight = styleToWeight(face.style || "");
+        const blob: Blob = await face.blob();
+        const formData = new FormData();
+        formData.append("file", blob, `${fontName}-${weight}.ttf`);
+        formData.append("fontName", fontName);
+        formData.append("fontWeight", String(weight));
+        const res = await fetch("/api/font-upload", { method: "POST", body: formData });
+        lastData = await res.json();
+        if (lastData.error) break;
+      }
+      setKoFontUploadStatus({ loading: false, font: fontName, result: lastData });
+      if (!lastData.error && onFontUpload) onFontUpload(fontName);
       setTimeout(() => setKoFontUploadStatus(null), 5000);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "로컬 폰트 업로드 실패";
