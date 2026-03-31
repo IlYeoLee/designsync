@@ -184,24 +184,22 @@ export async function fetchAndResolveTokens(
       : flatPrimitives["--neutral-900"] || "oklch(0.145 0 0)";
   }
 
-  // Sidebar tokens
-  lightVars["sidebar"] = flatPrimitives["--neutral-100"] || lightVars["sidebar"] || "";
-  lightVars["sidebar-foreground"] = flatPrimitives["--neutral-900"] || lightVars["sidebar-foreground"] || "";
-  lightVars["sidebar-primary"] = flatPrimitives["--brand-600"] || lightVars["sidebar-primary"] || "";
-  lightVars["sidebar-primary-foreground"] = lightVars["primary-foreground"];
-  lightVars["sidebar-accent"] = flatPrimitives["--brand-100"] || lightVars["sidebar-accent"] || "";
-  lightVars["sidebar-accent-foreground"] = flatPrimitives["--brand-900"] || lightVars["sidebar-accent-foreground"] || "";
-  lightVars["sidebar-border"] = flatPrimitives["--neutral-200"] || lightVars["sidebar-border"] || "";
-  lightVars["sidebar-ring"] = flatPrimitives["--brand-400"] || lightVars["sidebar-ring"] || "";
-
-  darkVars["sidebar"] = flatPrimitives["--neutral-800"] || darkVars["sidebar"] || "";
-  darkVars["sidebar-foreground"] = flatPrimitives["--neutral-50"] || darkVars["sidebar-foreground"] || "";
-  darkVars["sidebar-primary"] = flatPrimitives["--brand-400"] || darkVars["sidebar-primary"] || "";
-  darkVars["sidebar-primary-foreground"] = darkVars["primary-foreground"];
-  darkVars["sidebar-accent"] = flatPrimitives["--brand-900"] || darkVars["sidebar-accent"] || "";
-  darkVars["sidebar-accent-foreground"] = darkVars["primary-foreground"] || flatPrimitives["--brand-100"] || darkVars["sidebar-accent-foreground"] || "";
-  darkVars["sidebar-border"] = flatPrimitives["--neutral-700"] || darkVars["sidebar-border"] || "";
-  darkVars["sidebar-ring"] = flatPrimitives["--brand-500"] || darkVars["sidebar-ring"] || "";
+  // Sidebar tokens — filled by semantic resolve above; fallback to primitives for older snapshots
+  const sidebarDefaults: Record<string, [string, string]> = {
+    "sidebar":                    ["--neutral-100", "--neutral-800"],
+    "sidebar-foreground":         ["--neutral-900", "--neutral-50"],
+    "sidebar-primary":            ["--brand-600",   "--brand-400"],
+    "sidebar-accent":             ["--brand-100",   "--brand-900"],
+    "sidebar-accent-foreground":  ["--brand-900",   "--brand-100"],
+    "sidebar-border":             ["--neutral-200", "--neutral-700"],
+    "sidebar-ring":               ["--brand-400",   "--brand-500"],
+  };
+  for (const [key, [lightFb, darkFb]] of Object.entries(sidebarDefaults)) {
+    if (!lightVars[key]) lightVars[key] = flatPrimitives[lightFb] || "";
+    if (!darkVars[key])  darkVars[key]  = flatPrimitives[darkFb]  || "";
+  }
+  if (!lightVars["sidebar-primary-foreground"]) lightVars["sidebar-primary-foreground"] = lightVars["primary-foreground"];
+  if (!darkVars["sidebar-primary-foreground"])  darkVars["sidebar-primary-foreground"]  = darkVars["primary-foreground"];
 
   // Font
   const fontFamily = tokens.primitives?.fontFamily || "Geist";
