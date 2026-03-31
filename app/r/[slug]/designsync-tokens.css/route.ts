@@ -24,7 +24,7 @@ const SHADCN_TOKENS = new Set([
   "muted", "muted-foreground",
   "accent", "accent-foreground",
   "destructive", "destructive-foreground",
-  "border", "input", "ring",
+  "border", "card-border", "input", "ring",
   "popover", "popover-foreground",
   "radius", "font-sans", "font-mono",
   "sidebar", "sidebar-foreground",
