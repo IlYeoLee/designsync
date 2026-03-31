@@ -1230,19 +1230,19 @@ function DisplayPreview({ icons }: { icons: IconMap }) {
       <div>
         <h3 className="text-sm font-medium text-foreground mb-[var(--ds-internal-gap)]">Typography</h3>
         <div className="flex flex-col gap-[var(--ds-internal-gap)] max-w-lg">
-          <TypographyH1 style={{ fontSize: 'var(--font-size-4xl)' }}>Heading 1</TypographyH1>
-          <TypographyH2>Heading 2</TypographyH2>
-          <TypographyH3>Heading 3</TypographyH3>
-          <TypographyH4>Heading 4</TypographyH4>
-          <TypographyLead>리드 문단은 조금 더 큰 텍스트로 섹션을 소개합니다.</TypographyLead>
-          <TypographyP>일반 본문 텍스트입니다. 빠른 갈색 여우가 게으른 개를 뛰어넘었습니다.</TypographyP>
-          <TypographyBlockquote>
+          <TypographyH1 style={{ fontSize: 'var(--font-size-4xl)', fontWeight: 'var(--font-weight-extrabold)' }}>Heading 1</TypographyH1>
+          <TypographyH2 style={{ fontSize: 'var(--font-size-3xl)', fontWeight: 'var(--font-weight-semibold)' }}>Heading 2</TypographyH2>
+          <TypographyH3 style={{ fontSize: 'var(--font-size-2xl)', fontWeight: 'var(--font-weight-semibold)' }}>Heading 3</TypographyH3>
+          <TypographyH4 style={{ fontSize: 'var(--font-size-xl)', fontWeight: 'var(--font-weight-semibold)' }}>Heading 4</TypographyH4>
+          <TypographyLead style={{ fontSize: 'var(--font-size-xl)' }}>리드 문단은 조금 더 큰 텍스트로 섹션을 소개합니다.</TypographyLead>
+          <TypographyP style={{ fontSize: 'var(--font-size-base)', fontWeight: 'var(--font-weight-normal)', lineHeight: 'var(--line-height-normal)' }}>일반 본문 텍스트입니다. 빠른 갈색 여우가 게으른 개를 뛰어넘었습니다.</TypographyP>
+          <TypographyBlockquote style={{ fontSize: 'var(--font-size-base)', lineHeight: 'var(--line-height-relaxed)' }}>
             &ldquo;디자인은 어떻게 보이는가가 아니라, 어떻게 작동하는가이다.&rdquo; &mdash; 스티브 잡스
           </TypographyBlockquote>
-          <TypographyCode>npm install @designsync/ui</TypographyCode>
-          <TypographyLarge>Large 텍스트</TypographyLarge>
-          <TypographySmall>Small 텍스트 — 작은 보조 정보</TypographySmall>
-          <TypographyMuted>보조 정보를 위한 흐린 텍스트입니다.</TypographyMuted>
+          <TypographyCode style={{ fontSize: 'var(--font-size-sm)' }}>npm install @designsync/ui</TypographyCode>
+          <TypographyLarge style={{ fontSize: 'var(--font-size-lg)', fontWeight: 'var(--font-weight-semibold)' }}>Large 텍스트</TypographyLarge>
+          <TypographySmall style={{ fontSize: 'var(--font-size-sm)', fontWeight: 'var(--font-weight-medium)' }}>Small 텍스트 — 작은 보조 정보</TypographySmall>
+          <TypographyMuted style={{ fontSize: 'var(--font-size-sm)', lineHeight: 'var(--line-height-normal)' }}>보조 정보를 위한 흐린 텍스트입니다.</TypographyMuted>
 
           <TypographyList>
             <li>순서 없는 리스트 항목 1</li>
@@ -1816,12 +1816,10 @@ function FeedbackPreview({ icons }: { icons: IconMap }) {
             <AlertTitle>안내</AlertTitle>
             <AlertDescription>계정이 성공적으로 업데이트되었습니다.</AlertDescription>
           </Alert>
-          <Alert
-            className="border-[var(--success-300)] bg-[var(--success-50)] dark:border-[var(--success-700)] dark:bg-[var(--success-900)]"
-          >
-            <icons.checkCircle className="h-4 w-4 text-[var(--success-600)] dark:text-[var(--success-400)]" />
-            <AlertTitle className="text-[var(--success-800)] dark:text-[var(--success-100)]">성공</AlertTitle>
-            <AlertDescription className="text-[var(--success-700)] dark:text-[var(--success-200)]">
+          <Alert variant="success">
+            <icons.checkCircle className="h-4 w-4" />
+            <AlertTitle>성공</AlertTitle>
+            <AlertDescription>
               변경사항이 저장되고 성공적으로 배포되었습니다.
             </AlertDescription>
           </Alert>

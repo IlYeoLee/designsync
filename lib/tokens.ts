@@ -270,12 +270,17 @@ export function applyTokensToDocument(tokens: TokenState): void {
   // Apply typography
   for (const [key, value] of Object.entries(tokens.primitives.fontSize)) {
     root.style.setProperty(`--font-size-${key}`, value);
+    // Also set Tailwind v4 --text-* vars directly so @theme inline utility
+    // classes (text-base, text-sm …) reflect runtime token changes
+    root.style.setProperty(`--text-${key}`, value);
   }
   for (const [key, value] of Object.entries(tokens.primitives.fontWeight)) {
     root.style.setProperty(`--font-weight-${key}`, value);
   }
   for (const [key, value] of Object.entries(tokens.primitives.lineHeight)) {
     root.style.setProperty(`--line-height-${key}`, value);
+    // Also set Tailwind v4 --leading-* vars
+    root.style.setProperty(`--leading-${key}`, value);
   }
 
   // Apply spacing
