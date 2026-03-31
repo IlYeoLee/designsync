@@ -152,6 +152,14 @@ const SEMANTIC_INFO: Record<string, { label: string; desc: string }> = {
   "warning-border":        { label: "경고 선",        desc: "경고 상태 테두리" },
   info:                    { label: "정보 배경",      desc: "정보 상태 배경" },
   "info-foreground":       { label: "정보 텍스트",   desc: "정보 배경 위 글자" },
+  sidebar:                         { label: "사이드바 배경",      desc: "사이드바 배경색" },
+  "sidebar-foreground":            { label: "사이드바 텍스트",    desc: "사이드바 글자색" },
+  "sidebar-primary":               { label: "사이드바 액션",      desc: "사이드바 강조색" },
+  "sidebar-primary-foreground":    { label: "사이드바 액션 텍스트", desc: "강조색 위 글자" },
+  "sidebar-accent":                { label: "사이드바 호버",      desc: "호버/활성 배경" },
+  "sidebar-accent-foreground":     { label: "사이드바 호버 텍스트", desc: "호버 배경 위 글자" },
+  "sidebar-border":                { label: "사이드바 선",        desc: "사이드바 테두리" },
+  "sidebar-ring":                  { label: "사이드바 포커스",    desc: "사이드바 포커스 링" },
 };
 
 // Grouping for semantic token editor
@@ -162,6 +170,7 @@ const SEMANTIC_GROUPS: { title: string; keys: string[] }[] = [
   { title: "테두리", keys: ["card-border", "input", "divider", "ring"] },
   { title: "상태",   keys: ["selected", "selected-foreground"] },
   { title: "피드백", keys: ["destructive", "destructive-foreground", "error-border", "success", "success-foreground", "success-border", "warning", "warning-foreground", "warning-border", "info", "info-foreground"] },
+  { title: "사이드바", keys: ["sidebar", "sidebar-foreground", "sidebar-primary", "sidebar-primary-foreground", "sidebar-accent", "sidebar-accent-foreground", "sidebar-border", "sidebar-ring"] },
 ];
 
 // Non-color semantic tokens to hide from the color editor
