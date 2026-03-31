@@ -82,8 +82,9 @@ export default function Home() {
           const ds = newDs as DesignSystem;
           setDesignSystems([ds]);
           setActiveDs(ds);
-          setTokens(ds.tokens);
-          applyTokensToDocument(ds.tokens);
+          const normalized = normalizeTokens(ds.tokens);
+          setTokens(normalized);
+          applyTokensToDocument(normalized);
           applyStylePreset("vega");
         }
       }
@@ -413,9 +414,10 @@ export default function Home() {
   // ── Sidebar handlers ────────────────────────────────────────────
   function handleSelectDs(ds: DesignSystem) {
     setActiveDs(ds);
-    setTokens(ds.tokens);
+    const normalized = normalizeTokens(ds.tokens);
+    setTokens(normalized);
     setIsDark(ds.default_mode === "dark");
-    applyTokensToDocument(ds.tokens);
+    applyTokensToDocument(normalized);
     applyStylePreset(ds.style_preset || "vega");
     setHistory([]);
     setSnapshots([]);
