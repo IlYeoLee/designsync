@@ -12,6 +12,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/registry/new-york/ui/sheet"
+import { SidebarTrigger } from "@/registry/new-york/ui/sidebar"
 
 /* ─────────────────────────────────────────────────────────────────────────────
  * Header — composable top navigation bar.
@@ -35,14 +36,24 @@ import {
  *       <HeaderMobileNavLink href="/pricing">Pricing</HeaderMobileNavLink>
  *     </HeaderMobileNav>
  *   </Header>
+ *
+ * With sidebar toggle (renders SidebarTrigger on the left):
+ *   <Header sticky showSidebarTrigger>
+ *     <HeaderLogo href="/" title="MyApp" />
+ *     ...
+ *   </Header>
+ *
+ * With text title (no logo icon):
+ *   <HeaderLogo href="/" title="Dashboard" />
  * ──────────────────────────────────────────────────────────────────────────── */
 
 function Header({
   className,
   sticky = false,
+  showSidebarTrigger = false,
   children,
   ...props
-}: React.ComponentProps<"header"> & { sticky?: boolean }) {
+}: React.ComponentProps<"header"> & { sticky?: boolean; showSidebarTrigger?: boolean }) {
   return (
     <header
       data-slot="header"
@@ -55,6 +66,7 @@ function Header({
       {...props}
     >
       <div className="flex h-14 items-center gap-[var(--ds-section-gap)] px-[var(--ds-card-padding)] md:px-[var(--ds-card-padding)]">
+        {showSidebarTrigger && <SidebarTrigger className="-ml-1 shrink-0" />}
         {children}
       </div>
     </header>
@@ -64,9 +76,10 @@ function Header({
 function HeaderLogo({
   className,
   href = "/",
+  title,
   children,
   ...props
-}: React.ComponentProps<"a">) {
+}: React.ComponentProps<"a"> & { title?: string }) {
   return (
     <a
       data-slot="header-logo"
@@ -77,7 +90,7 @@ function HeaderLogo({
       )}
       {...props}
     >
-      {children}
+      {children ?? title}
     </a>
   )
 }
