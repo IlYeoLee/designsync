@@ -102,6 +102,19 @@ ${tokensCssUrl ? `
 
 ` : ""}**[최우선 규칙] 이 프로젝트는 DesignSync 디자인 시스템 + ESLint 강제를 사용한다. 코드를 작성하거나 수정한 후 반드시 \`npx eslint src/\`을 실행하고, 에러가 0이 될 때까지 수정해라. ESLint가 잡는 것: 하드코딩 색상, 하드코딩 radius/height/padding, raw HTML 요소(<button>/<input>/<aside>/<header>/<table>/<h1>~<h6>), SVG 차트. 에러가 남아있으면 작업 완료가 아니다.**
 
+**[커스텀 컴포넌트 강제 규칙 — DS 컴포넌트가 없어도 토큰은 반드시 사용]**
+DesignSync에 해당 컴포넌트가 없다고 해서 하드코딩 색상/크기를 써도 되는 게 아니다. 커스텀으로 만드는 모든 UI도 아래 토큰을 **예외 없이** 사용해야 한다. 이걸 어기면 DesignSync 웹에서 색상/폰트를 바꿔도 해당 컴포넌트만 혼자 동떨어진 스타일로 남게 된다.
+- 배경: bg-background / bg-card / bg-popover — surface 위계에 맞게 선택
+- 텍스트: text-foreground / text-muted-foreground / text-primary-foreground 등 시맨틱만
+- 테두리: border-border(일반) / border-input(폼) / border-[color:var(--card-border)](카드) / border-[color:var(--error-border)](오류)
+- 구분선: bg-[color:var(--divider)] — border-t 직접 사용 금지
+- 선택 상태: bg-[color:var(--selected)] text-[color:var(--selected-foreground)]
+- 둥글기: rounded-[var(--ds-button-radius)] / rounded-[var(--ds-element-radius)] / rounded-[var(--ds-input-radius)] / rounded-[var(--ds-card-radius)]
+- 호버: hover:bg-accent hover:text-accent-foreground
+- 포커스(폼): focus:border-ring focus:ring-ring/50 focus:ring-[var(--ds-focus-ring-width)]
+- 포커스(버튼): focus-visible:ring-ring/50
+- ❌ 시맨틱 토큰에 없는 색상이 필요하면 프리미티브(--brand-600 등) 직접 참조 금지 → 새 시맨틱 토큰 추가 먼저 제안할 것
+
 **[사이드바 강제 규칙 — 절대 예외 없음]**
 사이드바가 있는 페이지는 반드시 \`<SidebarProvider>\` + \`<Sidebar>\` + \`<SidebarInset>\` 구조를 사용해야 한다. ❌ \`<aside>\` 직접 사용 금지. ❌ div로 사이드바 커스텀 구현 금지.
 레이아웃 필수 패턴:
