@@ -121,25 +121,47 @@ const PRIMITIVE_VAR_OPTIONS: { label: string; value: string; scale: ColorScaleNa
 
 // Semantic token labels: English name + Korean short description
 const SEMANTIC_INFO: Record<string, { label: string; desc: string }> = {
-  primary:              { label: "primary",              desc: "메인 색상" },
-  "primary-foreground": { label: "primary-fg",           desc: "메인 위 텍스트" },
-  background:           { label: "background",           desc: "페이지 배경" },
-  foreground:           { label: "foreground",            desc: "기본 텍스트" },
-  card:                 { label: "card",                  desc: "카드 배경" },
-  "card-foreground":    { label: "card-fg",               desc: "카드 텍스트" },
-  popover:              { label: "popover",               desc: "팝오버 배경" },
-  "popover-foreground": { label: "popover-fg",            desc: "팝오버 텍스트" },
-  secondary:            { label: "secondary",             desc: "보조 배경" },
-  "secondary-foreground": { label: "secondary-fg",        desc: "보조 텍스트" },
-  muted:                { label: "muted",                 desc: "흐린 배경" },
-  "muted-foreground":   { label: "muted-fg",              desc: "흐린 텍스트" },
-  accent:               { label: "accent",                desc: "강조 배경" },
-  "accent-foreground":  { label: "accent-fg",             desc: "강조 텍스트" },
-  destructive:          { label: "destructive",           desc: "삭제/위험" },
-  border:               { label: "border",                desc: "테두리" },
-  input:                { label: "input",                 desc: "입력 테두리" },
-  ring:                 { label: "ring",                  desc: "포커스 링" },
+  background:              { label: "배경",           desc: "페이지 배경" },
+  card:                    { label: "카드",           desc: "카드 배경" },
+  "card-foreground":       { label: "카드 텍스트",    desc: "카드 위 글자" },
+  popover:                 { label: "팝오버",         desc: "팝오버/드롭다운 배경" },
+  "popover-foreground":    { label: "팝오버 텍스트",  desc: "팝오버 위 글자" },
+  secondary:               { label: "보조 배경",      desc: "2차 영역 배경" },
+  "secondary-foreground":  { label: "보조 텍스트",    desc: "보조 배경 위 글자" },
+  muted:                   { label: "흐린 배경",      desc: "흐린 영역 배경" },
+  accent:                  { label: "강조 배경",      desc: "강조/hover 배경" },
+  foreground:              { label: "텍스트",         desc: "기본 글자색" },
+  "muted-foreground":      { label: "흐린 텍스트",   desc: "부제목·설명 글자" },
+  "accent-foreground":     { label: "강조 텍스트",   desc: "강조 배경 위 글자" },
+  primary:                 { label: "주 색상",        desc: "브랜드 메인 색상" },
+  "primary-foreground":    { label: "주 색 위 텍스트", desc: "주 색상 위 글자" },
+  destructive:             { label: "위험",           desc: "삭제·오류 색상" },
+  icon:                    { label: "아이콘",          desc: "기본 아이콘 색" },
+  "icon-muted":            { label: "흐린 아이콘",    desc: "비활성 아이콘 색" },
+  border:                  { label: "선",             desc: "카드·구분 테두리" },
+  input:                   { label: "입력선",         desc: "폼 요소 테두리" },
+  divider:                 { label: "구분선",         desc: "섹션 구분 선" },
+  ring:                    { label: "포커스",         desc: "포커스 링 색" },
+  selected:                { label: "선택됨",         desc: "선택 항목 배경" },
+  "selected-foreground":   { label: "선택 텍스트",   desc: "선택 항목 글자" },
+  success:                 { label: "성공",           desc: "성공 상태 배경" },
+  "success-foreground":    { label: "성공 텍스트",   desc: "성공 배경 위 글자" },
+  warning:                 { label: "경고",           desc: "경고 상태 배경" },
+  "warning-foreground":    { label: "경고 텍스트",   desc: "경고 배경 위 글자" },
+  info:                    { label: "정보",           desc: "정보 상태 배경" },
+  "info-foreground":       { label: "정보 텍스트",   desc: "정보 배경 위 글자" },
 };
+
+// Grouping for semantic token editor
+const SEMANTIC_GROUPS: { title: string; keys: string[] }[] = [
+  { title: "배경",   keys: ["background", "card", "card-foreground", "popover", "popover-foreground", "secondary", "secondary-foreground", "muted", "accent"] },
+  { title: "텍스트", keys: ["foreground", "muted-foreground", "accent-foreground"] },
+  { title: "아이콘", keys: ["icon", "icon-muted"] },
+  { title: "액션",   keys: ["primary", "primary-foreground", "destructive"] },
+  { title: "테두리", keys: ["border", "input", "divider", "ring"] },
+  { title: "상태",   keys: ["selected", "selected-foreground"] },
+  { title: "피드백", keys: ["success", "success-foreground", "warning", "warning-foreground", "info", "info-foreground"] },
+];
 
 // Non-color semantic tokens to hide from the color editor
 const SEMANTIC_SKIP = new Set(["radius"]);
@@ -244,13 +266,14 @@ function SemanticDropdown({
               })}
             </div>
           ))}
-          {/* White / Black */}
+          {/* White / Black / Transparent */}
           <div className="px-2 py-1 text-[9px] font-medium text-muted-foreground bg-muted/50 sticky top-0">
             기타
           </div>
           {[
             { label: "white", value: "oklch(1 0 0)", color: "#ffffff" },
             { label: "black", value: "oklch(0 0 0)", color: "#000000" },
+            { label: "없음 (transparent)", value: "transparent", color: "transparent" },
           ].map((opt) => (
             <Button
               key={opt.value}
@@ -646,33 +669,59 @@ export function ColorTab({ tokens, onTokenChange, onBatchChange, onSemanticChang
               ))}
             </div>
 
-            <div className="flex flex-col gap-[var(--ds-internal-gap)]">
-              {Object.entries(semanticTokens).filter(([key]) => !SEMANTIC_SKIP.has(key)).map(([key, value]) => {
-                const info = SEMANTIC_INFO[key];
+            <div className="flex flex-col gap-3">
+              {SEMANTIC_GROUPS.map((group) => {
+                const groupEntries = group.keys
+                  .filter((key) => !SEMANTIC_SKIP.has(key))
+                  .map((key) => [key, semanticTokens[key]] as [string, string])
+                  .filter(([, value]) => value !== undefined);
+                if (groupEntries.length === 0) return null;
                 return (
-                  <div key={key} className="flex items-center gap-2">
-                    <div
-                      className="w-4 h-4 rounded-sm border border-border flex-shrink-0"
-                      style={{ backgroundColor: `var(--${key})` }}
-                    />
-                    <div className="w-24 flex-shrink-0">
-                      <span className="text-[10px] text-foreground font-mono block leading-tight truncate">
-                        {info?.label ?? key}
-                      </span>
-                      {info?.desc && (
-                        <span className="text-[9px] text-muted-foreground block leading-tight">
-                          {info.desc}
-                        </span>
-                      )}
+                  <div key={group.title}>
+                    <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider mb-1.5 px-0.5">{group.title}</p>
+                    <div className="flex flex-col gap-[var(--ds-internal-gap)]">
+                      {groupEntries.map(([key, value]) => {
+                        const info = SEMANTIC_INFO[key];
+                        return (
+                          <div key={key} className="flex items-center gap-2">
+                            <div
+                              className="w-4 h-4 rounded-sm border border-border flex-shrink-0"
+                              style={{ backgroundColor: value === "transparent" ? "transparent" : `var(--${key})` }}
+                            />
+                            <div className="w-24 flex-shrink-0">
+                              <span className="text-[10px] text-foreground font-medium block leading-tight truncate">
+                                {info?.label ?? key}
+                              </span>
+                              {info?.desc && (
+                                <span className="text-[9px] text-muted-foreground block leading-tight">
+                                  {info.desc}
+                                </span>
+                              )}
+                            </div>
+                            <SemanticDropdown
+                              value={value}
+                              tokens={tokens}
+                              onChange={(v) => onSemanticChange(semanticMode, key, v)}
+                            />
+                          </div>
+                        );
+                      })}
                     </div>
-                    <SemanticDropdown
-                      value={value}
-                      tokens={tokens}
-                      onChange={(v) => onSemanticChange(semanticMode, key, v)}
-                    />
                   </div>
                 );
               })}
+              {/* 그룹에 없는 토큰 (사용자 커스텀) */}
+              {Object.entries(semanticTokens)
+                .filter(([key]) => !SEMANTIC_SKIP.has(key) && !SEMANTIC_GROUPS.flatMap((g) => g.keys).includes(key))
+                .map(([key, value]) => (
+                  <div key={key} className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-sm border border-border flex-shrink-0" style={{ backgroundColor: `var(--${key})` }} />
+                    <div className="w-24 flex-shrink-0">
+                      <span className="text-[10px] text-foreground font-medium block leading-tight truncate">{key}</span>
+                    </div>
+                    <SemanticDropdown value={value} tokens={tokens} onChange={(v) => onSemanticChange(semanticMode, key, v)} />
+                  </div>
+                ))}
             </div>
           </>
         )}
