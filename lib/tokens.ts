@@ -194,6 +194,15 @@ export const DEFAULT_TOKENS: TokenState = {
   },
 };
 
+/** Normalize tokens loaded from Supabase — Supabase may return numeric fontWeight values */
+export function normalizeTokens(tokens: TokenState): TokenState {
+  const t = JSON.parse(JSON.stringify(tokens)) as TokenState;
+  for (const key of Object.keys(t.primitives.fontWeight) as Array<keyof typeof t.primitives.fontWeight>) {
+    t.primitives.fontWeight[key] = String(t.primitives.fontWeight[key]);
+  }
+  return t;
+}
+
 /** Apply all tokens to the document CSS variables */
 export function applyTokensToDocument(tokens: TokenState): void {
   if (typeof document === 'undefined') return;

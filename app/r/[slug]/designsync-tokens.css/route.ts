@@ -53,25 +53,20 @@ async function buildFontFaceCSS(fontNames: string[]): Promise<string> {
       continue;
     }
 
-    const exts = ["woff2", "woff", "ttf", "otf"];
-    const weightRanges: [number, number, number][] = [
-      [100, 300, 300], [400, 400, 400], [500, 600, 500], [700, 700, 700], [800, 900, 900],
-    ];
-    let foundAny = false;
-    for (const ext of exts) {
-      const { data: allFiles } = await supabase.storage.from(STORAGE_BUCKET).list("", { search: fontSlug });
-      if (!allFiles || allFiles.length === 0) break;
-      const format = ext === "ttf" ? "truetype" : ext === "otf" ? "opentype" : ext;
-      for (const [wMin, wMax, wFile] of weightRanges) {
-        const filename = `${fontSlug}-${wFile}.${ext}`;
-        if (allFiles.some((f) => f.name === filename)) {
-          const url = `${supabaseUrl}/storage/v1/object/public/${STORAGE_BUCKET}/${filename}`;
-          const weightDesc = wMin === wMax ? `${wMin}` : `${wMin} ${wMax}`;
-          css += `@font-face {\n  font-family: '${fontName}';\n  src: url('${url}') format('${format}');\n  font-weight: ${weightDesc};\n  font-display: swap;\n}\n`;
-          foundAny = true;
-        }
+    // List all files matching this font slug
+    const { data: allFiles } = await supabase.storage.from(STORAGE_BUCKET).list("", { search: fontSlug });
+    if (allFiles && allFiles.length > 0) {
+      // Match files like: fontslug-400.ttf, fontslug-700.woff2, etc.
+      const weightFileRe = new RegExp(`^${fontSlug}-(\\d+)\\.(woff2|woff|ttf|otf)$`);
+      const matched = allFiles
+        .map((f) => { const m = f.name.match(weightFileRe); return m ? { name: f.name, weight: parseInt(m[1], 10), ext: m[2] } : null; })
+        .filter((x): x is { name: string; weight: number; ext: string } => x !== null)
+        .sort((a, b) => a.weight - b.weight);
+      for (const { name, weight, ext } of matched) {
+        const format = ext === "ttf" ? "truetype" : ext === "otf" ? "opentype" : ext;
+        const url = `${supabaseUrl}/storage/v1/object/public/${STORAGE_BUCKET}/${name}`;
+        css += `@font-face {\n  font-family: '${fontName}';\n  src: url('${url}') format('${format}');\n  font-weight: ${weight};\n  font-display: swap;\n}\n`;
       }
-      if (foundAny) break;
     }
   }
 

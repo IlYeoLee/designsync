@@ -69,6 +69,26 @@ function RemPxInput({
   );
 }
 
+/** Map font style name to CSS font-weight number */
+function styleToWeight(style: string): number {
+  const s = style.toLowerCase();
+  if (s.includes("thin") || s.includes("hairline")) return 100;
+  if (s.includes("extralight") || s.includes("extra light") || s.includes("ultralight")) return 200;
+  if (s.includes("light")) return 300;
+  if (s.includes("medium")) return 500;
+  if (s.includes("semibold") || s.includes("semi bold") || s.includes("demibold")) return 600;
+  if (s.includes("extrabold") || s.includes("extra bold") || s.includes("ultrabold")) return 800;
+  if (s.includes("black") || s.includes("heavy")) return 900;
+  if (s.includes("bold")) return 700;
+  return 400;
+}
+
+/** Parse weight from filename like "FontName-Bold.ttf" */
+function weightFromFilename(name: string): number {
+  const m = name.match(/[-_](thin|hairline|extralight|extra.?light|ultralight|light|medium|semibold|semi.?bold|demibold|extrabold|extra.?bold|ultrabold|black|heavy|bold|regular)/i);
+  return m ? styleToWeight(m[1]) : 400;
+}
+
 export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFontFamilyKoChange, onFontUpload }: TypographyTabProps) {
   const [fontSearch, setFontSearch] = React.useState("");
   const [localFonts, setLocalFonts] = React.useState<string[]>([]);
@@ -80,6 +100,13 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
   const [koLocalFonts, setKoLocalFonts] = React.useState<string[]>([]);
   const [koLocalFontsLoading, setKoLocalFontsLoading] = React.useState(false);
   const [koFontUploadStatus, setKoFontUploadStatus] = React.useState<{ loading: boolean; font: string; result: Record<string, unknown> | null } | null>(null);
+  const [supportsLocalFontApi, setSupportsLocalFontApi] = React.useState<boolean | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const koFileInputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    setSupportsLocalFontApi("queryLocalFonts" in window);
+  }, []);
 
   const filteredGoogleFonts = GOOGLE_FONTS.filter((f) =>
     f.toLowerCase().includes(fontSearch.toLowerCase())
@@ -89,16 +116,12 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
   );
 
   async function loadLocalFonts() {
+    if (!supportsLocalFontApi) return;
     setLocalFontsLoading(true);
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const win = window as any;
-      if ("queryLocalFonts" in win) {
-        const fonts: { family: string }[] = await win.queryLocalFonts();
-        setLocalFonts([...new Set(fonts.map((f) => f.family))].sort());
-      } else {
-        setLocalFonts([]);
-      }
+      const fonts: { family: string }[] = await (window as any).queryLocalFonts();
+      setLocalFonts([...new Set(fonts.map((f) => f.family))].sort());
     } catch { setLocalFonts([]); }
     setLocalFontsLoading(false);
   }
@@ -131,27 +154,24 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
   async function uploadLocalFont(fontName: string) {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const win = window as any;
-      if (!("queryLocalFonts" in win)) return;
-
-      const fonts = await win.queryLocalFonts();
-      const match = fonts.find((f: { family: string }) => f.family === fontName);
-      if (!match) return;
-
-      // Get font blob
-      const blob: Blob = await match.blob();
+      const fonts: { family: string; style: string; blob: () => Promise<Blob> }[] = await (window as any).queryLocalFonts();
+      const matches = fonts.filter((f) => f.family === fontName);
+      if (matches.length === 0) return;
 
       setFontUploadStatus({ loading: true, font: fontName, result: null });
 
-      const formData = new FormData();
-      formData.append("file", blob, `${fontName}.ttf`);
-      formData.append("fontName", fontName);
+      for (const match of matches) {
+        const blob = await match.blob();
+        const weight = styleToWeight(match.style || "");
+        const formData = new FormData();
+        formData.append("file", blob, `${fontName}.ttf`);
+        formData.append("fontName", fontName);
+        formData.append("fontWeight", String(weight));
+        await fetch("/api/font-upload", { method: "POST", body: formData });
+      }
 
-      const res = await fetch("/api/font-upload", { method: "POST", body: formData });
-      const data = await res.json();
-
-      setFontUploadStatus({ loading: false, font: fontName, result: data });
-      if (!data.error && onFontUpload) onFontUpload(fontName);
+      setFontUploadStatus({ loading: false, font: fontName, result: { success: true } });
+      if (onFontUpload) onFontUpload(fontName);
       setTimeout(() => setFontUploadStatus(null), 5000);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "로컬 폰트 업로드 실패";
@@ -160,17 +180,39 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
     }
   }
 
+  async function handleFileInputUpload(files: FileList | null, setStatus: typeof setFontUploadStatus, fontChangeFn: (f: string) => void) {
+    if (!files || files.length === 0) return;
+    // Derive font family name from first file's name
+    const rawName = files[0].name.replace(/\.(ttf|otf|woff|woff2)$/i, "");
+    const fontName = rawName
+      .replace(/[-_](thin|hairline|extralight|extra.?light|ultralight|light|medium|semibold|semi.?bold|demibold|extrabold|extra.?bold|ultrabold|black|heavy|bold|regular|italic).*/gi, "")
+      .replace(/[-_]/g, " ")
+      .trim();
+
+    setStatus({ loading: true, font: fontName, result: null });
+    fontChangeFn(fontName);
+
+    for (const f of Array.from(files)) {
+      const weight = weightFromFilename(f.name);
+      const formData = new FormData();
+      formData.append("file", f, f.name);
+      formData.append("fontName", fontName);
+      formData.append("fontWeight", String(weight));
+      await fetch("/api/font-upload", { method: "POST", body: formData });
+    }
+
+    setStatus({ loading: false, font: fontName, result: { success: true } });
+    if (onFontUpload) onFontUpload(fontName);
+    setTimeout(() => setStatus(null), 5000);
+  }
+
   async function loadKoLocalFonts() {
+    if (!supportsLocalFontApi) return;
     setKoLocalFontsLoading(true);
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const win = window as any;
-      if ("queryLocalFonts" in win) {
-        const fonts: { family: string }[] = await win.queryLocalFonts();
-        setKoLocalFonts([...new Set(fonts.map((f) => f.family))].sort());
-      } else {
-        setKoLocalFonts([]);
-      }
+      const fonts: { family: string }[] = await (window as any).queryLocalFonts();
+      setKoLocalFonts([...new Set(fonts.map((f) => f.family))].sort());
     } catch { setKoLocalFonts([]); }
     setKoLocalFontsLoading(false);
   }
@@ -178,20 +220,21 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
   async function uploadKoLocalFont(fontName: string) {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const win = window as any;
-      if (!("queryLocalFonts" in win)) return;
-      const fonts = await win.queryLocalFonts();
-      const match = fonts.find((f: { family: string }) => f.family === fontName);
-      if (!match) return;
-      const blob: Blob = await match.blob();
+      const fonts: { family: string; style: string; blob: () => Promise<Blob> }[] = await (window as any).queryLocalFonts();
+      const matches = fonts.filter((f) => f.family === fontName);
+      if (matches.length === 0) return;
       setKoFontUploadStatus({ loading: true, font: fontName, result: null });
-      const formData = new FormData();
-      formData.append("file", blob, `${fontName}.ttf`);
-      formData.append("fontName", fontName);
-      const res = await fetch("/api/font-upload", { method: "POST", body: formData });
-      const data = await res.json();
-      setKoFontUploadStatus({ loading: false, font: fontName, result: data });
-      if (!data.error && onFontUpload) onFontUpload(fontName);
+      for (const match of matches) {
+        const blob = await match.blob();
+        const weight = styleToWeight(match.style || "");
+        const formData = new FormData();
+        formData.append("file", blob, `${fontName}.ttf`);
+        formData.append("fontName", fontName);
+        formData.append("fontWeight", String(weight));
+        await fetch("/api/font-upload", { method: "POST", body: formData });
+      }
+      setKoFontUploadStatus({ loading: false, font: fontName, result: { success: true } });
+      if (onFontUpload) onFontUpload(fontName);
       setTimeout(() => setKoFontUploadStatus(null), 5000);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "로컬 폰트 업로드 실패";
@@ -301,6 +344,21 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
                 }`}
               >{font}</Button>
             )) : <p className="text-xs text-muted-foreground p-3">폰트를 찾을 수 없습니다</p>
+          ) : supportsLocalFontApi === false ? (
+            <div className="p-3 flex flex-col gap-2">
+              <p className="text-xs text-muted-foreground">이 브라우저는 로컬 폰트 API를 지원하지 않습니다. 폰트 파일을 직접 선택하세요.</p>
+              <Button size="sm" variant="outline" className="text-xs" onClick={() => fileInputRef.current?.click()}>
+                폰트 파일 선택 (.ttf .otf .woff .woff2)
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".ttf,.otf,.woff,.woff2"
+                multiple
+                className="hidden"
+                onChange={(e) => handleFileInputUpload(e.target.files, setFontUploadStatus, onFontFamilyChange)}
+              />
+            </div>
           ) : localFontsLoading ? (
             <p className="text-xs text-muted-foreground p-3">로컬 폰트 로딩 중...</p>
           ) : filteredLocalFonts.length > 0 ? filteredLocalFonts.map((font) => (
@@ -316,7 +374,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
           )) : (
             <p className="text-xs text-muted-foreground p-3">
               {localFonts.length === 0
-                ? "로컬 폰트 접근 API를 사용할 수 없거나 권한이 거부되었습니다"
+                ? "로컬 폰트 접근 권한을 허용하세요"
                 : "폰트를 찾을 수 없습니다"}
             </p>
           )}
@@ -397,6 +455,21 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
                 {font}
               </Button>
             ))
+          ) : supportsLocalFontApi === false ? (
+            <div className="p-3 flex flex-col gap-2">
+              <p className="text-xs text-muted-foreground">이 브라우저는 로컬 폰트 API를 지원하지 않습니다. 폰트 파일을 직접 선택하세요.</p>
+              <Button size="sm" variant="outline" className="text-xs" onClick={() => koFileInputRef.current?.click()}>
+                폰트 파일 선택 (.ttf .otf .woff .woff2)
+              </Button>
+              <input
+                ref={koFileInputRef}
+                type="file"
+                accept=".ttf,.otf,.woff,.woff2"
+                multiple
+                className="hidden"
+                onChange={(e) => handleFileInputUpload(e.target.files, setKoFontUploadStatus, onFontFamilyKoChange)}
+              />
+            </div>
           ) : koLocalFontsLoading ? (
             <p className="text-xs text-muted-foreground p-3">로컬 폰트 로딩 중...</p>
           ) : koLocalFonts.filter(f => f.toLowerCase().includes(koFontSearch.toLowerCase())).map(font => (

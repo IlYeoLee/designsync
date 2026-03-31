@@ -5,7 +5,7 @@ import { EditorHeader } from "@/components/editor/Header";
 import { EditorPanel } from "@/components/editor/EditorPanel";
 import { PreviewPanel } from "@/components/editor/PreviewPanel";
 import { AppSidebar, type DesignSystem } from "@/components/editor/AppSidebar";
-import { DEFAULT_TOKENS, TokenState, HistoryEntry, applyTokensToDocument } from "@/lib/tokens";
+import { DEFAULT_TOKENS, TokenState, HistoryEntry, applyTokensToDocument, normalizeTokens } from "@/lib/tokens";
 import { SidebarProvider, SidebarInset } from "@/registry/new-york/ui/sidebar";
 import { applyStylePreset } from "@/lib/style-presets";
 import { createClient } from "@/lib/supabase";
@@ -54,8 +54,9 @@ export default function Home() {
         setDesignSystems(dsList as DesignSystem[]);
         const first = dsList[0] as DesignSystem;
         setActiveDs(first);
-        setTokens(first.tokens);
-        applyTokensToDocument(first.tokens);
+        const normalized = normalizeTokens(first.tokens);
+        setTokens(normalized);
+        applyTokensToDocument(normalized);
         applyStylePreset(first.style_preset || "vega");
       } else {
         // 첫 방문 — 기본 DS 자동 생성

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { getInstallationToken } from "@/lib/github-app";
+import { generateRules } from "@/lib/rules";
 
 const CDN_BASE = "https://designsync-omega.vercel.app";
 
@@ -226,23 +227,23 @@ export async function POST(req: NextRequest) {
       const lightVars = tokensJson.cssVars?.light || {};
       const darkVars = tokensJson.cssVars?.dark || {};
 
-      const fontFamily = ds.tokens?.primitives?.fontFamily || "Geist";
-      const fontFamilyKo = ds.tokens?.primitives?.fontFamilyKo || "";
-      let fontSansValue = "";
-      let fontSansKoValue = "";
+      const ff = ds.tokens?.primitives?.fontFamily || "Geist";
+      const ffKo = ds.tokens?.primitives?.fontFamilyKo || "";
+      let ffSans = "";
+      let ffSansKo = "";
 
-      if (fontFamilyKo && fontFamily !== "Geist") {
-        fontSansValue = `'${fontFamily}', '${fontFamilyKo}', sans-serif`;
-        fontSansKoValue = `'${fontFamilyKo}', '${fontFamily}', sans-serif`;
-      } else if (fontFamilyKo) {
-        fontSansValue = `'${fontFamilyKo}', sans-serif`;
-        fontSansKoValue = fontSansValue;
-      } else if (fontFamily !== "Geist") {
-        fontSansValue = `'${fontFamily}', sans-serif`;
-        fontSansKoValue = fontSansValue;
+      if (ffKo && ff !== "Geist") {
+        ffSans = `'${ff}', '${ffKo}', sans-serif`;
+        ffSansKo = `'${ffKo}', '${ff}', sans-serif`;
+      } else if (ffKo) {
+        ffSans = `'${ffKo}', sans-serif`;
+        ffSansKo = ffSans;
+      } else if (ff !== "Geist") {
+        ffSans = `'${ff}', sans-serif`;
+        ffSansKo = ffSans;
       }
 
-      tokenCSS = generateTokenCSS(lightVars, darkVars, fontSansKoValue, fontSansValue);
+      tokenCSS = generateTokenCSS(lightVars, darkVars, ffSansKo, ffSans);
     }
 
     if (!tokenCSS) {
@@ -251,10 +252,33 @@ export async function POST(req: NextRequest) {
     }
 
     // 5. Create blobs for files
+    const fontFamily = ds.tokens?.primitives?.fontFamily || "Geist";
+    const fontFamilyKo = ds.tokens?.primitives?.fontFamilyKo || "";
+    let fontSansValue = "";
+    if (fontFamilyKo && fontFamily !== "Geist") {
+      fontSansValue = `'${fontFamily}', '${fontFamilyKo}', sans-serif`;
+    } else if (fontFamilyKo) {
+      fontSansValue = `'${fontFamilyKo}', sans-serif`;
+    } else if (fontFamily !== "Geist") {
+      fontSansValue = `'${fontFamily}', sans-serif`;
+    }
+
+    const claudeMd = generateRules({
+      fontFamily: fontFamily !== "Geist" ? fontFamily : undefined,
+      fontFamilyKo: fontFamilyKo || undefined,
+      fontSansValue: fontSansValue || undefined,
+      iconLibrary: ds.tokens?.primitives?.iconLibrary || "lucide",
+      dsSlug: slug,
+    });
+
     const files: { path: string; content: string }[] = [
       {
         path: "designsync-tokens.css",
         content: tokenCSS,
+      },
+      {
+        path: "CLAUDE.md",
+        content: claudeMd,
       },
     ];
 

@@ -20,6 +20,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "file과 fontName이 필요합니다." }, { status: 400 });
     }
 
+    const fontWeightRaw = formData.get("fontWeight") as string | null;
+    const fontWeight = fontWeightRaw ? parseInt(fontWeightRaw, 10) || 400 : 400;
+
     const arrayBuffer = await file.arrayBuffer();
     const inputBuffer = new Uint8Array(arrayBuffer);
 
@@ -40,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     // Upload to Supabase Storage (original format, no conversion)
     const fontSlug = fontName.replace(/ /g, "-").toLowerCase();
-    const uploadFilename = `${fontSlug}-400.${ext}`;
+    const uploadFilename = `${fontSlug}-${fontWeight}.${ext}`;
 
     const { error: uploadError } = await getSupabase().storage
       .from(STORAGE_BUCKET)
