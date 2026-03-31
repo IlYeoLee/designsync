@@ -199,7 +199,7 @@ export async function fetchAndResolveTokens(
   darkVars["sidebar-primary"] = flatPrimitives["--brand-400"] || darkVars["sidebar-primary"] || "";
   darkVars["sidebar-primary-foreground"] = darkVars["primary-foreground"];
   darkVars["sidebar-accent"] = flatPrimitives["--brand-900"] || darkVars["sidebar-accent"] || "";
-  darkVars["sidebar-accent-foreground"] = flatPrimitives["--brand-100"] || darkVars["sidebar-accent-foreground"] || "";
+  darkVars["sidebar-accent-foreground"] = darkVars["primary-foreground"] || flatPrimitives["--brand-100"] || darkVars["sidebar-accent-foreground"] || "";
   darkVars["sidebar-border"] = flatPrimitives["--neutral-700"] || darkVars["sidebar-border"] || "";
   darkVars["sidebar-ring"] = flatPrimitives["--brand-500"] || darkVars["sidebar-ring"] || "";
 
