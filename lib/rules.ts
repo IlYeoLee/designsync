@@ -158,7 +158,7 @@ ${fontSection}- 시맨틱 색상: var(--primary), var(--secondary), var(--accent
 - Dialog, Sheet, Drawer, AlertDialog, Popover, Tooltip, DropdownMenu, ContextMenu
 - Tabs, Accordion, Collapsible, NavigationMenu, Menubar, Sidebar
 - Table, Badge, Avatar, Progress, Skeleton, Separator, ScrollArea
-- Alert (variant="default|destructive"), Sonner (토스트 알림)
+- Alert (variant="default|destructive|success|warning|info"), Sonner (토스트 알림)
 - Spinner: <Spinner size="sm|default|lg|xl" /> — 로딩 인디케이터
 - Empty: <Empty> <EmptyIcon> <EmptyTitle> <EmptyDescription> <EmptyActions> — 빈 상태 UI
 - Item: <Item> <ItemMedia> <ItemContent> <ItemTitle> <ItemDescription> <ItemActions> — 리스트 아이템
@@ -408,8 +408,8 @@ DesignSync에 해당 컴포넌트가 없더라도 아래 파운데이션 토큰�
 - 커맨드 팔레트 (Cmd+K) → \`<Command> <CommandInput> <CommandList> <CommandItem>\`
 
 **피드백 컴포넌트:**
-- 알림 배너 (bg-blue-50/green-50/red-50 + border + icon) → \`<Alert> <AlertTitle> <AlertDescription>\`
-- 에러 알림 → \`<Alert variant="destructive">\`
+- 알림 배너 → \`<Alert variant="default|destructive|success|warning|info"> <AlertTitle> <AlertDescription>\`
+- 에러 → \`variant="destructive"\`, 성공 → \`variant="success"\`, 경고 → \`variant="warning"\`, 정보 → \`variant="info"\`
 - 토스트 알림 → Sonner \`toast()\`
 - 프로그레스 바 (bg-gray-200 + bg-blue-600 bar) → \`<Progress value={n}>\`
 - 로딩 스켈레톤 (animate-pulse + bg-gray) → \`<Skeleton>\`

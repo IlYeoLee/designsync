@@ -110,7 +110,7 @@ function HeaderNavLink({
       data-active={active || undefined}
       className={cn(
         "text-sm font-medium text-muted-foreground transition-colors hover:text-foreground px-3 py-2 rounded-[var(--ds-element-radius)] whitespace-nowrap",
-        active && "text-foreground bg-accent",
+        active && "bg-[color:var(--selected)] text-[color:var(--selected-foreground)]",
         className
       )}
       {...props}
@@ -176,7 +176,7 @@ function HeaderMobileNavLink({
       data-active={active || undefined}
       className={cn(
         "flex items-center gap-2 rounded-[var(--ds-element-radius)] px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
-        active && "bg-accent text-foreground",
+        active && "bg-[color:var(--selected)] text-[color:var(--selected-foreground)]",
         className
       )}
       {...props}
