@@ -160,12 +160,17 @@ export async function fetchAndResolveTokens(
   const lightPrimaryFg = readableColor(brand600Hex);
   const darkPrimaryFg = readableColor(brand400Hex);
 
-  lightVars["primary-foreground"] = lightPrimaryFg === "#ffffff"
-    ? flatPrimitives["--neutral-50"] || "oklch(1 0 0)"
-    : flatPrimitives["--neutral-900"] || "oklch(0.145 0 0)";
-  darkVars["primary-foreground"] = darkPrimaryFg === "#ffffff"
-    ? flatPrimitives["--neutral-50"] || "oklch(1 0 0)"
-    : flatPrimitives["--neutral-900"] || "oklch(0.145 0 0)";
+  // Only auto-compute if user hasn't explicitly set it in semantic tokens
+  if (!tokens.semantic?.light?.["primary-foreground"]) {
+    lightVars["primary-foreground"] = lightPrimaryFg === "#ffffff"
+      ? flatPrimitives["--neutral-50"] || "oklch(1 0 0)"
+      : flatPrimitives["--neutral-900"] || "oklch(0.145 0 0)";
+  }
+  if (!tokens.semantic?.dark?.["primary-foreground"]) {
+    darkVars["primary-foreground"] = darkPrimaryFg === "#ffffff"
+      ? flatPrimitives["--neutral-50"] || "oklch(1 0 0)"
+      : flatPrimitives["--neutral-900"] || "oklch(0.145 0 0)";
+  }
 
   // Sidebar tokens
   lightVars["sidebar"] = flatPrimitives["--neutral-100"] || lightVars["sidebar"] || "";
