@@ -6,6 +6,7 @@ import { STYLE_PRESETS, applyStylePreset } from "@/lib/style-presets";
 import { Button } from "@/registry/new-york/ui/button";
 import { Input } from "@/registry/new-york/ui/input";
 import { Slider } from "@/registry/new-york/ui/slider";
+import { Switch } from "@/registry/new-york/ui/switch";
 import { getIconMap, type IconName } from "@/lib/icon-map";
 
 const PREVIEW_ICON_KEYS: IconName[] = ["home", "settings", "search", "bell", "mail"];
@@ -296,52 +297,69 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
           {SHADOW_LEVELS.map(({ key, label, yOffset }) => {
             const currentShadow = tokens.primitives.shadows?.[key] ??
               `0 ${yOffset}px ${yOffset * 2}px 0px oklch(0 0 0 / 0.05)`;
-            const { blur, spread, opacity } = parseShadow(currentShadow, yOffset);
+            const isOff = currentShadow === "none" || currentShadow === "0 0 0 0 transparent";
+            const { blur, spread, opacity } = isOff
+              ? { blur: 0, spread: 0, opacity: 0 }
+              : parseShadow(currentShadow, yOffset);
 
             function update(newBlur: number, newSpread: number, newOpacity: number) {
               onTokenChange(`--ds-shadow-${key}`, buildShadow(yOffset, newBlur, newSpread, newOpacity));
             }
 
+            function toggleShadow() {
+              if (isOff) {
+                // 기본값으로 복원
+                onTokenChange(`--ds-shadow-${key}`, buildShadow(yOffset, yOffset * 2, 0, 0.05));
+              } else {
+                onTokenChange(`--ds-shadow-${key}`, "none");
+              }
+            }
+
             return (
               <div key={key}>
-                {/* Preview */}
+                {/* Header with toggle */}
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs text-muted-foreground w-6 font-mono">{label}</span>
                   <div
                     className="flex-1 h-8 rounded-[var(--ds-element-radius)] bg-background border border-border/50"
-                    style={{ boxShadow: currentShadow }}
+                    style={{ boxShadow: isOff ? "none" : currentShadow }}
                   />
+                  <Switch checked={!isOff} onCheckedChange={toggleShadow} />
                 </div>
-                {/* Blur */}
-                <div className="flex items-center gap-2 mb-1 pl-8">
-                  <span className="text-[10px] text-muted-foreground w-10">블러</span>
-                  <Slider
-                    min={0} max={30} step={1} value={[blur]}
-                    onValueChange={(vals) => update(vals[0], spread, opacity)}
-                    className="flex-1"
-                  />
-                  <span className="text-[10px] font-mono text-muted-foreground w-8 text-right">{blur}px</span>
-                </div>
-                {/* Spread */}
-                <div className="flex items-center gap-2 mb-1 pl-8">
-                  <span className="text-[10px] text-muted-foreground w-10">확산</span>
-                  <Slider
-                    min={-10} max={10} step={1} value={[spread]}
-                    onValueChange={(vals) => update(blur, vals[0], opacity)}
-                    className="flex-1"
-                  />
-                  <span className="text-[10px] font-mono text-muted-foreground w-8 text-right">{spread}px</span>
-                </div>
-                {/* Opacity */}
-                <div className="flex items-center gap-2 pl-8">
-                  <span className="text-[10px] text-muted-foreground w-10">투명도</span>
-                  <Slider
-                    min={0} max={0.5} step={0.01} value={[opacity]}
-                    onValueChange={(vals) => update(blur, spread, vals[0])}
-                    className="flex-1"
-                  />
-                  <span className="text-[10px] font-mono text-muted-foreground w-8 text-right">{Math.round(opacity * 100)}%</span>
-                </div>
+                {!isOff && (
+                  <>
+                    {/* Blur */}
+                    <div className="flex items-center gap-2 mb-1 pl-8">
+                      <span className="text-[10px] text-muted-foreground w-10">블러</span>
+                      <Slider
+                        min={0} max={30} step={1} value={[blur]}
+                        onValueChange={(vals) => update(vals[0], spread, opacity)}
+                        className="flex-1"
+                      />
+                      <span className="text-[10px] font-mono text-muted-foreground w-8 text-right">{blur}px</span>
+                    </div>
+                    {/* Spread */}
+                    <div className="flex items-center gap-2 mb-1 pl-8">
+                      <span className="text-[10px] text-muted-foreground w-10">확산</span>
+                      <Slider
+                        min={-10} max={10} step={1} value={[spread]}
+                        onValueChange={(vals) => update(blur, vals[0], opacity)}
+                        className="flex-1"
+                      />
+                      <span className="text-[10px] font-mono text-muted-foreground w-8 text-right">{spread}px</span>
+                    </div>
+                    {/* Opacity */}
+                    <div className="flex items-center gap-2 pl-8">
+                      <span className="text-[10px] text-muted-foreground w-10">투명도</span>
+                      <Slider
+                        min={0} max={0.5} step={0.01} value={[opacity]}
+                        onValueChange={(vals) => update(blur, spread, vals[0])}
+                        className="flex-1"
+                      />
+                      <span className="text-[10px] font-mono text-muted-foreground w-8 text-right">{Math.round(opacity * 100)}%</span>
+                    </div>
+                  </>
+                )}
               </div>
             );
           })}
