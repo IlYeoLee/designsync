@@ -32,7 +32,7 @@ function InputGroupAddon({
     <div
       data-slot="input-group-addon"
       className={cn(
-        "flex items-center bg-muted px-3 text-sm text-muted-foreground select-none shrink-0",
+        "flex items-center self-stretch bg-muted px-3 text-sm text-muted-foreground select-none shrink-0",
         className
       )}
       {...props}
