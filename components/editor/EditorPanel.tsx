@@ -24,6 +24,7 @@ interface EditorPanelProps {
   iconLibrary: string;
   history: HistoryEntry[];
   isDark: boolean;
+  dsSlug?: string;
 }
 
 export function EditorPanel({
@@ -39,6 +40,7 @@ export function EditorPanel({
   iconLibrary,
   history,
   isDark,
+  dsSlug,
 }: EditorPanelProps) {
   const icons = getIconMap(iconLibrary);
   const [activeTab, setActiveTab] = React.useState<Tab>("colors");
@@ -96,6 +98,7 @@ export function EditorPanel({
               onTokenChange={onTokenChange}
               onIconLibraryChange={onIconLibraryChange}
               onStylePresetChange={onStylePresetChange}
+              dsSlug={dsSlug}
             />
           </TabsContent>
         </div>

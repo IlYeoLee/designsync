@@ -23,6 +23,7 @@ interface LayoutTabProps {
   onTokenChange: (variable: string, value: string) => void;
   onIconLibraryChange: (library: string) => void;
   onStylePresetChange: (preset: string) => void;
+  dsSlug?: string;
 }
 
 const RADIUS_OPTIONS = [
@@ -168,7 +169,26 @@ function RadiusScaleSlider({
   );
 }
 
-export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStylePresetChange }: LayoutTabProps) {
+export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStylePresetChange, dsSlug }: LayoutTabProps) {
+  const [iconChanged, setIconChanged] = React.useState<string | null>(null);
+  const [copied, setCopied] = React.useState(false);
+
+  const handleIconChange = (lib: string) => {
+    onIconLibraryChange(lib);
+    setIconChanged(lib);
+    setCopied(false);
+  };
+
+  const installCmd = dsSlug
+    ? `npx shadcn@latest add "https://designsync-omega.vercel.app/r/${dsSlug}/designsync-all.json" --overwrite`
+    : "";
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(installCmd);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="flex flex-col gap-[var(--ds-section-gap)] p-[var(--ds-card-padding)]">
       {/* Style Presets */}
@@ -337,7 +357,7 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
             <Button
               key={lib.id}
               variant={tokens.primitives.iconLibrary === lib.id ? "outline" : "ghost"}
-              onClick={() => onIconLibraryChange(lib.id)}
+              onClick={() => handleIconChange(lib.id)}
               className={`flex flex-col items-start px-3 py-2.5 h-auto rounded-[var(--ds-element-radius)] border text-left transition-colors ${
                 tokens.primitives.iconLibrary === lib.id
                   ? "border-primary bg-accent text-foreground"
@@ -368,6 +388,41 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
           ))}
         </div>
       </div>
+
+      {/* Icon change notification */}
+      {iconChanged && dsSlug && (
+        <div className="rounded-[var(--ds-card-radius)] border border-primary/30 bg-primary/5 p-[var(--ds-card-padding)] flex flex-col gap-2">
+          <div className="flex items-start justify-between">
+            <p className="text-xs font-medium text-foreground">
+              아이콘 변경됨 &rarr; {ICON_LIBRARIES.find((l) => l.id === iconChanged)?.label}
+            </p>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIconChanged(null)}
+              className="h-5 w-5 p-0 text-muted-foreground hover:text-foreground text-xs leading-none"
+            >
+              &times;
+            </Button>
+          </div>
+          <p className="text-[10px] text-muted-foreground">
+            저장 후 프로젝트에서 아래 명령어를 실행하면 모든 컴포넌트의 아이콘이 일괄 교체됩니다.
+          </p>
+          <div className="flex items-center gap-1">
+            <code className="flex-1 text-[10px] font-mono bg-background border border-border rounded-[var(--ds-element-radius)] px-2 py-1.5 overflow-x-auto whitespace-nowrap select-all">
+              {installCmd}
+            </code>
+            <Button
+              variant="outline"
+              size="sm"
+              className="shrink-0 h-7 text-[10px] px-2"
+              onClick={handleCopy}
+            >
+              {copied ? "OK" : "복사"}
+            </Button>
+          </div>
+        </div>
+      )}
 
       <div className="rounded-[var(--ds-element-radius)] bg-muted/50 p-[var(--ds-card-padding)] border border-border">
         <p className="text-xs text-muted-foreground">

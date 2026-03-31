@@ -511,6 +511,7 @@ export default function Home() {
           iconLibrary={tokens.primitives.iconLibrary}
           history={history.slice(0, 3)}
           isDark={isDark}
+          dsSlug={activeDs?.slug ?? ""}
         />
         <PreviewPanel iconLibrary={tokens.primitives.iconLibrary} />
       </div>
