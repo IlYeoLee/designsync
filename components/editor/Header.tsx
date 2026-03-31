@@ -4,8 +4,8 @@ import * as React from "react";
 import { getIconMap } from "@/lib/icon-map";
 import { generateRules } from "@/lib/rules";
 import {
-  NavBar as HeaderRoot,
-  NavBarActions as HeaderActions,
+  Header as HeaderRoot,
+  HeaderActions,
 } from "@/registry/new-york/ui/header";
 import { SidebarTrigger } from "@/registry/new-york/ui/sidebar";
 import { Button } from "@/registry/new-york/ui/button";

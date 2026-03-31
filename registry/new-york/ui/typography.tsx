@@ -24,7 +24,7 @@ function TypographyH2({
   return (
     <h2
       className={cn(
-        "scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0",
+        "scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0",
         className
       )}
       {...props}
@@ -68,7 +68,7 @@ function TypographyP({
 }: React.ComponentProps<"p">) {
   return (
     <p
-      className={cn("leading-7", className)}
+      className={cn("leading-7 [&:not(:first-child)]:mt-6", className)}
       {...props}
     />
   )
@@ -80,7 +80,7 @@ function TypographyBlockquote({
 }: React.ComponentProps<"blockquote">) {
   return (
     <blockquote
-      className={cn("border-l-2 pl-6 italic", className)}
+      className={cn("mt-6 border-l-2 pl-6 italic", className)}
       {...props}
     />
   )

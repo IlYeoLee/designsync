@@ -5,7 +5,7 @@ import { EditorHeader } from "@/components/editor/Header";
 import { EditorPanel } from "@/components/editor/EditorPanel";
 import { PreviewPanel } from "@/components/editor/PreviewPanel";
 import { AppSidebar, type DesignSystem } from "@/components/editor/AppSidebar";
-import { DEFAULT_TOKENS, TokenState, HistoryEntry, applyTokensToDocument, normalizeTokens } from "@/lib/tokens";
+import { DEFAULT_TOKENS, TokenState, HistoryEntry, applyTokensToDocument } from "@/lib/tokens";
 import { SidebarProvider, SidebarInset } from "@/registry/new-york/ui/sidebar";
 import { applyStylePreset } from "@/lib/style-presets";
 import { createClient } from "@/lib/supabase";
@@ -54,9 +54,8 @@ export default function Home() {
         setDesignSystems(dsList as DesignSystem[]);
         const first = dsList[0] as DesignSystem;
         setActiveDs(first);
-        const firstTokens = normalizeTokens(first.tokens);
-        setTokens(firstTokens);
-        applyTokensToDocument(firstTokens);
+        setTokens(first.tokens);
+        applyTokensToDocument(first.tokens);
         applyStylePreset(first.style_preset || "vega");
       } else {
         // 첫 방문 — 기본 DS 자동 생성
@@ -338,7 +337,7 @@ export default function Home() {
     setPrResult(null);
     setPrError(null);
     try {
-      const { data: updatedRows, error } = await supabase
+      const { error } = await supabase
         .from("design_systems")
         .update({
           tokens,
@@ -346,15 +345,10 @@ export default function Home() {
           style_preset: tokens.primitives.stylePreset,
           updated_at: new Date().toISOString(),
         })
-        .eq("id", activeDs.id)
-        .select("id");
+        .eq("id", activeDs.id);
 
       if (error) {
         alert(`저장 실패: ${error.message}`);
-        return false;
-      }
-      if (!updatedRows || updatedRows.length === 0) {
-        alert("저장 실패: 업데이트된 행이 없습니다. 권한 문제이거나 ID가 올바르지 않습니다.");
         return false;
       }
 
@@ -400,9 +394,8 @@ export default function Home() {
   // ── Sidebar handlers ────────────────────────────────────────────
   function handleSelectDs(ds: DesignSystem) {
     setActiveDs(ds);
-    const dsTokens = normalizeTokens(ds.tokens);
-    setTokens(dsTokens);
-    applyTokensToDocument(dsTokens);
+    setTokens(ds.tokens);
+    applyTokensToDocument(ds.tokens);
     applyStylePreset(ds.style_preset || "vega");
     setHistory([]);
     setSnapshots([]);

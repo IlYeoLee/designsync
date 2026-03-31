@@ -53,33 +53,25 @@ async function buildFontFaceCSS(fontNames: string[]): Promise<string> {
       continue;
     }
 
-    // List all uploaded files for this font slug
-    const { data: allFiles } = await supabase.storage.from(STORAGE_BUCKET).list("", { search: fontSlug });
-    if (!allFiles || allFiles.length === 0) continue;
-
-    // Match pattern: fontSlug-{weight}.{ext}
-    const weightFileRegex = new RegExp(`^${fontSlug}-(\\d+)\\.(woff2|woff|ttf|otf)$`);
-    const formatMap: Record<string, string> = { ttf: "truetype", otf: "opentype", woff: "woff", woff2: "woff2" };
-
-    // Sort by weight ascending, prefer woff2 > woff > ttf > otf per weight
-    const byWeight: Record<number, { filename: string; ext: string }> = {};
-    for (const file of allFiles) {
-      const m = file.name.match(weightFileRegex);
-      if (!m) continue;
-      const weight = parseInt(m[1], 10);
-      const ext = m[2];
-      const existing = byWeight[weight];
-      const priority = ["woff2", "woff", "ttf", "otf"];
-      if (!existing || priority.indexOf(ext) < priority.indexOf(existing.ext)) {
-        byWeight[weight] = { filename: file.name, ext };
+    const exts = ["woff2", "woff", "ttf", "otf"];
+    const weightRanges: [number, number, number][] = [
+      [100, 300, 300], [400, 400, 400], [500, 600, 500], [700, 700, 700], [800, 900, 900],
+    ];
+    let foundAny = false;
+    for (const ext of exts) {
+      const { data: allFiles } = await supabase.storage.from(STORAGE_BUCKET).list("", { search: fontSlug });
+      if (!allFiles || allFiles.length === 0) break;
+      const format = ext === "ttf" ? "truetype" : ext === "otf" ? "opentype" : ext;
+      for (const [wMin, wMax, wFile] of weightRanges) {
+        const filename = `${fontSlug}-${wFile}.${ext}`;
+        if (allFiles.some((f) => f.name === filename)) {
+          const url = `${supabaseUrl}/storage/v1/object/public/${STORAGE_BUCKET}/${filename}`;
+          const weightDesc = wMin === wMax ? `${wMin}` : `${wMin} ${wMax}`;
+          css += `@font-face {\n  font-family: '${fontName}';\n  src: url('${url}') format('${format}');\n  font-weight: ${weightDesc};\n  font-display: swap;\n}\n`;
+          foundAny = true;
+        }
       }
-    }
-
-    const sortedWeights = Object.keys(byWeight).map(Number).sort((a, b) => a - b);
-    for (const weight of sortedWeights) {
-      const { filename, ext } = byWeight[weight];
-      const url = `${supabaseUrl}/storage/v1/object/public/${STORAGE_BUCKET}/${filename}`;
-      css += `@font-face {\n  font-family: '${fontName}';\n  src: url('${url}') format('${formatMap[ext]}');\n  font-weight: ${weight};\n  font-display: swap;\n}\n`;
+      if (foundAny) break;
     }
   }
 
