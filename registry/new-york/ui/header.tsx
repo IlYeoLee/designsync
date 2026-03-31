@@ -197,4 +197,12 @@ export {
   NavBarActions,
   NavBarMobileNav,
   NavBarMobileNavLink,
+  // Header* — aliases (generated CLAUDE.md uses these names)
+  NavBar as Header,
+  NavBarLogo as HeaderLogo,
+  NavBarNav as HeaderNav,
+  NavBarNavLink as HeaderNavLink,
+  NavBarActions as HeaderActions,
+  NavBarMobileNav as HeaderMobileNav,
+  NavBarMobileNavLink as HeaderMobileNavLink,
 }
