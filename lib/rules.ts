@@ -65,7 +65,6 @@ export function generateRules(params: RulesParams = {}): string {
 
   // -- Install section (only in clipboard prompt) --
   const tokensCssUrl = dsSlug ? `${CDN}/r/${dsSlug}/designsync-tokens.css` : "";
-  const modeParam = defaultMode === "dark" ? "&mode=dark" : "";
   const installSection = includeInstall
     ? `## 1. 설치
 
