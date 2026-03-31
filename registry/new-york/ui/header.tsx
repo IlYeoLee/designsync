@@ -48,7 +48,7 @@ function Header({
       data-slot="header"
       data-sticky={sticky || undefined}
       className={cn(
-        "border-b border-border bg-background",
+        "border-b border-border bg-card",
         sticky && "sticky top-0 z-50",
         className
       )}
