@@ -311,7 +311,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
               ? "bg-muted/50 border-border text-muted-foreground"
               : fontUploadStatus.result?.error
               ? "bg-destructive/10 border-destructive/30 text-destructive"
-              : "bg-success-50 border-success-200 text-success-700"
+              : "bg-[color:var(--success)] border-[color:var(--success-border)] text-[color:var(--success-foreground)]"
           }`}>
             {fontUploadStatus.loading
               ? `${fontUploadStatus.font} CDN 업로드 중...`
@@ -422,7 +422,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
               ? "bg-muted/50 border-border text-muted-foreground"
               : koFontUploadStatus.result?.error
               ? "bg-destructive/10 border-destructive/30 text-destructive"
-              : "bg-success-50 border-success-200 text-success-700"
+              : "bg-[color:var(--success)] border-[color:var(--success-border)] text-[color:var(--success-foreground)]"
           }`}>
             {koFontUploadStatus.loading
               ? `${koFontUploadStatus.font} CDN 업로드 중...`
