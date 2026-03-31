@@ -349,6 +349,25 @@ function getPayloadConfigFromPayload(
     : config[key as keyof typeof config]
 }
 
+/** Bar that reads --ds-button-radius token for top corners */
+function ChartBar(props: React.ComponentProps<typeof RechartsPrimitive.Bar>) {
+  const [topRadius, setTopRadius] = React.useState(4)
+
+  React.useEffect(() => {
+    const raw = getComputedStyle(document.documentElement)
+      .getPropertyValue("--ds-button-radius")
+      .trim()
+    if (raw) {
+      const px = raw.endsWith("rem")
+        ? parseFloat(raw) * 16
+        : parseFloat(raw)
+      if (!isNaN(px)) setTopRadius(px)
+    }
+  }, [])
+
+  return <RechartsPrimitive.Bar radius={[topRadius, topRadius, 0, 0]} {...props} />
+}
+
 export {
   ChartContainer,
   ChartTooltip,
@@ -356,4 +375,5 @@ export {
   ChartLegend,
   ChartLegendContent,
   ChartStyle,
+  ChartBar,
 }

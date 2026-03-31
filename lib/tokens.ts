@@ -194,6 +194,25 @@ export const DEFAULT_TOKENS: TokenState = {
   },
 };
 
+/**
+ * Normalize tokens loaded from Supabase JSON — numeric values get parsed as JS numbers,
+ * but UI controls (NativeSelect) compare with string option values. Convert all numeric
+ * token fields back to strings so React controlled components behave correctly.
+ */
+export function normalizeTokens(raw: TokenState): TokenState {
+  const t = structuredClone(raw);
+  const stringify = (obj: Record<string, unknown>) => {
+    for (const k of Object.keys(obj)) {
+      if (typeof obj[k] === "number") obj[k] = String(obj[k]);
+    }
+  };
+  stringify(t.primitives.fontWeight as unknown as Record<string, unknown>);
+  stringify(t.primitives.fontSize as unknown as Record<string, unknown>);
+  stringify(t.primitives.lineHeight as unknown as Record<string, unknown>);
+  stringify(t.primitives.spacing as unknown as Record<string, unknown>);
+  return t;
+}
+
 /** Apply all tokens to the document CSS variables */
 export function applyTokensToDocument(tokens: TokenState): void {
   if (typeof document === 'undefined') return;

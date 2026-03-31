@@ -39,7 +39,7 @@ function TabsList({
           variant === "pill" &&
             "bg-muted text-muted-foreground h-[var(--ds-input-h)] w-fit rounded-[var(--ds-card-radius)] p-1",
           variant === "underline" &&
-            "relative w-full border-b border-border gap-0 bg-transparent p-0 rounded-none h-auto justify-start",
+            "relative w-full border-b border-border gap-0 bg-transparent p-0 rounded-none h-auto",
           className
         )}
         {...props}
