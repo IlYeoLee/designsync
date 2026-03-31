@@ -186,6 +186,15 @@ function HeaderMobileNavLink({
   )
 }
 
+// NavBar aliases (Header = NavBar)
+const NavBar = Header
+const NavBarLogo = HeaderLogo
+const NavBarNav = HeaderNav
+const NavBarNavLink = HeaderNavLink
+const NavBarActions = HeaderActions
+const NavBarMobileNav = HeaderMobileNav
+const NavBarMobileNavLink = HeaderMobileNavLink
+
 export {
   Header,
   HeaderLogo,
@@ -194,4 +203,11 @@ export {
   HeaderActions,
   HeaderMobileNav,
   HeaderMobileNavLink,
+  NavBar,
+  NavBarLogo,
+  NavBarNav,
+  NavBarNavLink,
+  NavBarActions,
+  NavBarMobileNav,
+  NavBarMobileNavLink,
 }
