@@ -85,7 +85,11 @@ ${tokensCssUrl ? `
   // -- Numbering offset --
   const n = includeInstall ? 2 : 1;
 
-  return `${includeInstall ? "이 프로젝트에 DesignSync 디자인 시스템을 적용해줘.\n\n" : ""}**[최우선 규칙] 이 프로젝트는 DesignSync 디자인 시스템 + ESLint 강제를 사용한다. 코드를 작성하거나 수정한 후 반드시 \`npx eslint src/\`을 실행하고, 에러가 0이 될 때까지 수정해라. ESLint가 잡는 것: 하드코딩 색상, 하드코딩 radius/height/padding, raw HTML 요소(<button>/<input>/<aside>/<header>/<table>/<h1>~<h6>), SVG 차트. 에러가 남아있으면 작업 완료가 아니다.**
+  return `${includeInstall ? `이 프로젝트에 DesignSync 디자인 시스템을 적용해줘.
+
+**[진행 방식]** 파일별로 어떤 변경을 할지 먼저 보여주고, 변경할지 여부를 나에게 물어봐. 내가 y라고 하면 적용하고, n이면 건너뛰어. 토큰 교체(색상/간격/radius)는 자동으로 해도 되지만, 컴포넌트 교체(<button>→<Button> 등 구조가 바뀌는 것)는 반드시 먼저 물어봐.
+
+` : ""}**[최우선 규칙] 이 프로젝트는 DesignSync 디자인 시스템 + ESLint 강제를 사용한다. 코드를 작성하거나 수정한 후 반드시 \`npx eslint src/\`을 실행하고, 에러가 0이 될 때까지 수정해라. ESLint가 잡는 것: 하드코딩 색상, 하드코딩 radius/height/padding, raw HTML 요소(<button>/<input>/<aside>/<header>/<table>/<h1>~<h6>), SVG 차트. 에러가 남아있으면 작업 완료가 아니다.**
 
 아래는 DesignSync 규칙 상세 레퍼런스다. 위 lint 규칙과 함께 적용된다.
 
