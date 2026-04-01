@@ -54,10 +54,10 @@ export function EditorPanel({
 
   function formatTimeAgo(date: Date): string {
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-    if (seconds < 60) return `${seconds}초 전`;
+    if (seconds < 60) return `${seconds}s ago`;
     const minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return `${minutes}분 전`;
-    return `${Math.floor(minutes / 60)}시간 전`;
+    if (minutes < 60) return `${minutes}m ago`;
+    return `${Math.floor(minutes / 60)}h ago`;
   }
 
   return (
@@ -112,7 +112,7 @@ export function EditorPanel({
             className="w-full flex items-center justify-between px-[var(--ds-card-padding)] py-2 h-auto rounded-none text-xs text-muted-foreground hover:text-foreground hover:bg-accent/30"
             onClick={() => setHistoryOpen(!historyOpen)}
           >
-            <span className="font-medium">최근 변경 ({history.length})</span>
+            <span className="font-medium">Recent Changes ({history.length})</span>
             {historyOpen ? <icons.chevronDown className="w-3.5 h-3.5" /> : <icons.chevronUp className="w-3.5 h-3.5" />}
           </Button>
           {historyOpen && (

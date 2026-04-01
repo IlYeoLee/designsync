@@ -15,8 +15,9 @@ const geistMono = Geist_Mono({
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "DesignSync - Design Token Editor",
+  title: ":designSystem: — Design Token Editor",
   description: "Visual design system token editor built with shadcn/ui",
+  icons: { icon: "/logo.png" },
 };
 
 export default function RootLayout({

@@ -178,7 +178,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
       if (onFontUpload) onFontUpload(fontName);
       setTimeout(() => setFontUploadStatus(null), 5000);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "로컬 폰트 업로드 실패";
+      const msg = err instanceof Error ? err.message : "Local font upload failed";
       setFontUploadStatus({ loading: false, font: fontName, result: { error: msg } });
       setTimeout(() => setFontUploadStatus(null), 8000);
     }
@@ -246,7 +246,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
       if (onFontUpload) onFontUpload(fontName);
       setTimeout(() => setKoFontUploadStatus(null), 5000);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "로컬 폰트 업로드 실패";
+      const msg = err instanceof Error ? err.message : "Local font upload failed";
       setKoFontUploadStatus({ loading: false, font: fontName, result: { error: msg } });
       setTimeout(() => setKoFontUploadStatus(null), 8000);
     }
@@ -279,33 +279,33 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
   const lineHeightKeys = ["tight", "normal", "loose"] as const;
 
   const FONT_SIZE_ROLE: Record<string, string> = {
-    xs:   "캡션",
-    sm:   "설명",
-    base: "본문",
-    lg:   "소본문",
-    xl:   "소제목",
-    "2xl": "제목",
-    "3xl": "대제목",
-    "4xl": "디스플레이",
+    xs:   "Caption",
+    sm:   "Description",
+    base: "Body",
+    lg:   "Sub-body",
+    xl:   "Subtitle",
+    "2xl": "Title",
+    "3xl": "Heading",
+    "4xl": "Display",
   };
   const FONT_WEIGHT_ROLE: Record<string, string> = {
-    normal:    "본문",
-    medium:    "강조본문",
-    semibold:  "소제목",
-    bold:      "제목",
-    extrabold: "강한강조",
+    normal:    "Body",
+    medium:    "Emphasis",
+    semibold:  "Subtitle",
+    bold:      "Title",
+    extrabold: "Strong",
   };
   const LINE_HEIGHT_ROLE: Record<string, string> = {
-    tight:  "제목",
-    normal: "본문",
-    loose:  "긴 글",
+    tight:  "Heading",
+    normal: "Body",
+    loose:  "Long text",
   };
 
   return (
     <div className="flex flex-col gap-[var(--ds-section-gap)] p-[var(--ds-card-padding)]">
       {/* English Font */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-2">영문 폰트</p>
+        <p className="text-xs font-medium text-foreground mb-2">Latin Font</p>
         <div
           className="w-full p-[var(--ds-card-padding)] rounded-[var(--ds-element-radius)] border border-border bg-muted/30 mb-[var(--ds-internal-gap)]"
           style={{ fontFamily: tokens.primitives.fontFamily }}
@@ -323,12 +323,12 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
               : "bg-[color:var(--success)] border-[color:var(--success-border)] text-[color:var(--success-foreground)]"
           }`}>
             {fontUploadStatus.loading
-              ? `${fontUploadStatus.font} CDN 업로드 중...`
+              ? `Uploading ${fontUploadStatus.font} to CDN...`
               : fontUploadStatus.result?.error
-              ? `✗ 업로드 실패: ${fontUploadStatus.result.error as string}`
+              ? `✗ Upload failed: ${fontUploadStatus.result.error as string}`
               : (
                 <span>
-                  ✓ {fontUploadStatus.font} 폰트 CDN 업로드 완료. Save 클릭 시 자동으로 적용됩니다.
+                  ✓ {fontUploadStatus.font} uploaded to CDN. Click Save to apply.
                 </span>
               )}
           </div>
@@ -351,14 +351,14 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
                 if (sec === "local" && localFonts.length === 0) loadLocalFonts();
               }}
             >
-              {sec === "google" ? "Google 폰트" : "로컬 폰트"}
+              {sec === "google" ? "Google Fonts" : "Local Fonts"}
             </Button>
           ))}
         </div>
 
         <Input
           type="text"
-          placeholder="폰트 검색..."
+          placeholder="Search fonts..."
           value={fontSearch}
           onChange={(e) => setFontSearch(e.target.value)}
           className="h-8 text-xs px-2.5 mb-2"
@@ -375,12 +375,12 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
                   tokens.primitives.fontFamily === font ? "bg-accent text-accent-foreground font-medium" : ""
                 }`}
               >{font}</Button>
-            )) : <p className="text-xs text-muted-foreground p-3">폰트를 찾을 수 없습니다</p>
+            )) : <p className="text-xs text-muted-foreground p-3">No fonts found</p>
           ) : supportsLocalFontApi === false ? (
             <div className="p-3 flex flex-col gap-2">
-              <p className="text-xs text-muted-foreground">이 브라우저는 로컬 폰트 API를 지원하지 않습니다. 폰트 파일을 직접 선택하세요.</p>
+              <p className="text-xs text-muted-foreground">This browser does not support the local font API. Please select a font file manually.</p>
               <Button size="sm" variant="outline" className="text-xs" onClick={() => fileInputRef.current?.click()}>
-                폰트 파일 선택 (.ttf .otf .woff .woff2)
+                Select font file (.ttf .otf .woff .woff2)
               </Button>
               <input
                 ref={fileInputRef}
@@ -392,7 +392,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
               />
             </div>
           ) : localFontsLoading ? (
-            <p className="text-xs text-muted-foreground p-3">로컬 폰트 로딩 중...</p>
+            <p className="text-xs text-muted-foreground p-3">Loading local fonts...</p>
           ) : filteredLocalFonts.length > 0 ? filteredLocalFonts.map((font) => (
             <Button
               key={font}
@@ -406,8 +406,8 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
           )) : (
             <p className="text-xs text-muted-foreground p-3">
               {localFonts.length === 0
-                ? "로컬 폰트 접근 권한을 허용하세요"
-                : "폰트를 찾을 수 없습니다"}
+                ? "Please allow access to local fonts"
+                : "No fonts found"}
             </p>
           )}
         </div>
@@ -415,10 +415,10 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
 
       {/* Korean Font */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-2">한글 폰트</p>
+        <p className="text-xs font-medium text-foreground mb-2">Korean Font</p>
         <div className="w-full p-[var(--ds-card-padding)] rounded-[var(--ds-element-radius)] border border-border bg-muted/30 mb-[var(--ds-internal-gap)]">
           <p className="text-base" style={{ fontFamily: tokens.primitives.fontFamilyKo || undefined }}>
-            안녕하세요 Hello
+            Hello World
           </p>
           <p className="text-sm text-muted-foreground">
             {tokens.primitives.fontFamilyKo || '(없음 — 영문 폰트 사용)'}

@@ -155,7 +155,7 @@ export function AppSidebar({
       .single();
 
     if (error) {
-      alert(`생성 실패: ${error.message}`);
+      alert(`Creation failed: ${error.message}`);
     } else if (data) {
       onCreated(data as DesignSystem);
       setCreateOpen(false);
@@ -254,13 +254,9 @@ export function AppSidebar({
               <SidebarMenuItem>
                 <SidebarMenuButton size="lg" asChild>
                   <div className="cursor-default">
-                    <div className="flex aspect-square size-8 items-center justify-center rounded-[var(--ds-element-radius)] bg-primary text-primary-foreground">
-                      <span className="text-xs font-bold">DS</span>
-                    </div>
-                    <div className="flex flex-col gap-0.5 leading-none">
-                      <span className="font-semibold text-sm">DesignSync</span>
-                      <span className="text-xs text-sidebar-foreground/50">디자인 시스템</span>
-                    </div>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/logo.png" alt="logo" className="size-8 rounded-[var(--ds-element-radius)] object-cover shrink-0" />
+                    <span className="font-semibold text-sm truncate">{":designSystem:"}</span>
                   </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -269,7 +265,7 @@ export function AppSidebar({
 
           <SidebarContent>
             <SidebarGroup>
-              <SidebarGroupLabel>내 디자인 시스템</SidebarGroupLabel>
+              <SidebarGroupLabel>My Design Systems</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   {designSystems.map((ds) => (
@@ -302,19 +298,19 @@ export function AppSidebar({
                             className="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 opacity-0 group-hover/menu-item:opacity-100"
                           >
                             <icons.moreHorizontal className="w-3.5 h-3.5" />
-                            <span className="sr-only">메뉴</span>
+                            <span className="sr-only">Menu</span>
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent side="right" align="start">
                           <DropdownMenuItem onClick={() => { setRenameTarget(ds); setRenameName(ds.name); }}>
-                            <icons.edit className="w-3.5 h-3.5 mr-2" /> 이름 변경
+                            <icons.edit className="w-3.5 h-3.5 mr-2" /> Rename
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => { setCloneFrom(ds.id); setNewName(deduplicateName(`${ds.name} (사본)`)); setCreateOpen(true); }}>
-                            <icons.copy className="w-3.5 h-3.5 mr-2" /> 복제
+                          <DropdownMenuItem onClick={() => { setCloneFrom(ds.id); setNewName(deduplicateName(`${ds.name} (copy)`)); setCreateOpen(true); }}>
+                            <icons.copy className="w-3.5 h-3.5 mr-2" /> Duplicate
                           </DropdownMenuItem>
                           {ds.github_repo ? (
                             <DropdownMenuItem onClick={() => handleGithubDisconnect(ds)}>
-                              <Unlink className="w-3.5 h-3.5 mr-2" /> 프로젝트 연결 해제
+                              <Unlink className="w-3.5 h-3.5 mr-2" /> Disconnect
                             </DropdownMenuItem>
                           ) : (
                             <DropdownMenuItem onClick={async () => {
@@ -334,7 +330,7 @@ export function AppSidebar({
                                 setGhReposLoading(false);
                               }
                             }}>
-                              <Github className="w-3.5 h-3.5 mr-2" /> 내 프로젝트에 연결
+                              <Github className="w-3.5 h-3.5 mr-2" /> Connect Project
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem
@@ -342,7 +338,7 @@ export function AppSidebar({
                             onClick={() => setDeleteTarget(ds)}
                             disabled={designSystems.length <= 1}
                           >
-                            <icons.trash className="w-3.5 h-3.5 mr-2" /> 삭제
+                            <icons.trash className="w-3.5 h-3.5 mr-2" /> Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -353,10 +349,10 @@ export function AppSidebar({
                   <SidebarMenuItem className="group-data-[collapsible=icon]:hidden">
                     <SidebarMenuButton
                       onClick={() => { setCloneFrom(null); setNewName(""); setCreateOpen(true); }}
-                      tooltip="새 디자인 시스템"
+                      tooltip="New Design System"
                     >
                       <icons.plus className="w-4 h-4" />
-                      <span>새로 만들기</span>
+                      <span>New</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenu>
@@ -385,7 +381,7 @@ export function AppSidebar({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent side="right" align="end" className="w-48">
                     <DropdownMenuItem onClick={handleLogout}>
-                      <icons.logout className="w-3.5 h-3.5 mr-2" /> 로그아웃
+                      <icons.logout className="w-3.5 h-3.5 mr-2" /> Sign Out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -400,23 +396,23 @@ export function AppSidebar({
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{cloneFrom ? "디자인 시스템 복제" : "새 디자인 시스템"}</DialogTitle>
+            <DialogTitle>{cloneFrom ? "Duplicate Design System" : "New Design System"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-[var(--ds-internal-gap)]">
             <div className="space-y-1.5">
-              <Label>이름</Label>
+              <Label>Name</Label>
               <Input
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                placeholder="내 SaaS"
+                placeholder="My SaaS"
                 onKeyDown={(e) => e.key === "Enter" && handleCreate()}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateOpen(false)}>취소</Button>
+            <Button variant="outline" onClick={() => setCreateOpen(false)}>Cancel</Button>
             <Button onClick={handleCreate} disabled={creating || !newName.trim()}>
-              {creating ? "생성 중..." : "만들기"}
+              {creating ? "Creating..." : "Create"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -426,14 +422,14 @@ export function AppSidebar({
       <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>정말 삭제하시겠습니까?</AlertDialogTitle>
+            <AlertDialogTitle>Delete this design system?</AlertDialogTitle>
             <AlertDialogDescription>
-              &quot;{deleteTarget?.name}&quot;을(를) 삭제하면 복구할 수 없습니다.
+              &quot;{deleteTarget?.name}&quot; will be permanently deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>취소</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>삭제</AlertDialogAction>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -442,10 +438,10 @@ export function AppSidebar({
       <Dialog open={!!renameTarget} onOpenChange={() => setRenameTarget(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>이름 변경</DialogTitle>
+            <DialogTitle>Rename</DialogTitle>
           </DialogHeader>
           <div className="space-y-1.5">
-            <Label>새 이름</Label>
+            <Label>New name</Label>
             <Input
               value={renameName}
               onChange={(e) => setRenameName(e.target.value)}
@@ -453,8 +449,8 @@ export function AppSidebar({
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRenameTarget(null)}>취소</Button>
-            <Button onClick={handleRename} disabled={!renameName.trim()}>저장</Button>
+            <Button variant="outline" onClick={() => setRenameTarget(null)}>Cancel</Button>
+            <Button onClick={handleRename} disabled={!renameName.trim()}>Save</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -467,12 +463,12 @@ export function AppSidebar({
               <div className="w-8 h-8 rounded-[var(--ds-element-radius)] bg-foreground flex items-center justify-center shrink-0">
                 <Github className="w-4 h-4 text-background" />
               </div>
-              내 프로젝트에 자동 반영
+              Auto-sync to Project
             </DialogTitle>
           </DialogHeader>
 
           <p className="text-sm text-muted-foreground">
-            저장할 때마다 프로젝트에 디자인 변경사항이 자동 제안됩니다.
+            Design changes will be automatically proposed to your project on every save.
           </p>
 
           <div className="space-y-[var(--ds-internal-gap)]">
@@ -481,13 +477,13 @@ export function AppSidebar({
               <>
                 <div className="flex items-center gap-2 p-3 rounded-[var(--ds-card-radius)] bg-muted/50">
                   <icons.check className="w-4 h-4 text-[color:var(--success-foreground)] shrink-0" />
-                  <p className="text-xs text-muted-foreground">GitHub 연결됨</p>
+                  <p className="text-xs text-muted-foreground">GitHub Connected</p>
                 </div>
                 <div className="space-y-1.5">
-                  <Label>프로젝트 선택</Label>
+                  <Label>Select Project</Label>
                   {ghReposLoading ? (
                     <div className="flex items-center gap-2 p-3 text-sm text-muted-foreground">
-                      <icons.loader className="w-4 h-4 animate-spin" /> 프로젝트 목록 불러오는 중...
+                      <icons.loader className="w-4 h-4 animate-spin" /> Loading projects...
                     </div>
                   ) : ghRepos.length > 0 ? (
                     <NativeSelect
@@ -498,7 +494,7 @@ export function AppSidebar({
                         if (selected) setGhBranch(selected.default_branch);
                       }}
                     >
-                      <option value="">프로젝트를 선택하세요</option>
+                      <option value="">Select a project</option>
                       {ghRepos.map((r) => (
                         <option key={r.full_name} value={r.full_name}>{r.full_name}</option>
                       ))}
@@ -514,10 +510,10 @@ export function AppSidebar({
                             .replace(/\/$/, "");
                           setGhRepo(val);
                         }}
-                        placeholder="GitHub 주소를 붙여넣기"
+                        placeholder="Paste GitHub URL"
                       />
                       <p className="text-xs text-muted-foreground">
-                        GitHub 프로젝트 페이지의 URL을 그대로 붙여넣으세요
+                        Paste the URL from your GitHub project page
                       </p>
                     </div>
                   )}
@@ -537,17 +533,17 @@ export function AppSidebar({
                     }}
                   >
                     <Github className="w-4 h-4" />
-                    GitHub에서 프로젝트 연결
+                    Connect from GitHub
                   </Button>
                   <p className="text-xs text-muted-foreground text-center">
-                    GitHub에서 연결할 프로젝트를 선택하면 자동으로 돌아옵니다
+                    Select a project on GitHub and you will be redirected back
                   </p>
                 </div>
 
                 {/* PAT fallback (접혀있음) */}
                 <details className="group">
                   <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground">
-                    직접 연결하기 (개발자용)
+                    Manual setup (advanced)
                   </summary>
                   <div className="mt-2 space-y-2">
                     <Input
@@ -559,7 +555,7 @@ export function AppSidebar({
                           .replace(/\/$/, "");
                         setGhRepo(val);
                       }}
-                      placeholder="GitHub 주소 붙여넣기"
+                      placeholder="Paste GitHub URL"
                     />
                     <Input
                       type="password"
@@ -573,7 +569,7 @@ export function AppSidebar({
                       rel="noopener noreferrer"
                       className="text-xs text-primary hover:underline inline-flex items-center gap-0.5"
                     >
-                      토큰 만들기 <ExternalLink className="w-3 h-3" />
+                      Create token <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
                 </details>
@@ -582,12 +578,12 @@ export function AppSidebar({
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setGithubTarget(null)}>취소</Button>
+            <Button variant="outline" onClick={() => setGithubTarget(null)}>Cancel</Button>
             <Button
               onClick={handleGithubSave}
               disabled={ghSaving || !ghRepo.trim() || (!githubTarget?.github_installation_id && !ghToken.trim() && !githubTarget?.github_token)}
             >
-              {ghSaving ? "연결 중..." : "연결하기"}
+              {ghSaving ? "Connecting..." : "Connect"}
             </Button>
           </DialogFooter>
         </DialogContent>

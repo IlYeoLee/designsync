@@ -23,7 +23,7 @@ export default function LoginPage() {
       },
     });
     if (error) {
-      alert("로그인 에러: " + error.message);
+      alert("Login error: " + error.message);
     }
   }
 
@@ -39,7 +39,7 @@ export default function LoginPage() {
     });
     setLoading(false);
     if (error) {
-      alert("이메일 전송 실패: " + error.message);
+      alert("Failed to send email: " + error.message);
     } else {
       setSent(true);
     }
@@ -49,25 +49,24 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="w-full max-w-sm space-y-6 p-[var(--ds-card-padding)]">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-[var(--ds-element-radius)] bg-primary flex items-center justify-center mx-auto">
-            <span className="text-primary-foreground text-lg font-bold">DS</span>
-          </div>
-          <p className="text-2xl font-bold text-foreground">DesignSync</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="logo" className="w-12 h-12 rounded-[var(--ds-element-radius)] object-cover mx-auto" />
+          <p className="text-2xl font-bold text-foreground">{":designSystem:"}</p>
           <p className="text-sm text-muted-foreground">
-            디자인 시스템을 만들고 관리하세요.
+            Create and manage your design systems.
           </p>
         </div>
 
         {sent ? (
           <div className="text-center space-y-3">
             <Mail className="w-10 h-10 text-primary mx-auto" />
-            <p className="text-sm text-foreground font-medium">이메일을 확인하세요!</p>
+            <p className="text-sm text-foreground font-medium">Check your email!</p>
             <p className="text-xs text-muted-foreground">
-              {email}로 로그인 링크를 보냈습니다.<br />
-              링크를 클릭하면 자동으로 로그인됩니다.
+              We sent a login link to {email}.<br />
+              Click the link to sign in automatically.
             </p>
             <Button variant="ghost" size="sm" onClick={() => setSent(false)}>
-              다른 이메일로 시도
+              Try another email
             </Button>
           </div>
         ) : (
@@ -75,7 +74,7 @@ export default function LoginPage() {
             {/* Email login */}
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <Label htmlFor="email">이메일</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -90,13 +89,13 @@ export default function LoginPage() {
                 onClick={signInWithEmail}
                 disabled={loading || !email.trim()}
               >
-                {loading ? "전송 중..." : "이메일로 계속하기"}
+                {loading ? "Sending..." : "Continue with Email"}
               </Button>
             </div>
 
             <div className="flex items-center gap-3">
               <Separator className="flex-1" />
-              <span className="text-xs text-muted-foreground">또는</span>
+              <span className="text-xs text-muted-foreground">or</span>
               <Separator className="flex-1" />
             </div>
 
@@ -107,13 +106,13 @@ export default function LoginPage() {
               onClick={signInWithGitHub}
             >
               <Github className="w-4 h-4" />
-              GitHub로 계속하기
+              Continue with GitHub
             </Button>
           </>
         )}
 
         <p className="text-xs text-center text-muted-foreground">
-          로그인하면 디자인 시스템을 생성하고 관리할 수 있습니다.
+          Sign in to create and manage your design systems.
         </p>
       </div>
     </div>

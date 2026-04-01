@@ -12,11 +12,11 @@ import { getIconMap, type IconName } from "@/lib/icon-map";
 const PREVIEW_ICON_KEYS: IconName[] = ["home", "settings", "search", "bell", "mail"];
 
 const ICON_LIBRARIES = [
-  { id: "lucide", label: "Lucide", pkg: "lucide-react", desc: "깔끔한 선형 — shadcn 기본", url: "https://lucide.dev/icons" },
-  { id: "tabler", label: "Tabler", pkg: "@tabler/icons-react", desc: "5400+ 굵은 선형 아이콘", url: "https://tabler.io/icons" },
-  { id: "phosphor", label: "Phosphor", pkg: "@phosphor-icons/react", desc: "6종 굵기 변형 지원", url: "https://phosphoricons.com" },
-  { id: "remix", label: "Remix", pkg: "remixicon", desc: "2800+ 선형/채움 아이콘", url: "https://remixicon.com" },
-  { id: "hugeicons", label: "Hugeicons", pkg: "@hugeicons/react", desc: "36000+ 다양한 스타일", url: "https://hugeicons.com" },
+  { id: "lucide", label: "Lucide", pkg: "lucide-react", desc: "Clean strokes — shadcn default", url: "https://lucide.dev/icons" },
+  { id: "tabler", label: "Tabler", pkg: "@tabler/icons-react", desc: "5400+ bold stroke icons", url: "https://tabler.io/icons" },
+  { id: "phosphor", label: "Phosphor", pkg: "@phosphor-icons/react", desc: "6 weight variants", url: "https://phosphoricons.com" },
+  { id: "remix", label: "Remix", pkg: "remixicon", desc: "2800+ line/fill icons", url: "https://remixicon.com" },
+  { id: "hugeicons", label: "Hugeicons", pkg: "@hugeicons/react", desc: "36000+ diverse styles", url: "https://hugeicons.com" },
 ] as const;
 
 interface LayoutTabProps {
@@ -28,12 +28,12 @@ interface LayoutTabProps {
 }
 
 const RADIUS_OPTIONS = [
-  { key: "none", label: "없음", value: "0px" },
+  { key: "none", label: "None", value: "0px" },
   { key: "sm", label: "SM", value: "0.25rem" },
   { key: "md", label: "MD", value: "0.375rem" },
   { key: "lg", label: "LG", value: "0.5rem" },
   { key: "xl", label: "XL", value: "0.75rem" },
-  { key: "full", label: "최대", value: "9999px" },
+  { key: "full", label: "Full", value: "9999px" },
 ] as const;
 
 const SPACING_KEYS = ["1", "2", "3", "4", "5", "6", "8", "10", "12", "16"] as const;
@@ -194,8 +194,8 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
     <div className="flex flex-col gap-[var(--ds-section-gap)] p-[var(--ds-card-padding)]">
       {/* Style Presets */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-2">스타일 프리셋</p>
-        <p className="text-[10px] text-muted-foreground mb-[var(--ds-internal-gap)]">컴포넌트 밀도와 둥글기를 한 번에 설정합니다.</p>
+        <p className="text-xs font-medium text-foreground mb-2">Style Presets</p>
+        <p className="text-[10px] text-muted-foreground mb-[var(--ds-internal-gap)]">Set component density and roundness at once.</p>
         <div className="grid grid-cols-1 gap-1.5">
           {STYLE_PRESETS.map((preset) => {
             const isActive = tokens.primitives.stylePreset === preset.id;
@@ -235,12 +235,12 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
 
       {/* Border Radius */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-[var(--ds-internal-gap)]">테두리 둥글기</p>
+        <p className="text-xs font-medium text-foreground mb-[var(--ds-internal-gap)]">Border Radius</p>
 
         {/* Global scale slider */}
         <RadiusScaleSlider tokens={tokens} onTokenChange={onTokenChange} />
 
-        <p className="text-xs text-muted-foreground mb-2 mt-4">커스텀 값</p>
+        <p className="text-xs text-muted-foreground mb-2 mt-4">Custom Values</p>
         <div className="flex flex-col gap-[var(--ds-internal-gap)]">
           {RADIUS_OPTIONS.map(({ key, label }) => {
             const varKey = key === "none" ? "none" : key === "full" ? "full" : `${key}-prim`;
@@ -263,8 +263,8 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
 
       {/* Spacing Scale */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-1">간격</p>
-        <p className="text-[10px] text-muted-foreground mb-[var(--ds-internal-gap)]">px 단위로 표시 (rem으로 저장)</p>
+        <p className="text-xs font-medium text-foreground mb-1">Spacing</p>
+        <p className="text-[10px] text-muted-foreground mb-[var(--ds-internal-gap)]">Displayed in px (saved as rem)</p>
         <div className="flex flex-col gap-[var(--ds-internal-gap)]">
           {SPACING_KEYS.map((key) => {
             const value = tokens.primitives.spacing[key as keyof typeof tokens.primitives.spacing];
@@ -292,7 +292,7 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
 
       {/* Shadows */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-[var(--ds-internal-gap)]">그림자</p>
+        <p className="text-xs font-medium text-foreground mb-[var(--ds-internal-gap)]">Shadows</p>
         <div className="flex flex-col gap-[var(--ds-section-gap)]">
           {SHADOW_LEVELS.map(({ key, label, yOffset }) => {
             const currentShadow = tokens.primitives.shadows?.[key] ??
@@ -330,7 +330,7 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
                   <>
                     {/* Blur */}
                     <div className="flex items-center gap-2 mb-1 pl-8">
-                      <span className="text-[10px] text-muted-foreground w-10">블러</span>
+                      <span className="text-[10px] text-muted-foreground w-10">Blur</span>
                       <Slider
                         min={0} max={30} step={1} value={[blur]}
                         onValueChange={(vals) => update(vals[0], spread, opacity)}
@@ -340,7 +340,7 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
                     </div>
                     {/* Spread */}
                     <div className="flex items-center gap-2 mb-1 pl-8">
-                      <span className="text-[10px] text-muted-foreground w-10">확산</span>
+                      <span className="text-[10px] text-muted-foreground w-10">Spread</span>
                       <Slider
                         min={-10} max={10} step={1} value={[spread]}
                         onValueChange={(vals) => update(blur, vals[0], opacity)}
@@ -350,7 +350,7 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
                     </div>
                     {/* Opacity */}
                     <div className="flex items-center gap-2 pl-8">
-                      <span className="text-[10px] text-muted-foreground w-10">투명도</span>
+                      <span className="text-[10px] text-muted-foreground w-10">Opacity</span>
                       <Slider
                         min={0} max={0.5} step={0.01} value={[opacity]}
                         onValueChange={(vals) => update(blur, spread, vals[0])}
@@ -368,8 +368,8 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
 
       {/* Icon Library */}
       <div>
-        <p className="text-xs font-medium text-foreground mb-2">아이콘 라이브러리</p>
-        <p className="text-[10px] text-muted-foreground mb-[var(--ds-internal-gap)]">Copy 시 AI가 이 아이콘 라이브러리를 사용합니다.</p>
+        <p className="text-xs font-medium text-foreground mb-2">Icon Library</p>
+        <p className="text-[10px] text-muted-foreground mb-[var(--ds-internal-gap)]">AI will use this icon library when generating code.</p>
         <div className="grid grid-cols-1 gap-1.5">
           {ICON_LIBRARIES.map((lib) => (
             <Button
@@ -391,7 +391,7 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
                   className="text-[9px] text-muted-foreground hover:text-primary underline"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  전체 보기
+                  Browse
                 </a>
               </div>
               <div className="flex items-center gap-2 mt-1.5">
@@ -412,7 +412,7 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
         <div className="rounded-[var(--ds-card-radius)] border border-primary/30 bg-primary/5 p-[var(--ds-card-padding)] flex flex-col gap-2">
           <div className="flex items-start justify-between">
             <p className="text-xs font-medium text-foreground">
-              아이콘 변경됨 &rarr; {ICON_LIBRARIES.find((l) => l.id === iconChanged)?.label}
+              Icon changed &rarr; {ICON_LIBRARIES.find((l) => l.id === iconChanged)?.label}
             </p>
             <Button
               variant="ghost"
@@ -424,7 +424,7 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
             </Button>
           </div>
           <p className="text-[10px] text-muted-foreground">
-            저장 후 프로젝트에서 아래 명령어를 실행하면 모든 컴포넌트의 아이콘이 일괄 교체됩니다.
+            After saving, run the command below in your project to replace all component icons.
           </p>
           <div className="flex items-center gap-1">
             <code className="flex-1 text-[10px] font-mono bg-background border border-border rounded-[var(--ds-element-radius)] px-2 py-1.5 overflow-x-auto whitespace-nowrap select-all">
@@ -436,7 +436,7 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
               className="shrink-0 h-7 text-[10px] px-2"
               onClick={handleCopy}
             >
-              {copied ? "OK" : "복사"}
+              {copied ? "OK" : "Copy"}
             </Button>
           </div>
         </div>
@@ -444,8 +444,8 @@ export function LayoutTab({ tokens, onTokenChange, onIconLibraryChange, onStyleP
 
       <div className="rounded-[var(--ds-element-radius)] bg-muted/50 p-[var(--ds-card-padding)] border border-border">
         <p className="text-xs text-muted-foreground">
-          그림자는 CSS 변수를 통해 <code className="font-mono text-xs">shadow-sm/md/lg</code> Tailwind 유틸리티에 연결됩니다.
-          간격 변경은 모든 <code className="font-mono text-xs">p-*</code>, <code className="font-mono text-xs">gap-*</code> 유틸리티에 영향을 줍니다.
+          Shadows are connected to <code className="font-mono text-xs">shadow-sm/md/lg</code> Tailwind utilities via CSS variables.
+          Spacing changes affect all <code className="font-mono text-xs">p-*</code>, <code className="font-mono text-xs">gap-*</code> utilities.
         </p>
       </div>
 

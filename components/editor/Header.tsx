@@ -101,7 +101,7 @@ export function EditorHeader({
           size="sm"
           onClick={handleCopyPrompt}
           disabled={copyState !== "idle"}
-          title="저장 후 설치 명령어 복사"
+          title="Save & copy install command"
         >
           {copyState === "saving" ? (
             <icons.loader className="w-3.5 h-3.5 animate-spin" />
@@ -111,7 +111,7 @@ export function EditorHeader({
             <icons.copy className="w-3.5 h-3.5" />
           )}
           <span className="hidden sm:inline">
-            {copyState === "saving" ? "저장 중..." : copyState === "copied" ? "복사됨!" : "저장 · 복사"}
+            {copyState === "saving" ? "Saving..." : copyState === "copied" ? "Copied!" : "Save · Copy"}
           </span>
         </Button>
 
@@ -123,7 +123,7 @@ export function EditorHeader({
           title="Reset all tokens to defaults"
         >
           <icons.reset className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">{confirmReset ? "확인?" : "초기화"}</span>
+          <span className="hidden sm:inline">{confirmReset ? "Confirm?" : "Reset"}</span>
         </Button>
 
         {/* Undo */}
@@ -142,7 +142,7 @@ export function EditorHeader({
           variant="outline"
           size="icon"
           onClick={onToggleDark}
-          title={isDark ? "라이트 모드" : "다크 모드"}
+          title={isDark ? "Light mode" : "Dark mode"}
         >
           {isDark ? <icons.sun className="w-4 h-4" /> : <icons.moon className="w-4 h-4" />}
         </Button>
@@ -151,7 +151,7 @@ export function EditorHeader({
         {prCreating && (
           <span className="text-xs text-muted-foreground flex items-center gap-1">
             <icons.loader className="w-3 h-3 animate-spin" />
-            <span className="hidden sm:inline">PR 생성 중...</span>
+            <span className="hidden sm:inline">Creating PR...</span>
           </span>
         )}
         {prResult && (
@@ -169,7 +169,7 @@ export function EditorHeader({
         {prError && (
           <span className="text-xs text-destructive flex items-center gap-1" title={prError}>
             <Github className="w-3 h-3" />
-            <span className="hidden sm:inline">PR 실패</span>
+            <span className="hidden sm:inline">PR Failed</span>
           </span>
         )}
       </HeaderActions>
