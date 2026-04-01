@@ -180,6 +180,16 @@ export async function GET(
         css += `${indent}--shadow-${level}: ${lightVars[`ds-shadow-${level}`]};\n`;
       }
     }
+    // When sm is "none", also zero out xs/2xs so Tailwind shadow-xs on inputs/buttons is killed
+    if (lightVars["ds-shadow-sm"] === "none") {
+      css += `${indent}--shadow-xs: none;\n`;
+      css += `${indent}--shadow-2xs: none;\n`;
+    }
+    // When lg is "none", also zero out xl/2xl
+    if (lightVars["ds-shadow-lg"] === "none") {
+      css += `${indent}--shadow-xl: none;\n`;
+      css += `${indent}--shadow-2xl: none;\n`;
+    }
     css += `}\n\n`;
 
     // Korean font unicode-range
