@@ -2,6 +2,11 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  // Dev auth bypass — skip all auth
+  if (process.env.DEV_AUTH_BYPASS === "1") {
+    return NextResponse.next({ request });
+  }
+
   // Public API routes — skip auth entirely
   if (request.nextUrl.pathname.startsWith("/api/migrate")) {
     return NextResponse.next();

@@ -40,10 +40,10 @@ export default function Home() {
   React.useEffect(() => {
     async function init() {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const devBypass = !user;
 
-      setUserName(user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split("@")[0] || "User");
-      setUserEmail(user.email || "");
+      setUserName(user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || "Dev");
+      setUserEmail(user?.email || "dev@local");
 
       const { data: dsList } = await supabase
         .from("design_systems")
@@ -59,13 +59,13 @@ export default function Home() {
         setIsDark(first.default_mode === "dark");
         applyTokensToDocument(normalized);
         applyStylePreset(first.style_preset || "vega");
-      } else {
-        // 첫 방문 — 기본 DS 자동 생성
+      } else if (!devBypass) {
+        // First visit — auto-create default DS
         const { data: newDs, error: insertError } = await supabase
           .from("design_systems")
           .insert({
-            user_id: user.id,
-            name: "내 디자인 시스템",
+            user_id: user!.id,
+            name: "My Design System",
             slug: "my-ds-" + Date.now().toString(36),
             tokens: DEFAULT_TOKENS,
             icon_library: "lucide",
@@ -75,7 +75,7 @@ export default function Home() {
           .single();
 
         if (insertError) {
-          console.error("DS 생성 실패:", insertError.message);
+          console.error("DS creation failed:", insertError.message);
         }
 
         if (newDs) {
