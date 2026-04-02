@@ -6,7 +6,8 @@ import { Button } from "@/registry/new-york/ui/button";
 import { Input } from "@/registry/new-york/ui/input";
 import { Label } from "@/registry/new-york/ui/label";
 import { Separator } from "@/registry/new-york/ui/separator";
-import { Mail, Github } from "lucide-react";
+import { Mail, Github, FlaskConical } from "lucide-react";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [email, setEmail] = React.useState("");
@@ -110,6 +111,19 @@ export default function LoginPage() {
             </Button>
           </>
         )}
+
+        <div className="flex items-center gap-3">
+          <Separator className="flex-1" />
+          <span className="text-xs text-muted-foreground">또는</span>
+          <Separator className="flex-1" />
+        </div>
+
+        <Button className="w-full" variant="ghost" asChild>
+          <Link href="/">
+            <FlaskConical className="w-4 h-4" />
+            로그인 없이 테스트로 시작하기
+          </Link>
+        </Button>
 
         <p className="text-xs text-center text-muted-foreground">
           Sign in to create and manage your design systems.

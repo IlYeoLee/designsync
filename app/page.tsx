@@ -6,6 +6,7 @@ import { EditorPanel } from "@/components/editor/EditorPanel";
 import { PreviewPanel } from "@/components/editor/PreviewPanel";
 import { AppSidebar, type DesignSystem } from "@/components/editor/AppSidebar";
 import { DEFAULT_TOKENS, TokenState, HistoryEntry, applyTokensToDocument, normalizeTokens } from "@/lib/tokens";
+import { DEMO_TOKENS, DEMO_STYLE_PRESET, DEMO_ICON_LIBRARY } from "@/lib/demo-tokens";
 import { SidebarProvider, SidebarInset } from "@/registry/new-york/ui/sidebar";
 import { applyStylePreset } from "@/lib/style-presets";
 import { createClient } from "@/lib/supabase";
@@ -35,15 +36,35 @@ export default function Home() {
   const [userName, setUserName] = React.useState("");
   const [userEmail, setUserEmail] = React.useState("");
   const [loaded, setLoaded] = React.useState(false);
+  const [isDemoMode, setIsDemoMode] = React.useState(false);
 
   // ── Mount: load user + design systems from Supabase ──────
   React.useEffect(() => {
     async function init() {
       const { data: { user } } = await supabase.auth.getUser();
-      const devBypass = !user;
 
-      setUserName(user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split("@")[0] || "Dev");
-      setUserEmail(user?.email || "dev@local");
+      // ── Demo mode: 비로그인 ──────
+      if (!user) {
+        const res = await fetch("/api/demo");
+        if (res.ok) {
+          const data = await res.json();
+          setTokens(data.tokens);
+          applyTokensToDocument(data.tokens);
+          applyStylePreset(data.style_preset || DEMO_STYLE_PRESET);
+          setTokens((prev) => ({ ...prev, primitives: { ...prev.primitives, iconLibrary: data.icon_library || DEMO_ICON_LIBRARY } }));
+        } else {
+          setTokens(DEMO_TOKENS);
+          applyTokensToDocument(DEMO_TOKENS);
+          applyStylePreset(DEMO_STYLE_PRESET);
+        }
+        setUserName("테스트 사용자");
+        setIsDemoMode(true);
+        setLoaded(true);
+        return;
+      }
+
+      setUserName(user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split("@")[0] || "User");
+      setUserEmail(user.email || "");
 
       const { data: dsList } = await supabase
         .from("design_systems")
@@ -59,7 +80,7 @@ export default function Home() {
         setIsDark(first.default_mode === "dark");
         applyTokensToDocument(normalized);
         applyStylePreset(first.style_preset || "vega");
-      } else if (!devBypass) {
+      } else {
         // First visit — auto-create default DS
         const { data: newDs, error: insertError } = await supabase
           .from("design_systems")
@@ -331,12 +352,13 @@ export default function Home() {
 
   // ── Reset ───────────────────────────────────────────────────────
   function handleReset() {
+    const baseTokens = isDemoMode ? DEMO_TOKENS : DEFAULT_TOKENS;
     setSnapshots((prev) => [...prev.slice(-19), tokens]);
-    setTokens(DEFAULT_TOKENS);
-    applyTokensToDocument(DEFAULT_TOKENS);
-    document.documentElement.style.setProperty("--custom-font-family", DEFAULT_TOKENS.primitives.fontFamily);
-    document.body.style.fontFamily = DEFAULT_TOKENS.primitives.fontFamily;
-    const semanticTokens = isDark ? DEFAULT_TOKENS.semantic.dark : DEFAULT_TOKENS.semantic.light;
+    setTokens(baseTokens);
+    applyTokensToDocument(baseTokens);
+    document.documentElement.style.setProperty("--custom-font-family", baseTokens.primitives.fontFamily);
+    document.body.style.fontFamily = baseTokens.primitives.fontFamily;
+    const semanticTokens = isDark ? baseTokens.semantic.dark : baseTokens.semantic.light;
     Object.entries(semanticTokens).forEach(([key, value]) => {
       document.documentElement.style.setProperty(`--${key}`, value);
     });
@@ -353,6 +375,20 @@ export default function Home() {
 
   // ── Save to Supabase ────────────────────────────────────────────
   async function handleSave(): Promise<boolean> {
+    // Demo mode: save via service role API
+    if (isDemoMode) {
+      try {
+        const res = await fetch("/api/demo", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tokens, style_preset: tokens.primitives.stylePreset, icon_library: tokens.primitives.iconLibrary }),
+        });
+        if (!res.ok) throw new Error("저장 실패");
+      } catch {
+        alert("저장 실패");
+      }
+      return true;
+    }
     if (!activeDs) return false;
     setPrResult(null);
     setPrError(null);
