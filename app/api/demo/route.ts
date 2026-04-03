@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { DEMO_DS_ID } from "@/lib/demo-tokens";
+import { DEMO_OWNER_USER_ID } from "@/lib/demo-tokens";
 
 function getServiceSupabase() {
   return createClient(
@@ -9,13 +9,14 @@ function getServiceSupabase() {
   );
 }
 
+// GET: return all DS owned by demo account
 export async function GET() {
   const supabase = getServiceSupabase();
   const { data, error } = await supabase
     .from("design_systems")
-    .select("tokens, style_preset, icon_library")
-    .eq("id", DEMO_DS_ID)
-    .single();
+    .select("*")
+    .eq("user_id", DEMO_OWNER_USER_ID)
+    .order("created_at", { ascending: true });
 
   if (error || !data) {
     return NextResponse.json({ error: "Demo DS not found" }, { status: 404 });
@@ -24,15 +25,21 @@ export async function GET() {
   return NextResponse.json(data);
 }
 
+// POST: save a specific DS by id
 export async function POST(request: Request) {
   const supabase = getServiceSupabase();
   const body = await request.json();
-  const { tokens, style_preset, icon_library } = body;
+  const { id, tokens, style_preset, icon_library } = body;
+
+  if (!id) {
+    return NextResponse.json({ error: "Missing id" }, { status: 400 });
+  }
 
   const { error } = await supabase
     .from("design_systems")
     .update({ tokens, style_preset, icon_library, updated_at: new Date().toISOString() })
-    .eq("id", DEMO_DS_ID);
+    .eq("id", id)
+    .eq("user_id", DEMO_OWNER_USER_ID);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

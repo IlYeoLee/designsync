@@ -1,6 +1,7 @@
 import { TokenState } from "@/lib/tokens";
 
 export const DEMO_DS_ID = "2ca883d2-3383-4cde-8925-14b3f1c7fa40";
+export const DEMO_OWNER_USER_ID = "e73b0db2-0384-4a88-9034-3b62e95d3fe7";
 export const DEMO_STYLE_PRESET = "maia";
 export const DEMO_ICON_LIBRARY = "hugeicons";
 

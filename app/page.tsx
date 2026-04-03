@@ -6,7 +6,7 @@ import { EditorPanel } from "@/components/editor/EditorPanel";
 import { PreviewPanel } from "@/components/editor/PreviewPanel";
 import { AppSidebar, type DesignSystem } from "@/components/editor/AppSidebar";
 import { DEFAULT_TOKENS, TokenState, HistoryEntry, applyTokensToDocument, normalizeTokens } from "@/lib/tokens";
-import { DEMO_TOKENS, DEMO_STYLE_PRESET, DEMO_ICON_LIBRARY } from "@/lib/demo-tokens";
+import { DEMO_TOKENS, DEMO_STYLE_PRESET } from "@/lib/demo-tokens";
 import { SidebarProvider, SidebarInset } from "@/registry/new-york/ui/sidebar";
 import { applyStylePreset } from "@/lib/style-presets";
 import { createClient } from "@/lib/supabase";
@@ -47,11 +47,15 @@ export default function Home() {
       if (!user) {
         const res = await fetch("/api/demo");
         if (res.ok) {
-          const data = await res.json();
-          setTokens(data.tokens);
-          applyTokensToDocument(data.tokens);
-          applyStylePreset(data.style_preset || DEMO_STYLE_PRESET);
-          setTokens((prev) => ({ ...prev, primitives: { ...prev.primitives, iconLibrary: data.icon_library || DEMO_ICON_LIBRARY } }));
+          const dsList = await res.json();
+          if (dsList && dsList.length > 0) {
+            setDesignSystems(dsList as DesignSystem[]);
+            const first = dsList[0] as DesignSystem;
+            setActiveDs(first);
+            setTokens(first.tokens);
+            applyTokensToDocument(first.tokens);
+            applyStylePreset(first.style_preset || DEMO_STYLE_PRESET);
+          }
         } else {
           setTokens(DEMO_TOKENS);
           applyTokensToDocument(DEMO_TOKENS);
@@ -377,11 +381,12 @@ export default function Home() {
   async function handleSave(): Promise<boolean> {
     // Demo mode: save via service role API
     if (isDemoMode) {
+      if (!activeDs) return false;
       try {
         const res = await fetch("/api/demo", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ tokens, style_preset: tokens.primitives.stylePreset, icon_library: tokens.primitives.iconLibrary }),
+          body: JSON.stringify({ id: activeDs.id, tokens, style_preset: tokens.primitives.stylePreset, icon_library: tokens.primitives.iconLibrary }),
         });
         if (!res.ok) throw new Error("저장 실패");
       } catch {
