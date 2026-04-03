@@ -10,6 +10,14 @@ import { DEMO_TOKENS, DEMO_STYLE_PRESET, DEMO_RESET_SNAPSHOTS, DEMO_PROTECTED_ID
 import { SidebarProvider, SidebarInset } from "@/registry/new-york/ui/sidebar";
 import { applyStylePreset } from "@/lib/style-presets";
 import { createClient } from "@/lib/supabase";
+import { injectGoogleFont, injectKoreanFont, GOOGLE_FONTS, KOREAN_FONTS } from "@/lib/fonts";
+
+function injectFontsFromTokens(t: { primitives: { fontFamily?: string; fontFamilyKo?: string } }) {
+  const en = t.primitives.fontFamily;
+  const ko = t.primitives.fontFamilyKo;
+  if (en && GOOGLE_FONTS.includes(en)) injectGoogleFont(en);
+  if (ko && KOREAN_FONTS.includes(ko)) injectKoreanFont(ko);
+}
 
 /** lang="ko" 시 한글 폰트 우선 적용 — style 태그로 주입 */
 function applyLangKoOverride(stackKo: string) {
@@ -55,6 +63,7 @@ export default function Home() {
             setTokens(first.tokens);
             applyTokensToDocument(first.tokens);
             applyStylePreset(first.style_preset || DEMO_STYLE_PRESET);
+            injectFontsFromTokens(first.tokens);
           }
         } else {
           setTokens(DEMO_TOKENS);
@@ -84,6 +93,7 @@ export default function Home() {
         setIsDark(first.default_mode === "dark");
         applyTokensToDocument(normalized);
         applyStylePreset(first.style_preset || "vega");
+        injectFontsFromTokens(first.tokens);
       } else {
         // First visit — auto-create default DS
         const { data: newDs, error: insertError } = await supabase
@@ -362,6 +372,8 @@ export default function Home() {
     setSnapshots((prev) => [...prev.slice(-19), tokens]);
     setTokens(baseTokens);
     applyTokensToDocument(baseTokens);
+    applyStylePreset(baseTokens.primitives.stylePreset || "vega");
+    injectFontsFromTokens(baseTokens);
     document.documentElement.style.setProperty("--custom-font-family", baseTokens.primitives.fontFamily);
     document.body.style.fontFamily = baseTokens.primitives.fontFamily;
     const semanticTokens = isDark ? baseTokens.semantic.dark : baseTokens.semantic.light;
@@ -463,6 +475,7 @@ export default function Home() {
     setIsDark(ds.default_mode === "dark");
     applyTokensToDocument(normalized);
     applyStylePreset(ds.style_preset || "vega");
+    injectFontsFromTokens(ds.tokens);
     setHistory([]);
     setSnapshots([]);
   }
