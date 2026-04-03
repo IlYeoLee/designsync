@@ -25,6 +25,7 @@ interface EditorPanelProps {
   history: HistoryEntry[];
   isDark: boolean;
   dsSlug?: string;
+  skipFontUpload?: boolean;
 }
 
 export function EditorPanel({
@@ -41,6 +42,7 @@ export function EditorPanel({
   history,
   isDark,
   dsSlug,
+  skipFontUpload,
 }: EditorPanelProps) {
   const icons = getIconMap(iconLibrary);
   const [activeTab, setActiveTab] = React.useState<Tab>("colors");
@@ -90,6 +92,7 @@ export function EditorPanel({
               onFontFamilyChange={onFontFamilyChange}
               onFontFamilyKoChange={onFontFamilyKoChange}
               onFontFaceAdded={onFontFaceAdded}
+              skipFontUpload={skipFontUpload}
             />
           </TabsContent>
           <TabsContent value="layout">

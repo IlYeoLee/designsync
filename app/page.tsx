@@ -572,6 +572,7 @@ export default function Home() {
           history={history.slice(0, 3)}
           isDark={isDark}
           dsSlug={activeDs?.slug ?? ""}
+          skipFontUpload={isDemoMode}
         />
         <PreviewPanel iconLibrary={tokens.primitives.iconLibrary} />
       </div>

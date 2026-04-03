@@ -16,6 +16,7 @@ interface TypographyTabProps {
   onFontUpload?: (fontName: string) => void;
   /** Called each time a font weight file is uploaded; used to build @font-face bridge rules */
   onFontFaceAdded?: (weight: number, url: string, isKo: boolean) => void;
+  skipFontUpload?: boolean;
 }
 
 /** Input that displays px value but stores/emits rem values */
@@ -91,7 +92,7 @@ function weightFromFilename(name: string): number {
   return m ? styleToWeight(m[1]) : 400;
 }
 
-export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFontFamilyKoChange, onFontUpload, onFontFaceAdded }: TypographyTabProps) {
+export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFontFamilyKoChange, onFontUpload, onFontFaceAdded, skipFontUpload }: TypographyTabProps) {
   const [fontSearch, setFontSearch] = React.useState("");
   const [localFonts, setLocalFonts] = React.useState<string[]>([]);
   const [localFontsLoading, setLocalFontsLoading] = React.useState(false);
@@ -132,7 +133,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
     if (isGoogle) injectGoogleFont(font);
     onFontFamilyChange(font);
 
-    if (isGoogle) {
+    if (isGoogle && !skipFontUpload) {
       // Google Font → /api/font (download from Google + upload to Storage)
       setFontUploadStatus({ loading: true, font, result: null });
       fetch('/api/font', {
@@ -255,7 +256,7 @@ export function TypographyTab({ tokens, onTokenChange, onFontFamilyChange, onFon
   function handleSelectKoFont(font: string, isGoogle: boolean) {
     if (isGoogle) injectKoreanFont(font);
     onFontFamilyKoChange(font);
-    if (isGoogle) {
+    if (isGoogle && !skipFontUpload) {
       setKoFontUploadStatus({ loading: true, font, result: null });
       fetch('/api/font', {
         method: 'POST',
