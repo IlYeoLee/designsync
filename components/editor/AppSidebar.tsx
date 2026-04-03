@@ -336,9 +336,15 @@ export function AppSidebar({
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => setDeleteTarget(ds)}
-                            disabled={designSystems.length <= 1 || protectedIds.includes(ds.id)}
+                            className={protectedIds.includes(ds.id) ? "text-muted-foreground" : "text-destructive"}
+                            onClick={() => {
+                              if (protectedIds.includes(ds.id)) {
+                                alert("이 디자인 시스템은 삭제할 수 없습니다.");
+                                return;
+                              }
+                              setDeleteTarget(ds);
+                            }}
+                            disabled={designSystems.length <= 1}
                           >
                             <icons.trash className="w-3.5 h-3.5 mr-2" /> Delete
                           </DropdownMenuItem>
