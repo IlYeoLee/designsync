@@ -6,7 +6,7 @@ import { EditorPanel } from "@/components/editor/EditorPanel";
 import { PreviewPanel } from "@/components/editor/PreviewPanel";
 import { AppSidebar, type DesignSystem } from "@/components/editor/AppSidebar";
 import { DEFAULT_TOKENS, TokenState, HistoryEntry, applyTokensToDocument, normalizeTokens } from "@/lib/tokens";
-import { DEMO_TOKENS, DEMO_STYLE_PRESET } from "@/lib/demo-tokens";
+import { DEMO_TOKENS, DEMO_STYLE_PRESET, DEMO_RESET_SNAPSHOTS, DEMO_PROTECTED_IDS } from "@/lib/demo-tokens";
 import { SidebarProvider, SidebarInset } from "@/registry/new-york/ui/sidebar";
 import { applyStylePreset } from "@/lib/style-presets";
 import { createClient } from "@/lib/supabase";
@@ -356,7 +356,9 @@ export default function Home() {
 
   // ── Reset ───────────────────────────────────────────────────────
   function handleReset() {
-    const baseTokens = isDemoMode ? DEMO_TOKENS : DEFAULT_TOKENS;
+    const baseTokens = isDemoMode
+      ? (activeDs && DEMO_RESET_SNAPSHOTS[activeDs.id]) || DEMO_TOKENS
+      : DEFAULT_TOKENS;
     setSnapshots((prev) => [...prev.slice(-19), tokens]);
     setTokens(baseTokens);
     applyTokensToDocument(baseTokens);
@@ -524,6 +526,7 @@ export default function Home() {
         userName={userName}
         userEmail={userEmail}
         iconLibrary={tokens.primitives.iconLibrary}
+        protectedIds={isDemoMode ? DEMO_PROTECTED_IDS : []}
       />
       <SidebarInset className="flex flex-col h-screen overflow-hidden">
       <EditorHeader

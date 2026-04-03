@@ -75,6 +75,7 @@ interface AppSidebarProps {
   userName: string;
   userEmail: string;
   iconLibrary: string;
+  protectedIds?: string[];
 }
 
 export function AppSidebar({
@@ -88,6 +89,7 @@ export function AppSidebar({
   userName,
   userEmail,
   iconLibrary,
+  protectedIds = [],
 }: AppSidebarProps) {
   const icons = getIconMap(iconLibrary);
   const supabase = createClient();
@@ -336,7 +338,7 @@ export function AppSidebar({
                           <DropdownMenuItem
                             className="text-destructive"
                             onClick={() => setDeleteTarget(ds)}
-                            disabled={designSystems.length <= 1}
+                            disabled={designSystems.length <= 1 || protectedIds.includes(ds.id)}
                           >
                             <icons.trash className="w-3.5 h-3.5 mr-2" /> Delete
                           </DropdownMenuItem>

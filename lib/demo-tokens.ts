@@ -225,3 +225,236 @@ export const DEMO_TOKENS: TokenState = ({
     "fontFamilyKo": "Pretendard"
   }
 } as unknown as TokenState);
+
+// Protected DS IDs (cannot be deleted in demo mode)
+export const DEMO_PROTECTED_IDS = [
+  'ef42000b-197c-4e38-b6bb-33873ba660b3', // {affinityDiagram}
+  '2ca883d2-3383-4cde-8925-14b3f1c7fa40', // !userTest*
+];
+
+// Snapshot: 2026-04-03 06:49 KST — {affinityDiagram}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const AFFINITY_TOKENS: TokenState = ({
+  "semantic": {
+    "dark": {
+      "card": "var(--neutral-900)",
+      "icon": "var(--neutral-50)",
+      "info": "var(--info-600)",
+      "ring": "var(--brand-500)",
+      "input": "var(--neutral-700)",
+      "muted": "var(--neutral-700)",
+      "accent": "var(--success-600)",
+      "border": "transparent",
+      "divider": "var(--neutral-700)",
+      "popover": "var(--neutral-800)",
+      "primary": "var(--brand-600)",
+      "sidebar": "var(--muted)",
+      "success": "var(--success-500)",
+      "warning": "var(--warning-600)",
+      "selected": "var(--brand-600)",
+      "secondary": "var(--success-600)",
+      "background": "oklch(0 0 0)",
+      "foreground": "var(--neutral-50)",
+      "icon-muted": "var(--brand-50)",
+      "card-border": "transparent",
+      "destructive": "var(--error-600)",
+      "error-border": "transparent",
+      "sidebar-ring": "var(--brand-500)",
+      "sidebar-accent": "var(--brand-900)",
+      "sidebar-border": "var(--neutral-700)",
+      "success-border": "transparent",
+      "warning-border": "transparent",
+      "card-foreground": "oklch(1 0 0)",
+      "info-foreground": "var(--info-200)",
+      "sidebar-primary": "var(--brand-400)",
+      "muted-foreground": "var(--neutral-500)",
+      "accent-foreground": "var(--brand-600)",
+      "popover-foreground": "var(--neutral-50)",
+      "primary-foreground": "var(--success-400)",
+      "sidebar-foreground": "var(--neutral-50)",
+      "success-foreground": "oklch(0 0 0)",
+      "warning-foreground": "oklch(0 0 0)",
+      "selected-foreground": "var(--success-600)",
+      "secondary-foreground": "var(--brand-700)",
+      "destructive-foreground": "oklch(0 0 0)",
+      "sidebar-accent-foreground": "var(--primary-foreground)",
+      "sidebar-primary-foreground": "var(--primary-foreground)"
+    },
+    "light": {
+      "card": "oklch(1 0 0)",
+      "icon": "var(--neutral-500)",
+      "info": "var(--brand-50)",
+      "ring": "var(--brand-400)",
+      "input": "var(--neutral-200)",
+      "muted": "var(--neutral-200)",
+      "accent": "var(--success-50)",
+      "border": "var(--neutral-200)",
+      "radius": "var(--radius-md-prim)",
+      "divider": "var(--neutral-200)",
+      "popover": "var(--neutral-50)",
+      "primary": "var(--brand-600)",
+      "sidebar": "var(--neutral-100)",
+      "success": "var(--success-100)",
+      "warning": "var(--warning-100)",
+      "selected": "var(--brand-100)",
+      "secondary": "var(--success-500)",
+      "background": "var(--neutral-50)",
+      "foreground": "var(--neutral-900)",
+      "icon-muted": "var(--neutral-300)",
+      "card-border": "var(--neutral-200)",
+      "destructive": "var(--error-600)",
+      "error-border": "transparent",
+      "sidebar-ring": "var(--brand-400)",
+      "sidebar-accent": "var(--neutral-200)",
+      "sidebar-border": "var(--neutral-200)",
+      "success-border": "transparent",
+      "warning-border": "var(--error-100)",
+      "card-foreground": "var(--neutral-900)",
+      "info-foreground": "var(--brand-700)",
+      "sidebar-primary": "var(--brand-600)",
+      "muted-foreground": "var(--neutral-500)",
+      "accent-foreground": "oklch(0.08 0 0)",
+      "popover-foreground": "var(--neutral-900)",
+      "primary-foreground": "oklch(1 0 0)",
+      "sidebar-foreground": "var(--neutral-700)",
+      "success-foreground": "var(--success-700)",
+      "warning-foreground": "var(--error-600)",
+      "selected-foreground": "var(--brand-700)",
+      "secondary-foreground": "var(--neutral-900)",
+      "destructive-foreground": "var(--neutral-50)",
+      "sidebar-accent-foreground": "var(--brand-900)",
+      "sidebar-primary-foreground": "var(--primary-foreground)"
+    }
+  },
+  "primitives": {
+    "info": {
+      "50": "oklch(0.97 0.02 210)",
+      "100": "oklch(0.93 0.06 210)",
+      "200": "oklch(0.87 0.10 210)",
+      "300": "oklch(0.78 0.15 210)",
+      "400": "oklch(0.67 0.19 210)",
+      "500": "oklch(0.57 0.22 210)",
+      "600": "oklch(0.48 0.22 210)",
+      "700": "oklch(0.38 0.19 210)",
+      "800": "oklch(0.28 0.14 210)",
+      "900": "oklch(0.20 0.10 210)"
+    },
+    "brand": {
+      "50": "#ffeff9",
+      "100": "#ffe4f5",
+      "200": "#ffceee",
+      "300": "#ffb1e5",
+      "400": "#ff89db",
+      "500": "#ff49d0",
+      "600": "#ff00bb",
+      "700": "#d7009a",
+      "800": "#81005b",
+      "900": "#210014"
+    },
+    "error": {
+      "50": "#fff1eb",
+      "100": "#ffe7dd",
+      "200": "#ffd5c2",
+      "300": "#ffbb9e",
+      "400": "#ff9a6e",
+      "500": "#ff7331",
+      "600": "#f25a06",
+      "700": "#ce3b00",
+      "800": "#7b2000",
+      "900": "#1f0300"
+    },
+    "radius": {
+      "lg": "1.25rem",
+      "md": "1rem",
+      "sm": "0.5rem",
+      "xl": "2.5rem",
+      "full": "62.4375rem",
+      "none": "0.25rem"
+    },
+    "neutral": {
+      "50": "oklch(0.99 0.003 60)",
+      "100": "oklch(0.97 0.004 60)",
+      "200": "oklch(0.93 0.004 60)",
+      "300": "oklch(0.87 0.005 60)",
+      "400": "oklch(0.72 0.006 60)",
+      "500": "oklch(0.57 0.006 60)",
+      "600": "oklch(0.45 0.006 60)",
+      "700": "oklch(0.33 0.007 60)",
+      "800": "oklch(0.22 0.007 60)",
+      "900": "oklch(0.13 0.007 60)"
+    },
+    "shadows": {
+      "lg": "0 10px 15px -3px oklch(0 0 0 / 0.15)",
+      "md": "none",
+      "sm": "0 1px 18px 4px oklch(0 0 0 / 0.01)"
+    },
+    "spacing": {
+      "1": "0.25rem",
+      "2": "0.5rem",
+      "3": "0.75rem",
+      "4": "1rem",
+      "5": "1.25rem",
+      "6": "1.5rem",
+      "8": "2rem",
+      "10": "2.5rem",
+      "12": "3rem",
+      "16": "4rem"
+    },
+    "success": {
+      "50": "#deffde",
+      "100": "#cbffcb",
+      "200": "#a1ffa5",
+      "300": "#5eff6f",
+      "400": "#4bf160",
+      "500": "#33e04e",
+      "600": "#00cd39",
+      "700": "#00a900",
+      "800": "#006400",
+      "900": "#001400"
+    },
+    "warning": {
+      "50": "#fff1eb",
+      "100": "#ffe7dd",
+      "200": "#ffd5c2",
+      "300": "#ffbb9e",
+      "400": "#ff9a6e",
+      "500": "#ff7331",
+      "600": "#f25a06",
+      "700": "#ce3b00",
+      "800": "#7b2000",
+      "900": "#1f0300"
+    },
+    "fontSize": {
+      "lg": "1.125rem",
+      "sm": "0.9375rem",
+      "xl": "1.5rem",
+      "xs": "0.875rem",
+      "2xl": "2.0000rem",
+      "3xl": "2.2500rem",
+      "4xl": "3rem",
+      "base": "1rem"
+    },
+    "fontFamily": "KMR Apparat",
+    "fontWeight": {
+      "bold": "500",
+      "medium": "500",
+      "normal": "400",
+      "semibold": "500",
+      "extrabold": "500"
+    },
+    "lineHeight": {
+      "loose": "1.6",
+      "tight": "1.3",
+      "normal": "1.45"
+    },
+    "iconLibrary": "phosphor",
+    "stylePreset": "maia",
+    "fontFamilyKo": "Pretendard"
+  }
+} as unknown as TokenState);
+
+// Reset snapshots per DS ID
+export const DEMO_RESET_SNAPSHOTS: Record<string, TokenState> = {
+  'ef42000b-197c-4e38-b6bb-33873ba660b3': AFFINITY_TOKENS,
+  '2ca883d2-3383-4cde-8925-14b3f1c7fa40': DEMO_TOKENS,
+};
